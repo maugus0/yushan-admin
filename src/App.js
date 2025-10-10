@@ -35,7 +35,7 @@ import './App.css';
 function App() {
   return (
     <AdminAuthProvider>
-      <Router>
+      <Router basename="/yushan-admin">
         <Routes>
           <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/login" element={<AdminLogin />} />
