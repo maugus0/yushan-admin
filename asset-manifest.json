@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/yushan-admin/static/css/main.d271641d.css",
-    "main.js": "/yushan-admin/static/js/main.77ce2d75.js",
+    "main.js": "/yushan-admin/static/js/main.3290413d.js",
     "index.html": "/yushan-admin/index.html",
     "main.d271641d.css.map": "/yushan-admin/static/css/main.d271641d.css.map",
-    "main.77ce2d75.js.map": "/yushan-admin/static/js/main.77ce2d75.js.map"
+    "main.3290413d.js.map": "/yushan-admin/static/js/main.3290413d.js.map"
   },
   "entrypoints": [
     "static/css/main.d271641d.css",
-    "static/js/main.77ce2d75.js"
+    "static/js/main.3290413d.js"
   ]
 }
