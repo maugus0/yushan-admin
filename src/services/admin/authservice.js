@@ -1,317 +1,314 @@
-import api from './api';
+import axios from 'axios';
 
-// Mock admin users for development
-const mockAdmins = [
-  {
-    id: 1,
-    username: 'admin',
-    email: 'admin@yushan.com',
-    password: 'admin123', // In real app, this would be hashed
-    role: 'super_admin',
-    permissions: [
-      'read',
-      'write',
-      'delete',
-      'manage_users',
-      'manage_content',
-      'manage_settings',
-      'view_analytics',
-    ],
-    profile: {
-      firstName: 'Super',
-      lastName: 'Admin',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SuperAdmin',
-      phone: '+1-555-0001',
-      department: 'IT Administration',
-      joinDate: '2023-01-15T00:00:00.000Z',
-      lastLogin: new Date().toISOString(),
-    },
-    settings: {
-      theme: 'light',
-      language: 'en',
-      notifications: true,
-      twoFactorEnabled: true,
-    },
-  },
-  {
-    id: 2,
-    username: 'moderator',
-    email: 'moderator@yushan.com',
-    password: 'mod123',
-    role: 'moderator',
-    permissions: ['read', 'write', 'manage_content', 'moderate_comments'],
-    profile: {
-      firstName: 'Content',
-      lastName: 'Moderator',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Moderator',
-      phone: '+1-555-0002',
-      department: 'Content Management',
-      joinDate: '2023-03-10T00:00:00.000Z',
-      lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    },
-    settings: {
-      theme: 'dark',
-      language: 'en',
-      notifications: true,
-      twoFactorEnabled: false,
-    },
-  },
-  {
-    id: 3,
-    username: 'editor',
-    email: 'editor@yushan.com',
-    password: 'edit123',
-    role: 'editor',
-    permissions: ['read', 'write', 'manage_content'],
-    profile: {
-      firstName: 'Novel',
-      lastName: 'Editor',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Editor',
-      phone: '+1-555-0003',
-      department: 'Editorial',
-      joinDate: '2023-06-20T00:00:00.000Z',
-      lastLogin: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    },
-    settings: {
-      theme: 'light',
-      language: 'en',
-      notifications: false,
-      twoFactorEnabled: true,
-    },
-  },
-];
+// Determine API base URL based on environment
+const getApiBaseUrl = () => {
+  console.log('Environment check:');
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- REACT_APP_API_BASE_URL:', process.env.REACT_APP_API_BASE_URL);
 
-export const authService = {
+  // If environment variable is set, use it
+  if (process.env.REACT_APP_API_BASE_URL) {
+    console.log('Using environment variable for API URL');
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+
+  // For development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Using development default');
+    return 'http://localhost:8080/api';
+  }
+
+  // For production - you need to update this with your actual backend URL
+  // Option 1: Use your deployed backend
+  // return 'https://your-backend-domain.com/api';
+
+  // Option 2: Use localhost (for testing with local backend)
+  console.log('Using production default (localhost)');
+  return 'http://localhost:8080/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Log the API URL for debugging
+console.log('API Base URL:', API_BASE_URL);
+
+// Configure axios defaults
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add request interceptor to include auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle token refresh
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const response = await authService.refreshToken();
+          if (response.success) {
+            return apiClient(originalRequest);
+          }
+        } catch (refreshError) {
+          // Refresh failed, logout user
+          authService.logout();
+          window.location.href = '/admin/login';
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+const authService = {
   // Login
   login: async (credentials) => {
     try {
-      await api.delay(800);
+      const response = await apiClient.post('/auth/login', {
+        email: credentials.username, // Assuming username is email
+        password: credentials.password,
+      });
 
-      const { username, password, rememberMe } = credentials;
-      const admin = mockAdmins.find(
-        (admin) =>
-          (admin.username === username || admin.email === username) &&
-          admin.password === password
-      );
+      if (response.data?.code === 200) {
+        const userData = response.data.data;
 
-      if (!admin) {
-        throw new Error('Invalid username or password');
-      }
+        // Check if user is admin
+        if (!userData.isAdmin) {
+          throw new Error('Access denied. Admin privileges required.');
+        }
 
-      // Update last login
-      admin.profile.lastLogin = new Date().toISOString();
+        // Store tokens and user data
+        localStorage.setItem('accessToken', userData.accessToken);
+        localStorage.setItem('refreshToken', userData.refreshToken);
+        localStorage.setItem('tokenType', userData.tokenType);
+        localStorage.setItem('expiresIn', userData.expiresIn.toString());
 
-      // Generate mock token
-      const token = `yushan_token_${admin.id}_${Date.now()}`;
+        // Store user info (excluding sensitive data)
+        const adminUser = {
+          uuid: userData.uuid,
+          email: userData.email,
+          username: userData.username,
+          avatarUrl: userData.avatarUrl,
+          role: userData.isAdmin ? 'admin' : 'user',
+          isAdmin: userData.isAdmin,
+          isAuthor: userData.isAuthor,
+          level: userData.level,
+          status: userData.status,
+          lastActive: userData.lastActive,
+          createTime: userData.createTime,
+          permissions: userData.isAdmin
+            ? [
+                'read',
+                'write',
+                'delete',
+                'manage_users',
+                'manage_content',
+                'manage_settings',
+                'view_analytics',
+              ]
+            : [],
+        };
 
-      // Store token
-      if (rememberMe) {
-        localStorage.setItem('admin_token', token);
-        localStorage.setItem('admin_remember', 'true');
-      } else {
-        sessionStorage.setItem('admin_token', token);
-      }
+        localStorage.setItem('admin_user', JSON.stringify(adminUser));
 
-      localStorage.setItem(
-        'admin_user',
-        JSON.stringify({
-          id: admin.id,
-          username: admin.username,
-          email: admin.email,
-          role: admin.role,
-          permissions: admin.permissions,
-          profile: admin.profile,
-        })
-      );
+        // Set up token refresh timer
+        authService.setupTokenRefresh(userData.expiresIn);
 
-      return {
-        success: true,
-        data: {
-          user: {
-            id: admin.id,
-            username: admin.username,
-            email: admin.email,
-            role: admin.role,
-            permissions: admin.permissions,
-            profile: admin.profile,
+        return {
+          success: true,
+          data: {
+            user: adminUser,
+            token: userData.accessToken,
+            expiresIn: userData.expiresIn,
           },
-          token,
-          expiresIn: rememberMe ? '30d' : '24h',
-        },
-      };
+        };
+      } else {
+        throw new Error(response.data?.message || 'Login failed');
+      }
     } catch (error) {
-      throw new Error(error.message || 'Login failed');
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else if (error.message) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('Login failed. Please check your credentials.');
+      }
     }
   },
 
   // Logout
   logout: async () => {
     try {
-      await api.delay(200);
-
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      localStorage.removeItem('admin_remember');
-      sessionStorage.removeItem('admin_token');
-
-      return { success: true };
-    } catch (error) {
-      throw new Error('Logout failed');
-    }
-  },
-
-  // Get current user
-  getCurrentUser: async () => {
-    try {
-      await api.delay(300);
-
-      const userJson = localStorage.getItem('admin_user');
-      if (!userJson) {
-        throw new Error('No authenticated user');
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        await apiClient.post('/auth/logout');
       }
-
-      const user = JSON.parse(userJson);
-      const admin = mockAdmins.find((a) => a.id === user.id);
-
-      return {
-        success: true,
-        data: {
-          id: admin.id,
-          username: admin.username,
-          email: admin.email,
-          role: admin.role,
-          permissions: admin.permissions,
-          profile: admin.profile,
-          settings: admin.settings,
-        },
-      };
     } catch (error) {
-      throw new Error('Failed to get current user');
+      console.error('Logout API call failed:', error);
+      // Continue with local logout even if API call fails
     }
+
+    // Clear all stored auth data
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('tokenType');
+    localStorage.removeItem('expiresIn');
+    localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_remember');
+
+    // Clear token refresh timer
+    if (authService.refreshTimer) {
+      clearTimeout(authService.refreshTimer);
+      authService.refreshTimer = null;
+    }
+
+    return { success: true };
   },
 
   // Refresh token
   refreshToken: async () => {
     try {
-      await api.delay(300);
-
-      const currentToken =
-        localStorage.getItem('admin_token') ||
-        sessionStorage.getItem('admin_token');
-      if (!currentToken) {
-        throw new Error('No token to refresh');
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
       }
 
-      const newToken = `yushan_token_refreshed_${Date.now()}`;
+      const response = await apiClient.post(
+        '/auth/refresh',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        }
+      );
 
-      if (localStorage.getItem('admin_remember')) {
-        localStorage.setItem('admin_token', newToken);
+      if (response.data?.code === 200) {
+        const tokenData = response.data.data;
+
+        // Update stored tokens
+        localStorage.setItem('accessToken', tokenData.accessToken);
+        localStorage.setItem('refreshToken', tokenData.refreshToken);
+        localStorage.setItem('expiresIn', tokenData.expiresIn.toString());
+
+        // Set up next refresh
+        authService.setupTokenRefresh(tokenData.expiresIn);
+
+        return {
+          success: true,
+          data: {
+            accessToken: tokenData.accessToken,
+            refreshToken: tokenData.refreshToken,
+            expiresIn: tokenData.expiresIn,
+          },
+        };
       } else {
-        sessionStorage.setItem('admin_token', newToken);
+        throw new Error(response.data?.message || 'Token refresh failed');
       }
-
-      return {
-        success: true,
-        data: {
-          token: newToken,
-          expiresIn: localStorage.getItem('admin_remember') ? '30d' : '24h',
-        },
-      };
     } catch (error) {
-      throw new Error('Token refresh failed');
+      console.error('Token refresh failed:', error);
+      throw error;
     }
   },
 
-  // Change password
-  changePassword: async (passwordData) => {
-    try {
-      await api.delay(600);
+  // Set up automatic token refresh
+  setupTokenRefresh: (expiresIn) => {
+    // Clear existing timer
+    if (authService.refreshTimer) {
+      clearTimeout(authService.refreshTimer);
+    }
 
-      const { currentPassword, newPassword } = passwordData;
-      const userJson = localStorage.getItem('admin_user');
+    // Set up refresh 1 minute before expiration
+    const refreshTime = (expiresIn - 60) * 1000; // Convert to milliseconds and subtract 60 seconds
 
-      if (!userJson) {
-        throw new Error('No authenticated user');
-      }
-
-      const user = JSON.parse(userJson);
-      const admin = mockAdmins.find((a) => a.id === user.id);
-
-      if (admin.password !== currentPassword) {
-        throw new Error('Current password is incorrect');
-      }
-
-      // Update password
-      admin.password = newPassword;
-
-      return {
-        success: true,
-        message: 'Password changed successfully',
-      };
-    } catch (error) {
-      throw new Error(error.message || 'Password change failed');
+    if (refreshTime > 0) {
+      authService.refreshTimer = setTimeout(async () => {
+        try {
+          await authService.refreshToken();
+        } catch (error) {
+          console.error('Automatic token refresh failed:', error);
+          // Force logout on refresh failure
+          authService.logout();
+          window.location.href = '/admin/login';
+        }
+      }, refreshTime);
     }
   },
 
-  // Update profile
-  updateProfile: async (profileData) => {
+  // Get current user from storage
+  getCurrentUser: () => {
     try {
-      await api.delay(500);
-
-      const userJson = localStorage.getItem('admin_user');
-      if (!userJson) {
-        throw new Error('No authenticated user');
-      }
-
-      const user = JSON.parse(userJson);
-      const admin = mockAdmins.find((a) => a.id === user.id);
-
-      // Update profile
-      admin.profile = { ...admin.profile, ...profileData };
-
-      // Update local storage
-      const updatedUser = {
-        ...user,
-        profile: admin.profile,
-      };
-      localStorage.setItem('admin_user', JSON.stringify(updatedUser));
-
-      return {
-        success: true,
-        data: updatedUser,
-      };
+      const userData = localStorage.getItem('admin_user');
+      return userData ? JSON.parse(userData) : null;
     } catch (error) {
-      throw new Error('Profile update failed');
+      console.error('Error parsing stored user data:', error);
+      return null;
     }
   },
 
   // Check if user is authenticated
   isAuthenticated: () => {
-    const token =
-      localStorage.getItem('admin_token') ||
-      sessionStorage.getItem('admin_token');
-    const user = localStorage.getItem('admin_user');
-    return !!(token && user);
+    const token = localStorage.getItem('accessToken');
+    const user = authService.getCurrentUser();
+    return !!(token && user && user.isAdmin);
   },
 
-  // Get user permissions
-  getUserPermissions: () => {
-    try {
-      const userJson = localStorage.getItem('admin_user');
-      if (!userJson) return [];
+  // Initialize auth state on app start
+  initializeAuth: async () => {
+    const token = localStorage.getItem('accessToken');
+    const expiresIn = localStorage.getItem('expiresIn');
 
-      const user = JSON.parse(userJson);
-      return user.permissions || [];
-    } catch {
-      return [];
+    if (token && expiresIn) {
+      const expirationTime = parseInt(expiresIn, 10);
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      // Check if token is still valid
+      if (currentTime < expirationTime) {
+        // Set up refresh timer
+        const remainingTime = expirationTime - currentTime;
+        authService.setupTokenRefresh(remainingTime);
+        return true;
+      } else {
+        // Token expired, try to refresh
+        try {
+          await authService.refreshToken();
+          return true;
+        } catch (error) {
+          // Refresh failed, clear auth data
+          authService.logout();
+          return false;
+        }
+      }
     }
+
+    return false;
   },
 
-  // Check specific permission
-  hasPermission: (permission) => {
-    const permissions = authService.getUserPermissions();
-    return permissions.includes(permission);
-  },
+  refreshTimer: null,
 };
 
 export default authService;

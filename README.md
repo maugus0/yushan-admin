@@ -1,6 +1,57 @@
 # Yushan Admin
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Admin dashboard for the Yushan web novel platform. Built with React, Ant Design, and integrates with the Yushan backend API.
+
+## Features
+
+- **Authentication**: Real API integration with JWT tokens and automatic refresh
+- **Role-based Access**: Admin-only access with permission management
+- **User Management**: Manage readers, writers, and their details
+- **Content Management**: Novels, chapters, categories, comments, and reviews
+- **Analytics**: Rankings, yuan statistics, and user activity tracking
+- **Security**: Token-based authentication with automatic session management
+
+## Setup
+
+### Prerequisites
+
+- Node.js 18.x or higher
+- npm or yarn
+- Yushan backend API running (default: `http://localhost:8080`)
+
+### Installation
+
+1. Clone the repository
+2. Copy the environment configuration:
+   ```bash
+   cp .env.example .env
+   ```
+3. Update `.env` with your API base URL if different from default
+4. Install dependencies:
+   ```bash
+   npm install
+   ```
+5. Start the development server:
+   ```bash
+   npm start
+   ```
+
+### Environment Variables
+
+- `REACT_APP_API_BASE_URL`: Base URL for the Yushan API (default: `http://localhost:8080/api`)
+
+## Authentication
+
+The admin dashboard integrates with the Yushan authentication API:
+
+- **Login**: `POST /auth/login` - Requires admin privileges
+- **Logout**: `POST /auth/logout` - Clears session
+- **Refresh**: `POST /auth/refresh` - Automatic token refresh every 15 minutes
+
+### Demo Credentials
+
+- Email: `admin@yushan.com`
+- Password: `admin`
 
 ## Available Scripts
 

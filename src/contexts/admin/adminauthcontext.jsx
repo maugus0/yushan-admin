@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { message } from 'antd';
+import authService from '../../services/admin/authservice';
 
 const AdminAuthContext = createContext();
 
@@ -16,50 +17,34 @@ export const AdminAuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if admin is already logged in (from localStorage)
-    const savedAdmin = localStorage.getItem('admin');
-    if (savedAdmin) {
+    // Initialize auth state on component mount
+    const initAuth = async () => {
       try {
-        setAdmin(JSON.parse(savedAdmin));
+        const isAuthenticated = await authService.initializeAuth();
+        if (isAuthenticated) {
+          const currentUser = authService.getCurrentUser();
+          setAdmin(currentUser);
+        }
       } catch (error) {
-        localStorage.removeItem('admin');
+        console.error('Auth initialization failed:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = async (credentials) => {
     setLoading(true);
     try {
-      // Mock login - in real app, this would call your API
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
-      if (
-        credentials.username === 'admin' &&
-        credentials.password === 'admin123'
-      ) {
-        const mockAdmin = {
-          id: 1,
-          username: 'admin',
-          email: 'admin@yushan.com',
-          role: 'super_admin',
-          permissions: [
-            'read',
-            'write',
-            'delete',
-            'manage_users',
-            'manage_content',
-          ],
-          avatar: null,
-          lastLogin: new Date().toISOString(),
-        };
-
-        setAdmin(mockAdmin);
-        localStorage.setItem('admin', JSON.stringify(mockAdmin));
+      const result = await authService.login(credentials);
+      if (result.success) {
+        setAdmin(result.data.user);
         message.success('Login successful!');
         return { success: true };
       } else {
-        throw new Error('Invalid credentials');
+        throw new Error('Login failed');
       }
     } catch (error) {
       message.error(error.message || 'Login failed');
@@ -69,10 +54,20 @@ export const AdminAuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setAdmin(null);
-    localStorage.removeItem('admin');
-    message.success('Logged out successfully');
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await authService.logout();
+      setAdmin(null);
+      message.success('Logged out successfully');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout API fails, clear local state
+      setAdmin(null);
+      message.success('Logged out successfully');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value = {

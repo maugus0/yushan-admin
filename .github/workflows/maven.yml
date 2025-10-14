@@ -271,6 +271,8 @@ jobs:
         run: npm ci
 
       - name: Build app
+        env:
+          REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
         run: npm run build
 
       - name: Record current gh-pages HEAD (for rollback)

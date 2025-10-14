@@ -60,12 +60,16 @@ const AdminLogin = () => {
             <Form.Item
               name="username"
               rules={[
-                { required: true, message: 'Please enter your username' },
+                { required: true, message: 'Please enter your email' },
+                {
+                  type: 'email',
+                  message: 'Please enter a valid email address',
+                },
               ]}
             >
               <Input
                 prefix={<UserOutlined />}
-                placeholder="Username"
+                placeholder="Email"
                 autoComplete="username"
               />
             </Form.Item>
@@ -96,7 +100,9 @@ const AdminLogin = () => {
           </Form>
 
           <div style={{ textAlign: 'center', fontSize: '12px', color: '#999' }}>
-            <Text type="secondary">Demo credentials: admin / admin123</Text>
+            <Text type="secondary">
+              ~ Yushan Platform Administrators only ~
+            </Text>
           </div>
         </Space>
       </Card>
