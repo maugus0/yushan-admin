@@ -1,5 +1,3 @@
-import api from './api';
-
 // Mock data for development
 const generateMockReaders = () => {
   const readers = [];

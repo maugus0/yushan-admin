@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Badge, Tag } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Button, Space, Table, Tooltip, Badge } from 'antd';
 import {
   PlusOutlined,
   TagsOutlined,
   BookOutlined,
   CalendarOutlined,
-  EditOutlined,
-  DeleteOutlined,
   FolderOutlined,
 } from '@ant-design/icons';
 import {
@@ -143,11 +141,13 @@ const Categories = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters]);
 
   // Filter configuration

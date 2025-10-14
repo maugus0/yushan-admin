@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography } from 'antd';
 import {
-  PlusOutlined,
   MessageOutlined,
   UserOutlined,
   BookOutlined,
@@ -151,11 +150,13 @@ const Comments = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters]);
 
   // Filter configuration
@@ -306,9 +307,7 @@ const Comments = () => {
     console.log('Delete comment:', record);
   };
 
-  const handleAddNew = () => {
-    console.log('Add new comment');
-  };
+  // Handlers removed: _handleAddNew (unused)
 
   const handleTableChange = (paginationInfo) => {
     fetchData(paginationInfo);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   Form,
@@ -84,6 +84,7 @@ const TableFilters = ({
 
   // Render filter component based on type
   const renderFilter = (filter) => {
+    // eslint-disable-next-line no-unused-vars
     const { key, label, type, options = [], placeholder, width, rules = [], ...props } = filter;
 
     const commonProps = {

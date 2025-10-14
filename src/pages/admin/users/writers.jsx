@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Tooltip, message, Avatar, Tag, Dropdown } from 'antd';
 import {
   PlusOutlined,
@@ -336,7 +336,7 @@ const Writers = () => {
     }
   };
 
-  const handleBulkAction = async (actionKey, selectedKeys, selectedRows) => {
+  const handleBulkAction = async (actionKey, selectedKeys, _selectedRows) => {
     try {
       if (actionKey === 'delete') {
         await userService.bulkDeleteUsers(selectedKeys);

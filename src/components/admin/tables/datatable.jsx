@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Table, Space, Card, Typography, Divider } from 'antd';
 import BulkActions, { useBulkActions } from './bulkactions';
-import ColumnSelector, { useColumnSelector } from './columnselector';
+import { useColumnSelector } from './columnselector';
 import ExportButton from './exportbutton';
 import TableFilters from './tablefilters';
 
@@ -60,21 +60,18 @@ const DataTable = ({
 
   ...restProps
 }) => {
-  const [sorter, setSorter] = useState({});
-
   // Bulk actions management
   const { selectedRowKeys, selectedRows, rowSelection, clearSelection } = useBulkActions();
 
-  // Column visibility management
-  const {
-    visibleColumns,
-    getVisibleColumns,
-    ColumnSelector: ColumnSelectorComponent,
-  } = useColumnSelector(columns, null, columnStorageKey);
+  // Column visibility management - removed unused visibleColumns
+  const { getVisibleColumns, ColumnSelector: ColumnSelectorComponent } = useColumnSelector(
+    columns,
+    null,
+    columnStorageKey
+  );
 
   // Handle table changes (pagination, sorting, filtering)
   const handleTableChange = (paginationInfo, filters, sorterInfo) => {
-    setSorter(sorterInfo);
     onChange?.(paginationInfo, filters, sorterInfo);
   };
 

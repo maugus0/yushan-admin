@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Space, Button, Dropdown, Typography, Popconfirm, Modal, message } from 'antd';
 import {
   CheckOutlined,
   DeleteOutlined,
   DownOutlined,
   ExportOutlined,
-  EditOutlined,
   FlagOutlined,
   UserDeleteOutlined,
   CloseOutlined,

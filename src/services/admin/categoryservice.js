@@ -330,6 +330,7 @@ export const categoryService = {
       // Remove children if not requested
       if (!includeChildren) {
         categories = categories.map((cat) => {
+          // eslint-disable-next-line no-unused-vars
           const { children, ...categoryWithoutChildren } = cat;
           return categoryWithoutChildren;
         });

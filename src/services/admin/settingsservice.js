@@ -409,6 +409,7 @@ export const settingsService = {
     try {
       await api.delay(1000); // Simulate email sending delay
 
+      // eslint-disable-next-line no-unused-vars
       const { recipient, subject, message } = emailData;
 
       // Simulate email test

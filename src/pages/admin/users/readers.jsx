@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Space, message, Avatar, Tooltip, Tag, Dropdown } from 'antd';
 import {
@@ -326,7 +326,7 @@ const Readers = () => {
     }
   };
 
-  const handleBulkAction = async (actionKey, selectedKeys, selectedRows) => {
+  const handleBulkAction = async (actionKey, selectedKeys, _selectedRows) => {
     try {
       switch (actionKey) {
         case 'suspend_users':

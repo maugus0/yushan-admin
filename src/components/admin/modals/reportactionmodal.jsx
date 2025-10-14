@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Modal, Form, Input, Select, Space, Typography, Card, Tag, Divider, message } from 'antd';
 import {
   FlagOutlined,

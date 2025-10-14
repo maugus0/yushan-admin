@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Button,
   Space,
@@ -510,12 +510,12 @@ const Yuan = () => {
     }
   };
 
-  const handleEdit = (record) => {
+  const handleEdit = (_record) => {
     // Handle edit functionality based on activeTab
     message.info('Edit functionality coming soon');
   };
 
-  const handleDelete = async (record) => {
+  const handleDelete = async (_record) => {
     try {
       // Handle delete functionality based on activeTab
       message.info('Delete functionality coming soon');
@@ -525,12 +525,12 @@ const Yuan = () => {
     }
   };
 
-  const handleAdjustBalance = (record) => {
+  const handleAdjustBalance = (_record) => {
     // TODO: Open modal for balance adjustment
     message.info('Balance adjustment modal coming soon');
   };
 
-  const handleProcessRefund = (record) => {
+  const handleProcessRefund = (_record) => {
     // TODO: Handle refund processing
     message.info('Refund processing coming soon');
   };

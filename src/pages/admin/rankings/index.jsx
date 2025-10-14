@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress, Statistic } from 'antd';
 import {
   TrophyOutlined,
@@ -270,11 +270,13 @@ const Rankings = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current, activeTab]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters, activeTab]);
 
   // Filter configurations for different tabs

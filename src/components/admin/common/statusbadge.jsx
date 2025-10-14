@@ -10,7 +10,7 @@ import {
 
 const StatusBadge = ({
   status,
-  type = 'default',
+  type: _type = 'default',
   showIcon = true,
   customConfig = {},
   ...props

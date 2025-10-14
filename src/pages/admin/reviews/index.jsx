@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography, Rate, Progress } from 'antd';
 import {
-  PlusOutlined,
   StarOutlined,
   UserOutlined,
   BookOutlined,
@@ -10,7 +9,6 @@ import {
   DislikeOutlined,
   FlagOutlined,
   CheckOutlined,
-  CloseOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
@@ -184,11 +182,13 @@ const Reviews = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters]);
 
   // Filter configuration
@@ -384,9 +384,7 @@ const Reviews = () => {
     console.log('Delete review:', record);
   };
 
-  const handleAddNew = () => {
-    console.log('Add new review');
-  };
+  // Handlers removed: _handleAddNew (unused)
 
   const handleTableChange = (paginationInfo) => {
     fetchData(paginationInfo);

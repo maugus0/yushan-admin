@@ -19,7 +19,7 @@ const PageHeader = ({
   style = {},
   className = '',
   children,
-  ...props
+  ..._props
 }) => {
   const backIcon = showBackButton ? <ArrowLeftOutlined /> : null;
 

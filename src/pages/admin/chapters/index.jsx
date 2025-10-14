@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Badge, Progress } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Button, Space, Table, Tooltip, Progress } from 'antd';
 import {
   PlusOutlined,
   FileTextOutlined,
@@ -148,11 +148,13 @@ const Chapters = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters]);
 
   // Filter configuration

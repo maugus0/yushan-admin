@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress, Statistic } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress } from 'antd';
 import {
   BookOutlined,
   UserOutlined,
@@ -18,7 +18,6 @@ import {
   PageHeader,
   SearchBar,
   FilterPanel,
-  StatusBadge,
   ActionButtons,
   EmptyState,
   LoadingSpinner,
@@ -244,11 +243,13 @@ const Library = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current, activeTab]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters, activeTab]);
 
   // Get bookmark type display

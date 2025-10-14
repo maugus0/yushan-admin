@@ -68,7 +68,7 @@ const Breadcrumbs = ({
   }
 
   // Process items to ensure proper Link components
-  const processedItems = breadcrumbItems.map((item, index) => {
+  const processedItems = breadcrumbItems.map((item, _index) => {
     if (typeof item === 'string') {
       return { title: item };
     }

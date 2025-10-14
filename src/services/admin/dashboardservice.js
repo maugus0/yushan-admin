@@ -29,6 +29,7 @@ export const dashboardService = {
       await api.delay(400);
 
       const now = new Date();
+      // eslint-disable-next-line no-unused-vars
       const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
       return {
@@ -388,7 +389,7 @@ export const dashboardService = {
   },
 
   // Get top content
-  getTopContent: async (type = 'novels', period = '7d', limit = 10) => {
+  getTopContent: async (_type = 'novels', _period = '7d', limit = 10) => {
     try {
       await api.delay(400);
 

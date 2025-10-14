@@ -103,7 +103,7 @@ export const exportToJSON = (data, columns = null, filename = 'export') => {
  * @param {string} filename - Export filename
  * @param {object} options - PDF options
  */
-export const exportToPDF = (data, columns, filename = 'export', options = {}) => {
+export const exportToPDF = (data, columns, _filename = 'export', options = {}) => {
   if (!Array.isArray(data) || data.length === 0) {
     console.warn('No data to export');
     return;

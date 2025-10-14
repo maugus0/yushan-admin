@@ -475,7 +475,7 @@ export const novelService = {
   },
 
   // Get trending novels
-  getTrendingNovels: async (period = '7d', limit = 20) => {
+  getTrendingNovels: async (_period = '7d', limit = 20) => {
     try {
       await api.delay(400);
 

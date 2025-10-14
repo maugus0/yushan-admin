@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Dropdown, Button, Checkbox, Space, Typography, Divider, Input, Tooltip } from 'antd';
 import {
   SettingOutlined,

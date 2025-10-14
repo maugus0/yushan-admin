@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Space,
@@ -8,12 +8,9 @@ import {
   Select,
   Switch,
   InputNumber,
-  Typography,
-  Divider,
   message,
   Row,
   Col,
-  Upload,
   ColorPicker,
   Slider,
 } from 'antd';
@@ -21,19 +18,15 @@ import {
   SettingOutlined,
   SaveOutlined,
   ReloadOutlined,
-  UploadOutlined,
   GlobalOutlined,
   SecurityScanOutlined,
   DollarOutlined,
-  MailOutlined,
   BellOutlined,
-  DatabaseOutlined,
   ThunderboltOutlined,
   PictureOutlined,
 } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner } from '../../../components/admin/common';
 
-const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -119,6 +112,7 @@ const Settings = () => {
   // Load settings on mount
   useEffect(() => {
     loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load settings from API

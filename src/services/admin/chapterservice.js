@@ -206,6 +206,7 @@ export const chapterService = {
       // Remove content if not requested (for performance)
       if (!includeContent) {
         chapters = chapters.map((chapter) => {
+          // eslint-disable-next-line no-unused-vars
           const { content, ...chapterWithoutContent } = chapter;
           return chapterWithoutContent;
         });

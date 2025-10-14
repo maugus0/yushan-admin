@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Card,
   Form,
@@ -64,6 +64,7 @@ const FilterPanel = ({
   };
 
   const renderFilterField = (filter) => {
+    // eslint-disable-next-line no-unused-vars
     const { type, name, label, options, placeholder, ...fieldProps } = filter;
 
     switch (type) {
