@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Button, 
-  Space, 
-  message,
-  Avatar,
-  Tooltip,
-  Tag,
-  Dropdown
-} from 'antd';
+import { Button, Space, message, Avatar, Tooltip, Tag, Dropdown } from 'antd';
 import {
   UserOutlined,
   MailOutlined,
@@ -21,7 +13,7 @@ import {
   StopOutlined,
   BookOutlined,
   ClockCircleOutlined,
-  MoreOutlined
+  MoreOutlined,
 } from '@ant-design/icons';
 
 // Import components
@@ -41,7 +33,7 @@ import { commonFilters, fieldTypes } from '../../../utils/admin/constants';
 
 const Readers = () => {
   const navigate = useNavigate();
-  
+
   // State management
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -60,28 +52,31 @@ const Readers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      const response = await userService.getReaders({
-        page: params.current || 1,
-        pageSize: params.pageSize || 10,
-        ...filters,
-      });
-      
-      setData(response.data);
-      setPagination(prev => ({
-        ...prev,
-        current: response.page,
-        total: response.total,
-      }));
-    } catch (error) {
-      message.error('Failed to fetch readers');
-      console.error('Failed to fetch readers:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        const response = await userService.getReaders({
+          page: params.current || 1,
+          pageSize: params.pageSize || 10,
+          ...filters,
+        });
+
+        setData(response.data);
+        setPagination((prev) => ({
+          ...prev,
+          current: response.page,
+          total: response.total,
+        }));
+      } catch (error) {
+        message.error('Failed to fetch readers');
+        console.error('Failed to fetch readers:', error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters]
+  );
 
   useEffect(() => {
     fetchData({ current: pagination.current, pageSize: pagination.pageSize });
@@ -120,11 +115,7 @@ const Readers = () => {
       key: 'username',
       render: (text, record) => (
         <Space>
-          <Avatar 
-            src={record.avatar} 
-            icon={<UserOutlined />}
-            size="default"
-          />
+          <Avatar src={record.avatar} icon={<UserOutlined />} size="default" />
           <div>
             <div style={{ fontWeight: 500 }}>{text}</div>
             <div style={{ fontSize: '12px', color: '#666' }}>
@@ -163,7 +154,7 @@ const Readers = () => {
       key: 'favoriteGenres',
       render: (genres) => (
         <Space wrap>
-          {genres?.slice(0, 2).map(genre => (
+          {genres?.slice(0, 2).map((genre) => (
             <Tag key={genre} color="blue" size="small">
               {genre}
             </Tag>
@@ -247,7 +238,7 @@ const Readers = () => {
   // Event handlers
   const handleFiltersChange = (newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleTableChange = (paginationInfo) => {
@@ -362,51 +353,47 @@ const Readers = () => {
 
   // Field configurations for modals
   const editFields = [
-    fieldTypes.text('username', 'Username', { 
+    fieldTypes.text('username', 'Username', {
       rules: [{ required: true, message: 'Username is required' }],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.text('email', 'Email', { 
+    fieldTypes.text('email', 'Email', {
       rules: [
         { required: true, message: 'Email is required' },
-        { type: 'email', message: 'Please enter a valid email' }
+        { type: 'email', message: 'Please enter a valid email' },
       ],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.select('status', 'Status', [
-      { label: 'Active', value: 'active' },
-      { label: 'Inactive', value: 'inactive' },
-      { label: 'Suspended', value: 'suspended' }
-    ], { span: 12 }),
-    fieldTypes.textarea('profile.bio', 'Bio', { 
+    fieldTypes.select(
+      'status',
+      'Status',
+      [
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' },
+        { label: 'Suspended', value: 'suspended' },
+      ],
+      { span: 12 }
+    ),
+    fieldTypes.textarea('profile.bio', 'Bio', {
       rows: 3,
-      span: 24
+      span: 24,
     }),
     fieldTypes.text('profile.location', 'Location', { span: 12 }),
   ];
 
-  const breadcrumbItems = [
-    { title: 'Admin' },
-    { title: 'User Management' },
-    { title: 'Readers' },
-  ];
+  const breadcrumbItems = [{ title: 'Admin' }, { title: 'User Management' }, { title: 'Readers' }];
 
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
-      
+
       <PageHeader
         title="Readers"
         subtitle="Manage reader accounts and their activities"
         extra={[
-          <Button
-            key="add"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddNew}
-          >
+          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
             Add Reader
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -426,8 +413,7 @@ const Readers = () => {
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
-            `${range[0]}-${range[1]} of ${total} readers`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} readers`,
         }}
         onChange={handleTableChange}
         enableSelection={true}
@@ -465,7 +451,7 @@ const Readers = () => {
           'All reading history will be permanently deleted',
           'All bookmarks and favorites will be removed',
           'All comments and reviews will be deleted',
-          'This action cannot be undone'
+          'This action cannot be undone',
         ]}
       />
 

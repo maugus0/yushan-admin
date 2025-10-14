@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography, Rate, Progress } from 'antd';
-import { 
+import {
   PlusOutlined,
   StarOutlined,
   UserOutlined,
@@ -12,14 +12,14 @@ import {
   CheckOutlined,
   CloseOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 
 const { Text, Paragraph } = Typography;
@@ -40,7 +40,8 @@ const Reviews = () => {
     {
       id: 1,
       title: 'An Epic Journey Worth Reading',
-      content: 'This novel has captivated me from the very first chapter. The world-building is extraordinary, and the character development is top-notch. The cultivation system is well thought out and the progression feels natural. I particularly love how the author handles the relationship between the protagonist and supporting characters.',
+      content:
+        'This novel has captivated me from the very first chapter. The world-building is extraordinary, and the character development is top-notch. The cultivation system is well thought out and the progression feels natural. I particularly love how the author handles the relationship between the protagonist and supporting characters.',
       rating: 5,
       reviewer: 'epic_reader_99',
       novel: 'The Cultivation Path',
@@ -57,7 +58,8 @@ const Reviews = () => {
     {
       id: 2,
       title: 'Disappointing After Great Start',
-      content: 'The first few chapters were promising, but the story quickly derailed. The pacing became too fast and character motivations became unclear. The author seems to have lost direction.',
+      content:
+        'The first few chapters were promising, but the story quickly derailed. The pacing became too fast and character motivations became unclear. The author seems to have lost direction.',
       rating: 2,
       reviewer: 'honest_critic',
       novel: 'Dragon Emperor',
@@ -74,7 +76,8 @@ const Reviews = () => {
     {
       id: 3,
       title: 'Contains Spoilers - Amazing Plot Twist',
-      content: 'I cannot believe the author killed off the main character in chapter 50! This was completely unexpected and changes everything about the story. The way they handled the resurrection was brilliant.',
+      content:
+        'I cannot believe the author killed off the main character in chapter 50! This was completely unexpected and changes everything about the story. The way they handled the resurrection was brilliant.',
       rating: 4,
       reviewer: 'spoiler_king',
       novel: 'Mystic Journey',
@@ -91,7 +94,8 @@ const Reviews = () => {
     {
       id: 4,
       title: 'Masterpiece of Modern Fantasy',
-      content: 'Every aspect of this novel is perfection. From the intricate magic system to the complex political intrigue, everything is masterfully crafted. This is definitely a must-read for any fantasy lover.',
+      content:
+        'Every aspect of this novel is perfection. From the intricate magic system to the complex political intrigue, everything is masterfully crafted. This is definitely a must-read for any fantasy lover.',
       rating: 5,
       reviewer: 'fantasy_master',
       novel: 'Immortal Realm',
@@ -108,7 +112,8 @@ const Reviews = () => {
     {
       id: 5,
       title: 'Needs Review - Potentially Inappropriate',
-      content: 'This review contains content that may violate our community guidelines and needs manual review before approval.',
+      content:
+        'This review contains content that may violate our community guidelines and needs manual review before approval.',
       rating: 3,
       reviewer: 'review_needed',
       novel: 'Celestial Warrior',
@@ -125,58 +130,62 @@ const Reviews = () => {
   ];
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      let filteredData = mockReviews;
-      
-      // Apply search filter
-      if (searchValue) {
-        filteredData = filteredData.filter(item => 
-          item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.content.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.reviewer.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.novel.toLowerCase().includes(searchValue.toLowerCase())
-        );
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let filteredData = mockReviews;
+
+        // Apply search filter
+        if (searchValue) {
+          filteredData = filteredData.filter(
+            (item) =>
+              item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.content.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.reviewer.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.novel.toLowerCase().includes(searchValue.toLowerCase())
+          );
+        }
+
+        // Apply filters
+        if (filters.status) {
+          filteredData = filteredData.filter((item) => item.status === filters.status);
+        }
+
+        if (filters.rating) {
+          filteredData = filteredData.filter((item) => item.rating === filters.rating);
+        }
+
+        if (filters.spoilerFree !== undefined) {
+          filteredData = filteredData.filter((item) => item.spoilerFree === filters.spoilerFree);
+        }
+
+        if (filters.hasReports) {
+          filteredData = filteredData.filter((item) => item.reports > 0);
+        }
+
+        const pageSize = params.pageSize || pagination.pageSize;
+        const current = params.current || pagination.current;
+        const startIndex = (current - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        setData(filteredData.slice(startIndex, endIndex));
+        setPagination((prev) => ({
+          ...prev,
+          current: current,
+          total: filteredData.length,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Apply filters
-      if (filters.status) {
-        filteredData = filteredData.filter(item => item.status === filters.status);
-      }
-      
-      if (filters.rating) {
-        filteredData = filteredData.filter(item => item.rating === filters.rating);
-      }
-      
-      if (filters.spoilerFree !== undefined) {
-        filteredData = filteredData.filter(item => item.spoilerFree === filters.spoilerFree);
-      }
-      
-      if (filters.hasReports) {
-        filteredData = filteredData.filter(item => item.reports > 0);
-      }
-      
-      const pageSize = params.pageSize || pagination.pageSize;
-      const current = params.current || pagination.current;
-      const startIndex = (current - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      
-      setData(filteredData.slice(startIndex, endIndex));
-      setPagination(prev => ({
-        ...prev,
-        current: current,
-        total: filteredData.length,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch reviews:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, pagination.pageSize, pagination.current]);
+    },
+    [searchValue, filters, pagination.pageSize, pagination.current]
+  );
 
   useEffect(() => {
     fetchData();
@@ -220,9 +229,7 @@ const Reviews = () => {
       name: 'hasReports',
       label: 'Has Reports',
       type: 'checkbox',
-      options: [
-        { value: true, label: 'Show only reviews with reports' },
-      ],
+      options: [{ value: true, label: 'Show only reviews with reports' }],
     },
     {
       name: 'createdDateRange',
@@ -244,13 +251,18 @@ const Reviews = () => {
             <Text strong>{record.reviewer}</Text>
             <Rate disabled value={record.rating} style={{ fontSize: '14px' }} />
             {!record.spoilerFree && (
-              <Text type="warning" style={{ fontSize: '11px', background: '#fff1b8', padding: '0 4px' }}>
+              <Text
+                type="warning"
+                style={{ fontSize: '11px', background: '#fff1b8', padding: '0 4px' }}
+              >
                 SPOILERS
               </Text>
             )}
           </Space>
-          <Text strong style={{ fontSize: '15px' }}>{text}</Text>
-          <Paragraph 
+          <Text strong style={{ fontSize: '15px' }}>
+            {text}
+          </Text>
+          <Paragraph
             ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
             style={{ margin: 0, maxWidth: 400 }}
           >
@@ -290,9 +302,9 @@ const Reviews = () => {
               <span style={{ color: '#faad14' }}>{record.reports} reports</span>
             </Space>
           )}
-          <Progress 
-            percent={Math.round((record.helpful / (record.likes + record.dislikes)) * 100)} 
-            size="small" 
+          <Progress
+            percent={Math.round((record.helpful / (record.likes + record.dislikes)) * 100)}
+            size="small"
             format={() => 'Helpful'}
             strokeColor="#52c41a"
           />
@@ -339,7 +351,7 @@ const Reviews = () => {
               key: 'spoiler',
               icon: <StarOutlined />,
               label: record.spoilerFree ? 'Mark as Spoiler' : 'Mark as Spoiler-Free',
-            }
+            },
           ]}
         />
       ),
@@ -385,17 +397,14 @@ const Reviews = () => {
       <PageHeader
         title="Reviews Management"
         subtitle="Moderate and manage user reviews"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Reviews' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Reviews' }]}
         actions={[
           <Button key="flagged" type="default" icon={<FlagOutlined />}>
-            Flagged ({data.filter(item => item.status === 'flagged').length})
+            Flagged ({data.filter((item) => item.status === 'flagged').length})
           </Button>,
           <Button key="pending" type="primary" icon={<StarOutlined />}>
-            Pending ({data.filter(item => item.status === 'pending').length})
-          </Button>
+            Pending ({data.filter((item) => item.status === 'pending').length})
+          </Button>,
         ]}
       />
 
@@ -427,7 +436,7 @@ const Reviews = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -438,8 +447,7 @@ const Reviews = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} reviews`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} reviews`,
             }}
             onChange={handleTableChange}
             loading={loading}

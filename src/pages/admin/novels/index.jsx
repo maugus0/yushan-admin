@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Badge, Rate, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   PlusOutlined,
   BookOutlined,
   UserOutlined,
@@ -10,14 +10,14 @@ import {
   FileTextOutlined,
   TagsOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 import { novelService } from '../../../services/admin/novelservice';
 
@@ -34,33 +34,36 @@ const Novels = () => {
   const [filters, setFilters] = useState({});
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      const currentPage = params.current || 1;
-      const currentPageSize = params.pageSize || 10;
-      
-      const response = await novelService.getAllNovels({
-        page: currentPage,
-        pageSize: currentPageSize,
-        search: searchValue,
-        ...filters,
-      });
-      
-      setData(response.data);
-      setPagination(prev => ({
-        ...prev,
-        current: response.page,
-        total: response.total,
-        pageSize: response.pageSize,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch novels:', error);
-      message.error('Failed to fetch novels');
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters]);
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        const currentPage = params.current || 1;
+        const currentPageSize = params.pageSize || 10;
+
+        const response = await novelService.getAllNovels({
+          page: currentPage,
+          pageSize: currentPageSize,
+          search: searchValue,
+          ...filters,
+        });
+
+        setData(response.data);
+        setPagination((prev) => ({
+          ...prev,
+          current: response.page,
+          total: response.total,
+          pageSize: response.pageSize,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch novels:', error);
+        message.error('Failed to fetch novels');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchValue, filters]
+  );
 
   useEffect(() => {
     fetchData();
@@ -125,15 +128,15 @@ const Novels = () => {
       width: 300,
       render: (text, record) => (
         <Space>
-          <img 
-            src={record.coverImage} 
+          <img
+            src={record.coverImage}
             alt={text}
-            style={{ 
-              width: 40, 
-              height: 60, 
-              objectFit: 'cover', 
+            style={{
+              width: 40,
+              height: 60,
+              objectFit: 'cover',
               borderRadius: 4,
-              border: '1px solid #f0f0f0'
+              border: '1px solid #f0f0f0',
             }}
           />
           <div>
@@ -220,9 +223,7 @@ const Novels = () => {
       width: 100,
       render: (revenue, record) => (
         <div>
-          {record.isPremium && (
-            <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />
-          )}
+          {record.isPremium && <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />}
           {revenue > 0 ? (
             <div style={{ fontSize: '12px', fontWeight: 500, color: '#52c41a' }}>
               ${revenue.toLocaleString()}
@@ -271,7 +272,7 @@ const Novels = () => {
               icon: <BookOutlined />,
               label: record.isFeatured ? 'Unfeature' : 'Feature',
               onClick: () => handleToggleFeature(record),
-            }
+            },
           ]}
         />
       ),
@@ -281,18 +282,18 @@ const Novels = () => {
   // Handlers
   const handleSearch = (value) => {
     setSearchValue(value);
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleFilter = (filterValues) => {
     setFilters(filterValues);
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleClearFilters = () => {
     setFilters({});
     setSearchValue('');
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleView = (record) => {
@@ -342,14 +343,11 @@ const Novels = () => {
       <PageHeader
         title="Novels Management"
         subtitle="Manage and monitor novels on the platform"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Novels' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Novels' }]}
         actions={[
           <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
             Add Novel
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -393,7 +391,7 @@ const Novels = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -404,8 +402,7 @@ const Novels = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} novels`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} novels`,
             }}
             onChange={handleTableChange}
             loading={loading}

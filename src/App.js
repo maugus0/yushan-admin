@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AdminAuthProvider } from './contexts/admin/adminauthcontext';
 import AdminLayout from './pages/admin/adminlayout';
@@ -42,26 +41,26 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
-            
+
             {/* User Management */}
             <Route path="users" element={<UsersOverview />} />
             <Route path="users/readers" element={<Readers />} />
             <Route path="users/readers/:id" element={<ReaderDetail />} />
             <Route path="users/writers" element={<Writers />} />
             <Route path="users/writers/:id" element={<WriterDetail />} />
-            
+
             {/* Content Management */}
             <Route path="novels" element={<Novels />} />
             <Route path="novels/:id" element={<NovelDetail />} />
             <Route path="categories" element={<Categories />} />
             <Route path="chapters" element={<Chapters />} />
-            
+
             {/* Community Management */}
             <Route path="comments" element={<Comments />} />
             <Route path="reviews" element={<Reviews />} />
             <Route path="rankings" element={<Rankings />} />
             <Route path="reports" element={<Reports />} />
-            
+
             {/* Platform Management */}
             <Route path="yuan" element={<Yuan />} />
             <Route path="yuan/statistics" element={<YuanStatistics />} />

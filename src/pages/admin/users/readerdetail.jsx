@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Card, 
-  Descriptions, 
-  Button, 
-  Space, 
-  Typography, 
+import {
+  Card,
+  Descriptions,
+  Button,
+  Space,
+  Typography,
   message,
   Avatar,
   Tag,
@@ -13,7 +13,7 @@ import {
   Row,
   Col,
   List,
-  Progress
+  Progress,
 } from 'antd';
 import {
   UserOutlined,
@@ -27,7 +27,7 @@ import {
   ClockCircleOutlined,
   StarOutlined,
   HeartOutlined,
-  MessageOutlined
+  MessageOutlined,
 } from '@ant-design/icons';
 
 // Import modals
@@ -48,11 +48,11 @@ const { Title, Text, Paragraph } = Typography;
 const ReaderDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   // State management
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  
+
   // Modal states
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -151,25 +151,30 @@ const ReaderDetail = () => {
 
   // Field configurations for edit modal
   const editFields = [
-    fieldTypes.text('username', 'Username', { 
+    fieldTypes.text('username', 'Username', {
       rules: [{ required: true, message: 'Username is required' }],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.text('email', 'Email', { 
+    fieldTypes.text('email', 'Email', {
       rules: [
         { required: true, message: 'Email is required' },
-        { type: 'email', message: 'Please enter a valid email' }
+        { type: 'email', message: 'Please enter a valid email' },
       ],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.select('status', 'Status', [
-      { label: 'Active', value: 'active' },
-      { label: 'Inactive', value: 'inactive' },
-      { label: 'Suspended', value: 'suspended' }
-    ], { span: 12 }),
-    fieldTypes.textarea('profile.bio', 'Bio', { 
+    fieldTypes.select(
+      'status',
+      'Status',
+      [
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' },
+        { label: 'Suspended', value: 'suspended' },
+      ],
+      { span: 12 }
+    ),
+    fieldTypes.textarea('profile.bio', 'Bio', {
       rows: 3,
-      span: 24
+      span: 24,
     }),
     fieldTypes.text('profile.location', 'Location', { span: 12 }),
   ];
@@ -207,7 +212,7 @@ const ReaderDetail = () => {
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
-      
+
       <PageHeader
         title={`Reader Details - ${user.username}`}
         subtitle="View and manage reader information"
@@ -233,9 +238,9 @@ const ReaderDetail = () => {
         <Row gutter={24}>
           <Col span={6}>
             <div style={{ textAlign: 'center' }}>
-              <Avatar 
-                size={120} 
-                src={user.avatar} 
+              <Avatar
+                size={120}
+                src={user.avatar}
                 icon={<UserOutlined />}
                 style={{ marginBottom: 16 }}
               />
@@ -265,8 +270,10 @@ const ReaderDetail = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Favorite Genres">
                 <Space wrap>
-                  {user.profile?.favoriteGenres?.map(genre => (
-                    <Tag key={genre} color="blue">{genre}</Tag>
+                  {user.profile?.favoriteGenres?.map((genre) => (
+                    <Tag key={genre} color="blue">
+                      {genre}
+                    </Tag>
                   ))}
                 </Space>
               </Descriptions.Item>
@@ -322,7 +329,7 @@ const ReaderDetail = () => {
           <Card title="Recent Activity">
             <List
               dataSource={recentActivity}
-              renderItem={item => (
+              renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={<MessageOutlined />}
@@ -346,7 +353,7 @@ const ReaderDetail = () => {
           <Card title="Favorite Novels">
             <List
               dataSource={favoriteNovels}
-              renderItem={item => (
+              renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={<HeartOutlined style={{ color: '#ff4d4f' }} />}
@@ -358,11 +365,7 @@ const ReaderDetail = () => {
                         <Space>
                           <StarOutlined style={{ color: '#faad14' }} />
                           <Text>{item.rating}/5</Text>
-                          <Progress 
-                            percent={item.progress} 
-                            size="small" 
-                            style={{ width: 100 }}
-                          />
+                          <Progress percent={item.progress} size="small" style={{ width: 100 }} />
                         </Space>
                       </div>
                     }
@@ -420,7 +423,7 @@ const ReaderDetail = () => {
           'All reading history will be permanently deleted',
           'All bookmarks and favorites will be removed',
           'All comments and reviews will be deleted',
-          'This action cannot be undone'
+          'This action cannot be undone',
         ]}
       />
 

@@ -6,7 +6,7 @@ const generateMockYuanData = () => {
   const yuanBalances = [];
   const rewardRules = [];
   const yuanPackages = [];
-  
+
   const transactionTypes = [
     { id: 'purchase', name: 'Purchase Yuan', category: 'income' },
     { id: 'reading_reward', name: 'Reading Reward', category: 'income' },
@@ -21,13 +21,22 @@ const generateMockYuanData = () => {
     { id: 'tournament_prize', name: 'Tournament Prize', category: 'income' },
     { id: 'referral_bonus', name: 'Referral Bonus', category: 'income' },
   ];
-  
+
   const usernames = [
-    'reader_001', 'bookworm_pro', 'novel_enthusiast', 'story_collector',
-    'chapter_hunter', 'yuan_saver', 'premium_reader', 'loyal_fan',
-    'daily_reader', 'generous_supporter', 'author_patron', 'vip_member'
+    'reader_001',
+    'bookworm_pro',
+    'novel_enthusiast',
+    'story_collector',
+    'chapter_hunter',
+    'yuan_saver',
+    'premium_reader',
+    'loyal_fan',
+    'daily_reader',
+    'generous_supporter',
+    'author_patron',
+    'vip_member',
   ];
-  
+
   // Generate user balances
   for (let userId = 1; userId <= 200; userId++) {
     yuanBalances.push({
@@ -38,69 +47,89 @@ const generateMockYuanData = () => {
       lifetimeEarned: Math.floor(Math.random() * 50000) + 1000, // 1,000-51,000 yuan
       lifetimeSpent: Math.floor(Math.random() * 45000) + 500, // 500-45,500 yuan
       pendingBalance: Math.floor(Math.random() * 500), // 0-500 yuan pending
-      
+
       // Subscription info
       isSubscriber: Math.random() > 0.7,
       subscriptionTier: Math.random() > 0.5 ? 'premium' : 'vip',
-      subscriptionExpiresAt: Math.random() > 0.7 ? 
-        new Date(Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString() : null,
-      
+      subscriptionExpiresAt:
+        Math.random() > 0.7
+          ? new Date(Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
+          : null,
+
       // Statistics
       totalTransactions: Math.floor(Math.random() * 500) + 50,
       averageMonthlySpending: Math.floor(Math.random() * 1000) + 50,
-      favoriteExpenseCategory: transactionTypes[Math.floor(Math.random() * transactionTypes.length)].id,
-      
+      favoriteExpenseCategory:
+        transactionTypes[Math.floor(Math.random() * transactionTypes.length)].id,
+
       // Account info
-      accountStatus: Math.random() > 0.05 ? 'active' : Math.random() > 0.5 ? 'suspended' : 'limited',
+      accountStatus:
+        Math.random() > 0.05 ? 'active' : Math.random() > 0.5 ? 'suspended' : 'limited',
       verificationLevel: Math.random() > 0.3 ? 'verified' : 'unverified',
       riskScore: Math.floor(Math.random() * 100), // 0-100 (lower is better)
-      
+
       // Timestamps
-      createdAt: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString(),
-      lastTransactionAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      createdAt: new Date(
+        2023,
+        Math.floor(Math.random() * 12),
+        Math.floor(Math.random() * 28) + 1
+      ).toISOString(),
+      lastTransactionAt: new Date(
+        Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+      ).toISOString(),
       updatedAt: new Date().toISOString(),
     });
   }
-  
+
   // Generate transactions for users
   for (let i = 0; i < 5000; i++) {
     const transactionDate = new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000);
     const transactionType = transactionTypes[Math.floor(Math.random() * transactionTypes.length)];
     const userId = Math.floor(Math.random() * 200) + 1;
-    
+
     yuanTransactions.push({
       id: i + 1,
       userId,
       username: `user_${userId}`,
-      
+
       // Transaction details
       type: transactionType.id,
       typeName: transactionType.name,
       category: transactionType.category,
       amount: Math.floor(Math.random() * 1000) + 10, // 10-1,010 yuan
-      
+
       // Related entities
       novelId: Math.random() > 0.5 ? Math.floor(Math.random() * 100) + 1 : null,
       chapterId: Math.random() > 0.7 ? Math.floor(Math.random() * 50) + 1 : null,
       authorId: Math.random() > 0.6 ? Math.floor(Math.random() * 50) + 1 : null,
       packageId: Math.random() > 0.8 ? Math.floor(Math.random() * 10) + 1 : null,
-      
+
       // Payment info
-      paymentMethod: Math.random() > 0.3 ? 'credit_card' : 
-                    Math.random() > 0.5 ? 'paypal' : 
-                    Math.random() > 0.7 ? 'bank_transfer' : 'crypto',
+      paymentMethod:
+        Math.random() > 0.3
+          ? 'credit_card'
+          : Math.random() > 0.5
+            ? 'paypal'
+            : Math.random() > 0.7
+              ? 'bank_transfer'
+              : 'crypto',
       paymentReference: `PAY_${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      
+
       // Status and processing
-      status: Math.random() > 0.05 ? 'completed' : 
-              Math.random() > 0.5 ? 'pending' : 
-              Math.random() > 0.8 ? 'failed' : 'cancelled',
+      status:
+        Math.random() > 0.05
+          ? 'completed'
+          : Math.random() > 0.5
+            ? 'pending'
+            : Math.random() > 0.8
+              ? 'failed'
+              : 'cancelled',
       processedAt: Math.random() > 0.1 ? transactionDate.toISOString() : null,
-      
+
       // Balances
       balanceBefore: Math.floor(Math.random() * 5000) + 100,
       balanceAfter: Math.floor(Math.random() * 5000) + 100,
-      
+
       // Additional data
       description: `${transactionType.name} transaction`,
       metadata: {
@@ -108,19 +137,19 @@ const generateMockYuanData = () => {
         ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
         platform: Math.random() > 0.5 ? 'web' : Math.random() > 0.5 ? 'mobile' : 'tablet',
       },
-      
+
       // Flags
       isRefunded: Math.random() > 0.98,
       isReversed: Math.random() > 0.995,
       isFraudulent: Math.random() > 0.999,
       requiresReview: Math.random() > 0.95,
-      
+
       // Timestamps
       createdAt: transactionDate.toISOString(),
       updatedAt: transactionDate.toISOString(),
     });
   }
-  
+
   // Generate yuan packages
   const packageTypes = [
     { yuan: 100, price: 0.99, bonus: 0, popular: false },
@@ -132,7 +161,7 @@ const generateMockYuanData = () => {
     { yuan: 25000, price: 249.99, bonus: 8000, popular: false },
     { yuan: 50000, price: 499.99, bonus: 18000, popular: false },
   ];
-  
+
   packageTypes.forEach((pkg, index) => {
     yuanPackages.push({
       id: index + 1,
@@ -143,26 +172,26 @@ const generateMockYuanData = () => {
       totalYuan: pkg.yuan + pkg.bonus,
       price: pkg.price,
       currency: 'USD',
-      
+
       // Package features
       isPopular: pkg.popular,
       isLimitedTime: Math.random() > 0.8,
       maxPurchasesPerUser: pkg.yuan >= 10000 ? 5 : null, // Limit large packages
-      
+
       // Status
       isActive: Math.random() > 0.1, // 90% active
       isVisible: Math.random() > 0.05, // 95% visible
-      
+
       // Sales data
       totalSales: Math.floor(Math.random() * 10000) + 100,
       revenue: (Math.floor(Math.random() * 10000) + 100) * pkg.price,
-      
+
       // Timestamps
       createdAt: new Date(2024, 0, 1).toISOString(),
       updatedAt: new Date().toISOString(),
     });
   });
-  
+
   // Generate reward rules
   const rewardActions = [
     { action: 'daily_login', name: 'Daily Login', yuan: 10, cooldown: 86400 }, // 24 hours
@@ -176,7 +205,7 @@ const generateMockYuanData = () => {
     { action: 'bug_report', name: 'Report Bug', yuan: 50, cooldown: 86400 },
     { action: 'beta_testing', name: 'Beta Testing', yuan: 200, cooldown: 2592000 }, // 30 days
   ];
-  
+
   rewardActions.forEach((reward, index) => {
     rewardRules.push({
       id: index + 1,
@@ -184,45 +213,52 @@ const generateMockYuanData = () => {
       actionName: reward.name,
       description: `Earn ${reward.yuan} Yuan by ${reward.name.toLowerCase()}`,
       yuanReward: reward.yuan,
-      
+
       // Conditions
       maxPerUser: reward.action === 'first_purchase' ? 1 : reward.action === 'referral' ? 10 : null,
       maxPerDay: reward.action === 'daily_login' ? 1 : reward.action === 'read_chapter' ? 50 : null,
       cooldownSeconds: reward.cooldown,
-      
+
       // Requirements
       minimumUserLevel: reward.yuan > 100 ? 5 : 1,
       requiresVerification: reward.yuan > 200,
       isSubscriberOnly: reward.action === 'beta_testing',
-      
+
       // Status
       isActive: Math.random() > 0.1, // 90% active
       startDate: new Date(2024, 0, 1).toISOString(),
-      endDate: Math.random() > 0.8 ? 
-        new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString() : null,
-      
+      endDate:
+        Math.random() > 0.8
+          ? new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
+          : null,
+
       // Statistics
       totalClaims: Math.floor(Math.random() * 10000) + 100,
       totalYuanAwarded: (Math.floor(Math.random() * 10000) + 100) * reward.yuan,
-      
+
       // Timestamps
       createdAt: new Date(2024, 0, 1).toISOString(),
       updatedAt: new Date().toISOString(),
     });
   });
-  
+
   return { yuanTransactions, yuanBalances, rewardRules, yuanPackages };
 };
 
 const mockData = generateMockYuanData();
-const { yuanTransactions: mockTransactions, yuanBalances: mockBalances, rewardRules: mockRewards, yuanPackages: mockPackages } = mockData;
+const {
+  yuanTransactions: mockTransactions,
+  yuanBalances: mockBalances,
+  rewardRules: mockRewards,
+  yuanPackages: mockPackages,
+} = mockData;
 
 export const yuanService = {
   // Get all yuan transactions with filtering
   getAllTransactions: async (params = {}) => {
     try {
       await api.delay(600);
-      
+
       const {
         page = 1,
         pageSize = 20,
@@ -238,59 +274,60 @@ export const yuanService = {
         sortBy = 'createdAt',
         sortOrder = 'desc',
       } = params;
-      
+
       let transactions = [...mockTransactions];
-      
+
       // Apply filters
       if (userId) {
-        transactions = transactions.filter(t => t.userId === parseInt(userId));
+        transactions = transactions.filter((t) => t.userId === parseInt(userId));
       }
-      
+
       if (type) {
-        transactions = transactions.filter(t => t.type === type);
+        transactions = transactions.filter((t) => t.type === type);
       }
-      
+
       if (category) {
-        transactions = transactions.filter(t => t.category === category);
+        transactions = transactions.filter((t) => t.category === category);
       }
-      
+
       if (status) {
-        transactions = transactions.filter(t => t.status === status);
+        transactions = transactions.filter((t) => t.status === status);
       }
-      
+
       if (minAmount !== null) {
-        transactions = transactions.filter(t => t.amount >= parseInt(minAmount));
+        transactions = transactions.filter((t) => t.amount >= parseInt(minAmount));
       }
-      
+
       if (maxAmount !== null) {
-        transactions = transactions.filter(t => t.amount <= parseInt(maxAmount));
+        transactions = transactions.filter((t) => t.amount <= parseInt(maxAmount));
       }
-      
+
       // Date range filter
       if (dateFrom) {
-        transactions = transactions.filter(t => new Date(t.createdAt) >= new Date(dateFrom));
+        transactions = transactions.filter((t) => new Date(t.createdAt) >= new Date(dateFrom));
       }
-      
+
       if (dateTo) {
-        transactions = transactions.filter(t => new Date(t.createdAt) <= new Date(dateTo));
+        transactions = transactions.filter((t) => new Date(t.createdAt) <= new Date(dateTo));
       }
-      
+
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
-        transactions = transactions.filter(t => 
-          t.username.toLowerCase().includes(searchLower) ||
-          t.typeName.toLowerCase().includes(searchLower) ||
-          t.description.toLowerCase().includes(searchLower) ||
-          t.paymentReference.toLowerCase().includes(searchLower)
+        transactions = transactions.filter(
+          (t) =>
+            t.username.toLowerCase().includes(searchLower) ||
+            t.typeName.toLowerCase().includes(searchLower) ||
+            t.description.toLowerCase().includes(searchLower) ||
+            t.paymentReference.toLowerCase().includes(searchLower)
         );
       }
-      
+
       // Apply sorting
       transactions.sort((a, b) => {
         let aValue = a[sortBy];
         let bValue = b[sortBy];
-        
+
         if (sortBy === 'amount') {
           aValue = parseInt(aValue);
           bValue = parseInt(bValue);
@@ -298,19 +335,19 @@ export const yuanService = {
           aValue = new Date(aValue);
           bValue = new Date(bValue);
         }
-        
+
         if (sortOrder === 'asc') {
           return aValue > bValue ? 1 : -1;
         } else {
           return aValue < bValue ? 1 : -1;
         }
       });
-      
+
       // Apply pagination
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       const paginatedTransactions = transactions.slice(start, end);
-      
+
       return {
         success: true,
         data: paginatedTransactions,
@@ -328,7 +365,7 @@ export const yuanService = {
   getAllBalances: async (params = {}) => {
     try {
       await api.delay(500);
-      
+
       const {
         page = 1,
         pageSize = 20,
@@ -340,59 +377,61 @@ export const yuanService = {
         minBalance = null,
         maxBalance = null,
       } = params;
-      
+
       let balances = [...mockBalances];
-      
+
       // Apply filters
       if (accountStatus) {
-        balances = balances.filter(b => b.accountStatus === accountStatus);
+        balances = balances.filter((b) => b.accountStatus === accountStatus);
       }
-      
+
       if (isSubscriber !== null) {
-        balances = balances.filter(b => b.isSubscriber === isSubscriber);
+        balances = balances.filter((b) => b.isSubscriber === isSubscriber);
       }
-      
+
       if (minBalance !== null) {
-        balances = balances.filter(b => b.currentBalance >= parseInt(minBalance));
+        balances = balances.filter((b) => b.currentBalance >= parseInt(minBalance));
       }
-      
+
       if (maxBalance !== null) {
-        balances = balances.filter(b => b.currentBalance <= parseInt(maxBalance));
+        balances = balances.filter((b) => b.currentBalance <= parseInt(maxBalance));
       }
-      
+
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
-        balances = balances.filter(b => 
-          b.username.toLowerCase().includes(searchLower)
-        );
+        balances = balances.filter((b) => b.username.toLowerCase().includes(searchLower));
       }
-      
+
       // Apply sorting
       balances.sort((a, b) => {
         let aValue = a[sortBy];
         let bValue = b[sortBy];
-        
-        if (['currentBalance', 'lifetimeEarned', 'lifetimeSpent', 'totalTransactions'].includes(sortBy)) {
+
+        if (
+          ['currentBalance', 'lifetimeEarned', 'lifetimeSpent', 'totalTransactions'].includes(
+            sortBy
+          )
+        ) {
           aValue = parseInt(aValue);
           bValue = parseInt(bValue);
         } else if (sortBy === 'lastTransactionAt' || sortBy === 'createdAt') {
           aValue = new Date(aValue);
           bValue = new Date(bValue);
         }
-        
+
         if (sortOrder === 'asc') {
           return aValue > bValue ? 1 : -1;
         } else {
           return aValue < bValue ? 1 : -1;
         }
       });
-      
+
       // Apply pagination
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       const paginatedBalances = balances.slice(start, end);
-      
+
       return {
         success: true,
         data: paginatedBalances,
@@ -410,19 +449,19 @@ export const yuanService = {
   getUserBalance: async (userId) => {
     try {
       await api.delay(300);
-      
-      const balance = mockBalances.find(b => b.userId === parseInt(userId));
-      
+
+      const balance = mockBalances.find((b) => b.userId === parseInt(userId));
+
       if (!balance) {
         throw new Error('User balance not found');
       }
-      
+
       // Get recent transactions for this user
       const recentTransactions = mockTransactions
-        .filter(t => t.userId === parseInt(userId))
+        .filter((t) => t.userId === parseInt(userId))
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 10);
-      
+
       return {
         success: true,
         data: {
@@ -439,9 +478,9 @@ export const yuanService = {
   createTransaction: async (transactionData) => {
     try {
       await api.delay(600);
-      
+
       const newTransaction = {
-        id: Math.max(...mockTransactions.map(t => t.id)) + 1,
+        id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
         ...transactionData,
         status: 'pending',
         paymentReference: `PAY_${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
@@ -453,12 +492,12 @@ export const yuanService = {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       mockTransactions.push(newTransaction);
-      
+
       // Update user balance if transaction is completed
       if (transactionData.status === 'completed') {
-        const userBalance = mockBalances.find(b => b.userId === transactionData.userId);
+        const userBalance = mockBalances.find((b) => b.userId === transactionData.userId);
         if (userBalance) {
           if (transactionData.category === 'income') {
             userBalance.currentBalance += transactionData.amount;
@@ -471,7 +510,7 @@ export const yuanService = {
           userBalance.updatedAt = new Date().toISOString();
         }
       }
-      
+
       return {
         success: true,
         data: newTransaction,
@@ -486,21 +525,21 @@ export const yuanService = {
   updateTransaction: async (id, updateData) => {
     try {
       await api.delay(400);
-      
-      const transactionIndex = mockTransactions.findIndex(t => t.id === parseInt(id));
-      
+
+      const transactionIndex = mockTransactions.findIndex((t) => t.id === parseInt(id));
+
       if (transactionIndex === -1) {
         throw new Error('Transaction not found');
       }
-      
+
       const originalTransaction = mockTransactions[transactionIndex];
-      
+
       mockTransactions[transactionIndex] = {
         ...originalTransaction,
         ...updateData,
         updatedAt: new Date().toISOString(),
       };
-      
+
       return {
         success: true,
         data: mockTransactions[transactionIndex],
@@ -515,9 +554,9 @@ export const yuanService = {
   getYuanPackages: async () => {
     try {
       await api.delay(400);
-      
-      const activePackages = mockPackages.filter(p => p.isActive && p.isVisible);
-      
+
+      const activePackages = mockPackages.filter((p) => p.isActive && p.isVisible);
+
       return {
         success: true,
         data: activePackages,
@@ -531,7 +570,7 @@ export const yuanService = {
   getAllYuanPackages: async () => {
     try {
       await api.delay(400);
-      
+
       return {
         success: true,
         data: mockPackages,
@@ -545,19 +584,19 @@ export const yuanService = {
   updateYuanPackage: async (id, updateData) => {
     try {
       await api.delay(400);
-      
-      const packageIndex = mockPackages.findIndex(p => p.id === parseInt(id));
-      
+
+      const packageIndex = mockPackages.findIndex((p) => p.id === parseInt(id));
+
       if (packageIndex === -1) {
         throw new Error('Package not found');
       }
-      
+
       mockPackages[packageIndex] = {
         ...mockPackages[packageIndex],
         ...updateData,
         updatedAt: new Date().toISOString(),
       };
-      
+
       return {
         success: true,
         data: mockPackages[packageIndex],
@@ -572,7 +611,7 @@ export const yuanService = {
   getRewardRules: async () => {
     try {
       await api.delay(400);
-      
+
       return {
         success: true,
         data: mockRewards,
@@ -586,19 +625,19 @@ export const yuanService = {
   updateRewardRule: async (id, updateData) => {
     try {
       await api.delay(400);
-      
-      const ruleIndex = mockRewards.findIndex(r => r.id === parseInt(id));
-      
+
+      const ruleIndex = mockRewards.findIndex((r) => r.id === parseInt(id));
+
       if (ruleIndex === -1) {
         throw new Error('Reward rule not found');
       }
-      
+
       mockRewards[ruleIndex] = {
         ...mockRewards[ruleIndex],
         ...updateData,
         updatedAt: new Date().toISOString(),
       };
-      
+
       return {
         success: true,
         data: mockRewards[ruleIndex],
@@ -613,40 +652,44 @@ export const yuanService = {
   getYuanStats: async (period = '30d') => {
     try {
       await api.delay(500);
-      
+
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
       const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
-      
-      const periodTransactions = mockTransactions.filter(t => new Date(t.createdAt) >= startDate);
-      
+
+      const periodTransactions = mockTransactions.filter((t) => new Date(t.createdAt) >= startDate);
+
       const income = periodTransactions
-        .filter(t => t.category === 'income' && t.status === 'completed')
+        .filter((t) => t.category === 'income' && t.status === 'completed')
         .reduce((sum, t) => sum + t.amount, 0);
-      
+
       const expenses = periodTransactions
-        .filter(t => t.category === 'expense' && t.status === 'completed')
+        .filter((t) => t.category === 'expense' && t.status === 'completed')
         .reduce((sum, t) => sum + t.amount, 0);
-      
+
       const totalBalance = mockBalances.reduce((sum, b) => sum + b.currentBalance, 0);
       const totalLifetimeEarned = mockBalances.reduce((sum, b) => sum + b.lifetimeEarned, 0);
       const totalLifetimeSpent = mockBalances.reduce((sum, b) => sum + b.lifetimeSpent, 0);
-      
+
       const packageSales = mockPackages.reduce((sum, p) => sum + p.totalSales, 0);
       const packageRevenue = mockPackages.reduce((sum, p) => sum + p.revenue, 0);
-      
-      const activeUsers = mockBalances.filter(b => 
-        new Date(b.lastTransactionAt) >= startDate
+
+      const activeUsers = mockBalances.filter(
+        (b) => new Date(b.lastTransactionAt) >= startDate
       ).length;
-      
+
       const transactionsByType = periodTransactions.reduce((acc, t) => {
         acc[t.type] = (acc[t.type] || 0) + 1;
         return acc;
       }, {});
-      
-      const averageTransactionValue = periodTransactions.length > 0 ? 
-        Math.round(periodTransactions.reduce((sum, t) => sum + t.amount, 0) / periodTransactions.length) : 0;
-      
+
+      const averageTransactionValue =
+        periodTransactions.length > 0
+          ? Math.round(
+              periodTransactions.reduce((sum, t) => sum + t.amount, 0) / periodTransactions.length
+            )
+          : 0;
+
       return {
         success: true,
         data: {
@@ -665,17 +708,20 @@ export const yuanService = {
           topSpenders: mockBalances
             .sort((a, b) => b.lifetimeSpent - a.lifetimeSpent)
             .slice(0, 10)
-            .map(b => ({
+            .map((b) => ({
               username: b.username,
               lifetimeSpent: b.lifetimeSpent,
               currentBalance: b.currentBalance,
             })),
-          rewardStats: mockRewards.reduce((acc, rule) => {
-            acc.totalClaims += rule.totalClaims;
-            acc.totalAwarded += rule.totalYuanAwarded;
-            return acc;
-          }, { totalClaims: 0, totalAwarded: 0 }),
-        }
+          rewardStats: mockRewards.reduce(
+            (acc, rule) => {
+              acc.totalClaims += rule.totalClaims;
+              acc.totalAwarded += rule.totalYuanAwarded;
+              return acc;
+            },
+            { totalClaims: 0, totalAwarded: 0 }
+          ),
+        },
       };
     } catch (error) {
       throw new Error('Failed to fetch yuan statistics');
@@ -686,22 +732,22 @@ export const yuanService = {
   adjustUserBalance: async (userId, adjustmentData) => {
     try {
       await api.delay(500);
-      
+
       const { amount, reason, type = 'adjustment' } = adjustmentData;
-      
-      const userBalance = mockBalances.find(b => b.userId === parseInt(userId));
-      
+
+      const userBalance = mockBalances.find((b) => b.userId === parseInt(userId));
+
       if (!userBalance) {
         throw new Error('User not found');
       }
-      
+
       const oldBalance = userBalance.currentBalance;
       userBalance.currentBalance += amount;
       userBalance.updatedAt = new Date().toISOString();
-      
+
       // Create transaction record
       const newTransaction = {
-        id: Math.max(...mockTransactions.map(t => t.id)) + 1,
+        id: Math.max(...mockTransactions.map((t) => t.id)) + 1,
         userId: parseInt(userId),
         username: userBalance.username,
         type: 'balance_adjustment',
@@ -722,9 +768,9 @@ export const yuanService = {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       mockTransactions.push(newTransaction);
-      
+
       return {
         success: true,
         data: {
@@ -744,7 +790,7 @@ export const yuanService = {
   getYuanSettings: async () => {
     try {
       await api.delay(300);
-      
+
       return {
         success: true,
         data: {
@@ -771,7 +817,7 @@ export const yuanService = {
             currencyConversionFee: 1.5, // percent
             refundFeeAmount: 50, // cents
           },
-        }
+        },
       };
     } catch (error) {
       throw new Error('Failed to fetch yuan settings');

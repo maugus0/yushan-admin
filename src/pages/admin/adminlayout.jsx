@@ -24,25 +24,25 @@ const AdminLayout = () => {
       title: 'New User Registration',
       description: 'John Doe has registered as a reader',
       time: '2 minutes ago',
-      type: 'user'
+      type: 'user',
     },
     {
       title: 'Novel Submitted for Review',
       description: 'Jane Smith submitted "Dragon Chronicles" for review',
       time: '5 minutes ago',
-      type: 'novel'
+      type: 'novel',
     },
     {
       title: 'Comment Reported',
       description: 'Inappropriate comment reported on Chapter 45',
       time: '10 minutes ago',
-      type: 'report'
+      type: 'report',
     },
     {
       title: 'New Review Posted',
       description: 'Alice rated "Mystic Journey" 5 stars',
       time: '15 minutes ago',
-      type: 'review'
+      type: 'review',
     },
   ];
 
@@ -86,11 +86,8 @@ const AdminLayout = () => {
   return (
     <ErrorBoundary>
       <Layout style={{ minHeight: '100vh' }}>
-        <AdminSidebar
-          collapsed={collapsed}
-          notifications={sidebarNotifications}
-        />
-        
+        <AdminSidebar collapsed={collapsed} notifications={sidebarNotifications} />
+
         <Layout>
           <AdminHeader
             collapsed={collapsed}
@@ -103,7 +100,7 @@ const AdminLayout = () => {
             showNotifications={true}
             showFullscreen={true}
           />
-          
+
           <Content
             style={{
               margin: '24px',

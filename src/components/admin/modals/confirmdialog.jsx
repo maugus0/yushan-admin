@@ -1,11 +1,10 @@
-import React from 'react';
 import { Modal, Space, Typography } from 'antd';
-import { 
-  ExclamationCircleOutlined, 
+import {
+  ExclamationCircleOutlined,
   QuestionCircleOutlined,
   InfoCircleOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined 
+  CloseCircleOutlined,
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -27,7 +26,7 @@ const ConfirmDialog = ({
 }) => {
   const getIcon = () => {
     if (icon) return icon;
-    
+
     const iconMap = {
       warning: <ExclamationCircleOutlined style={{ color: '#faad14' }} />,
       info: <InfoCircleOutlined style={{ color: '#1890ff' }} />,
@@ -35,7 +34,7 @@ const ConfirmDialog = ({
       error: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
       question: <QuestionCircleOutlined style={{ color: '#722ed1' }} />,
     };
-    
+
     return iconMap[type] || iconMap.warning;
   };
 
@@ -75,18 +74,18 @@ const ConfirmDialog = ({
       destroyOnClose
     >
       <div style={{ paddingTop: 16 }}>
-        <Text style={{ fontSize: '14px', lineHeight: 1.6 }}>
-          {content}
-        </Text>
-        
+        <Text style={{ fontSize: '14px', lineHeight: 1.6 }}>{content}</Text>
+
         {details && (
-          <div style={{ 
-            marginTop: 16, 
-            padding: 12, 
-            background: '#fafafa', 
-            borderRadius: 6,
-            border: '1px solid #f0f0f0'
-          }}>
+          <div
+            style={{
+              marginTop: 16,
+              padding: 12,
+              background: '#fafafa',
+              borderRadius: 6,
+              border: '1px solid #f0f0f0',
+            }}
+          >
             <Text type="secondary" style={{ fontSize: '13px' }}>
               {details}
             </Text>

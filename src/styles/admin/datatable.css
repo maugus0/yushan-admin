@@ -512,7 +512,9 @@
 .admin-datatable-row-enter-active {
   opacity: 1;
   transform: translateX(0);
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 .admin-datatable-row-exit {
@@ -523,7 +525,9 @@
 .admin-datatable-row-exit-active {
   opacity: 0;
   transform: translateX(20px);
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 /* Sticky Header */

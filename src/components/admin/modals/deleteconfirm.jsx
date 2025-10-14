@@ -21,8 +21,8 @@ const DeleteConfirm = ({
   const [confirmationInput, setConfirmationInput] = useState('');
 
   const expectedConfirmationText = confirmationText || itemName || 'DELETE';
-  const isConfirmationValid = requireConfirmation 
-    ? (confirmationChecked && (!confirmationText || confirmationInput === expectedConfirmationText))
+  const isConfirmationValid = requireConfirmation
+    ? confirmationChecked && (!confirmationText || confirmationInput === expectedConfirmationText)
     : true;
 
   const handleConfirm = () => {
@@ -74,9 +74,9 @@ const DeleteConfirm = ({
       confirmLoading={loading}
       okText="Delete"
       cancelText="Cancel"
-      okButtonProps={{ 
-        danger: true, 
-        disabled: !isConfirmationValid 
+      okButtonProps={{
+        danger: true,
+        disabled: !isConfirmationValid,
       }}
       width={500}
       centered
@@ -98,17 +98,17 @@ const DeleteConfirm = ({
 
         {/* Item Information */}
         <div>
-          <Text>
-            Are you sure you want to permanently delete this {itemType}?
-          </Text>
+          <Text>Are you sure you want to permanently delete this {itemType}?</Text>
           {itemName && (
-            <div style={{ 
-              marginTop: 8, 
-              padding: 12, 
-              background: '#fafafa', 
-              borderRadius: 6,
-              border: '1px solid #f0f0f0'
-            }}>
+            <div
+              style={{
+                marginTop: 8,
+                padding: 12,
+                background: '#fafafa',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+              }}
+            >
               <Text strong style={{ color: dangerConfig.color }}>
                 {itemName}
               </Text>

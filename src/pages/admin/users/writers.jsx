@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Tooltip, message, Avatar, Tag, Dropdown } from 'antd';
-import { 
+import {
   PlusOutlined,
   EditOutlined,
   UserOutlined,
@@ -33,7 +33,7 @@ import { commonFilters, fieldTypes } from '../../../utils/admin/constants';
 
 const Writers = () => {
   const navigate = useNavigate();
-  
+
   // State management
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -52,28 +52,31 @@ const Writers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      const response = await userService.getWriters({
-        page: params.current || 1,
-        pageSize: params.pageSize || 10,
-        ...filters,
-      });
-      
-      setData(response.data);
-      setPagination(prev => ({
-        ...prev,
-        current: response.page,
-        total: response.total,
-      }));
-    } catch (error) {
-      message.error('Failed to fetch writers');
-      console.error('Failed to fetch writers:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        const response = await userService.getWriters({
+          page: params.current || 1,
+          pageSize: params.pageSize || 10,
+          ...filters,
+        });
+
+        setData(response.data);
+        setPagination((prev) => ({
+          ...prev,
+          current: response.page,
+          total: response.total,
+        }));
+      } catch (error) {
+        message.error('Failed to fetch writers');
+        console.error('Failed to fetch writers:', error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters]
+  );
 
   useEffect(() => {
     fetchData({ current: pagination.current, pageSize: pagination.pageSize });
@@ -113,11 +116,7 @@ const Writers = () => {
       key: 'username',
       render: (text, record) => (
         <Space>
-          <Avatar 
-            src={record.avatar} 
-            icon={<UserOutlined />}
-            size="default"
-          />
+          <Avatar src={record.avatar} icon={<UserOutlined />} size="default" />
           <div>
             <div style={{ fontWeight: 500 }}>{text}</div>
             <div style={{ fontSize: '12px', color: '#666' }}>
@@ -156,7 +155,7 @@ const Writers = () => {
       key: 'genres',
       render: (genres) => (
         <Space wrap>
-          {genres?.slice(0, 2).map(genre => (
+          {genres?.slice(0, 2).map((genre) => (
             <Tag key={genre} color="purple" size="small">
               {genre}
             </Tag>
@@ -249,7 +248,7 @@ const Writers = () => {
   // Event handlers
   const handleFiltersChange = (newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleTableChange = (paginationInfo) => {
@@ -358,52 +357,48 @@ const Writers = () => {
 
   // Field configurations for modals
   const editFields = [
-    fieldTypes.text('username', 'Username', { 
+    fieldTypes.text('username', 'Username', {
       rules: [{ required: true, message: 'Username is required' }],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.text('email', 'Email', { 
+    fieldTypes.text('email', 'Email', {
       rules: [
         { required: true, message: 'Email is required' },
-        { type: 'email', message: 'Please enter a valid email' }
+        { type: 'email', message: 'Please enter a valid email' },
       ],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.select('status', 'Status', [
-      { label: 'Active', value: 'active' },
-      { label: 'Inactive', value: 'inactive' },
-      { label: 'Suspended', value: 'suspended' },
-      { label: 'Pending', value: 'pending' }
-    ], { span: 12 }),
-    fieldTypes.textarea('profile.bio', 'Bio', { 
+    fieldTypes.select(
+      'status',
+      'Status',
+      [
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' },
+        { label: 'Suspended', value: 'suspended' },
+        { label: 'Pending', value: 'pending' },
+      ],
+      { span: 12 }
+    ),
+    fieldTypes.textarea('profile.bio', 'Bio', {
       rows: 3,
-      span: 24
+      span: 24,
     }),
     fieldTypes.text('profile.location', 'Location', { span: 12 }),
   ];
 
-  const breadcrumbItems = [
-    { title: 'Admin' },
-    { title: 'User Management' },
-    { title: 'Writers' },
-  ];
+  const breadcrumbItems = [{ title: 'Admin' }, { title: 'User Management' }, { title: 'Writers' }];
 
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
-      
+
       <PageHeader
         title="Writers"
         subtitle="Manage writer accounts and their publications"
         extra={[
-          <Button
-            key="add"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddNew}
-          >
+          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
             Add Writer
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -423,8 +418,7 @@ const Writers = () => {
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
-            `${range[0]}-${range[1]} of ${total} writers`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} writers`,
         }}
         onChange={handleTableChange}
         enableSelection={true}
@@ -462,7 +456,7 @@ const Writers = () => {
           'All published novels will be archived',
           'All chapters and drafts will be preserved',
           'All earnings data will be retained for tax purposes',
-          'This action cannot be undone'
+          'This action cannot be undone',
         ]}
       />
 

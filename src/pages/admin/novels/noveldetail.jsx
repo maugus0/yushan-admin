@@ -52,7 +52,7 @@ const NovelDetail = () => {
           novelService.getNovelById(id),
           novelService.getNovelStats(id),
         ]);
-        
+
         setNovel(novelResponse.data);
         setStats(statsResponse.data);
       } catch (error) {
@@ -77,7 +77,7 @@ const NovelDetail = () => {
     try {
       const response = await novelService.toggleFeatureNovel(id);
       message.success(response.message);
-      setNovel(prev => ({ ...prev, isFeatured: !prev.isFeatured }));
+      setNovel((prev) => ({ ...prev, isFeatured: !prev.isFeatured }));
     } catch (error) {
       message.error('Failed to update feature status');
     }
@@ -101,18 +101,20 @@ const NovelDetail = () => {
   }
 
   // Prepare chart data
-  const viewsChartData = stats?.dailyStats?.map(stat => ({
-    date: stat.date,
-    views: stat.views,
-    uniqueViews: stat.uniqueViews,
-  })) || [];
+  const viewsChartData =
+    stats?.dailyStats?.map((stat) => ({
+      date: stat.date,
+      views: stat.views,
+      uniqueViews: stat.uniqueViews,
+    })) || [];
 
-  const engagementChartData = stats?.dailyStats?.map(stat => ({
-    date: stat.date,
-    likes: stat.likes,
-    comments: stat.comments,
-    bookmarks: stat.bookmarks,
-  })) || [];
+  const engagementChartData =
+    stats?.dailyStats?.map((stat) => ({
+      date: stat.date,
+      likes: stat.likes,
+      comments: stat.comments,
+      bookmarks: stat.bookmarks,
+    })) || [];
 
   // Demographics data for tables
   const ageGroupColumns = [
@@ -140,9 +142,9 @@ const NovelDetail = () => {
           <Button key="edit" type="primary" icon={<EditOutlined />} onClick={handleEdit}>
             Edit Novel
           </Button>,
-          <Button 
-            key="feature" 
-            type={novel.isFeatured ? "default" : "primary"}
+          <Button
+            key="feature"
+            type={novel.isFeatured ? 'default' : 'primary'}
             onClick={handleToggleFeature}
           >
             {novel.isFeatured ? 'Unfeature' : 'Feature'}
@@ -180,9 +182,7 @@ const NovelDetail = () => {
                         <StarOutlined /> Featured
                       </Tag>
                     )}
-                    {novel.isPremium && (
-                      <Tag color="purple">Premium</Tag>
-                    )}
+                    {novel.isPremium && <Tag color="purple">Premium</Tag>}
                   </div>
                   <div>
                     <Rate disabled value={parseFloat(novel.rating)} allowHalf />
@@ -254,9 +254,9 @@ const NovelDetail = () => {
                 {/* Description */}
                 <Card title="Description">
                   <Paragraph>{novel.description}</Paragraph>
-                  
+
                   <Divider />
-                  
+
                   <Descriptions column={2} size="small">
                     <Descriptions.Item label="Category">
                       <Tag color="blue">{novel.category}</Tag>
@@ -267,9 +267,7 @@ const NovelDetail = () => {
                     <Descriptions.Item label="Type">
                       {novel.isOriginal ? 'Original' : 'Translation'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Age Rating">
-                      {novel.ageRating}
-                    </Descriptions.Item>
+                    <Descriptions.Item label="Age Rating">{novel.ageRating}</Descriptions.Item>
                     <Descriptions.Item label="Total Words">
                       {novel.totalWords.toLocaleString()}
                     </Descriptions.Item>
@@ -289,8 +287,10 @@ const NovelDetail = () => {
                       <Divider />
                       <div>
                         <Text strong>Tags: </Text>
-                        {novel.tags.map(tag => (
-                          <Tag key={tag} style={{ margin: '2px' }}>{tag}</Tag>
+                        {novel.tags.map((tag) => (
+                          <Tag key={tag} style={{ margin: '2px' }}>
+                            {tag}
+                          </Tag>
                         ))}
                       </div>
                     </>
@@ -330,11 +330,16 @@ const NovelDetail = () => {
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Text>Trending</Text>
-                          <Text strong>{novel.trending ? `Rank #${novel.trendingRank}` : 'No'}</Text>
+                          <Text strong>
+                            {novel.trending ? `Rank #${novel.trendingRank}` : 'No'}
+                          </Text>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Text>Reports</Text>
-                          <Text strong style={{ color: novel.reportCount > 0 ? '#ff4d4f' : 'inherit' }}>
+                          <Text
+                            strong
+                            style={{ color: novel.reportCount > 0 ? '#ff4d4f' : 'inherit' }}
+                          >
                             {novel.reportCount}
                           </Text>
                         </div>
@@ -423,16 +428,10 @@ const NovelDetail = () => {
                         />
                       </Col>
                       <Col span={6}>
-                        <Statistic
-                          title="Retention Rate"
-                          value={stats.engagement.retentionRate}
-                        />
+                        <Statistic title="Retention Rate" value={stats.engagement.retentionRate} />
                       </Col>
                       <Col span={6}>
-                        <Statistic
-                          title="Share Rate"
-                          value={stats.engagement.shareRate}
-                        />
+                        <Statistic title="Share Rate" value={stats.engagement.shareRate} />
                       </Col>
                     </Row>
                   </Card>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress, Statistic } from 'antd';
-import { 
+import {
   BookOutlined,
   UserOutlined,
   HeartOutlined,
@@ -14,14 +14,14 @@ import {
   BarsOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 
 const { Text } = Typography;
@@ -181,62 +181,71 @@ const Library = () => {
   };
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      let filteredData = mockData[activeTab] || [];
-      
-      // Apply search filter
-      if (searchValue) {
-        filteredData = filteredData.filter(item => {
-          if (activeTab === 'collections') {
-            return item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-                   item.description.toLowerCase().includes(searchValue.toLowerCase()) ||
-                   item.owner.toLowerCase().includes(searchValue.toLowerCase());
-          } else if (activeTab === 'bookmarks') {
-            return item.user.toLowerCase().includes(searchValue.toLowerCase()) ||
-                   item.novel.toLowerCase().includes(searchValue.toLowerCase()) ||
-                   item.note.toLowerCase().includes(searchValue.toLowerCase());
-          } else {
-            return item.user.toLowerCase().includes(searchValue.toLowerCase()) ||
-                   item.novel.toLowerCase().includes(searchValue.toLowerCase());
-          }
-        });
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let filteredData = mockData[activeTab] || [];
+
+        // Apply search filter
+        if (searchValue) {
+          filteredData = filteredData.filter((item) => {
+            if (activeTab === 'collections') {
+              return (
+                item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.description.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.owner.toLowerCase().includes(searchValue.toLowerCase())
+              );
+            } else if (activeTab === 'bookmarks') {
+              return (
+                item.user.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.novel.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.note.toLowerCase().includes(searchValue.toLowerCase())
+              );
+            } else {
+              return (
+                item.user.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.novel.toLowerCase().includes(searchValue.toLowerCase())
+              );
+            }
+          });
+        }
+
+        // Apply filters
+        if (filters.status) {
+          filteredData = filteredData.filter((item) => item.status === filters.status);
+        }
+
+        if (filters.isPublic !== undefined && activeTab === 'collections') {
+          filteredData = filteredData.filter((item) => item.isPublic === filters.isPublic);
+        }
+
+        if (filters.bookmarkType && activeTab === 'bookmarks') {
+          filteredData = filteredData.filter((item) => item.bookmarkType === filters.bookmarkType);
+        }
+
+        const pageSize = params.pageSize || pagination.pageSize;
+        const current = params.current || pagination.current;
+        const startIndex = (current - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        setData(filteredData.slice(startIndex, endIndex));
+        setPagination((prev) => ({
+          ...prev,
+          current: current,
+          total: filteredData.length,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch library data:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Apply filters
-      if (filters.status) {
-        filteredData = filteredData.filter(item => item.status === filters.status);
-      }
-      
-      if (filters.isPublic !== undefined && activeTab === 'collections') {
-        filteredData = filteredData.filter(item => item.isPublic === filters.isPublic);
-      }
-      
-      if (filters.bookmarkType && activeTab === 'bookmarks') {
-        filteredData = filteredData.filter(item => item.bookmarkType === filters.bookmarkType);
-      }
-      
-      const pageSize = params.pageSize || pagination.pageSize;
-      const current = params.current || pagination.current;
-      const startIndex = (current - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      
-      setData(filteredData.slice(startIndex, endIndex));
-      setPagination(prev => ({
-        ...prev,
-        current: current,
-        total: filteredData.length,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch library data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, pagination.pageSize, pagination.current, activeTab]);
+    },
+    [searchValue, filters, pagination.pageSize, pagination.current, activeTab]
+  );
 
   useEffect(() => {
     fetchData();
@@ -320,7 +329,9 @@ const Library = () => {
           key: 'collection',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Text strong style={{ fontSize: '15px' }}>{record.name}</Text>
+              <Text strong style={{ fontSize: '15px' }}>
+                {record.name}
+              </Text>
               <Text type="secondary">{record.description}</Text>
               <Space>
                 <Avatar size="small" icon={<UserOutlined />} />
@@ -328,8 +339,10 @@ const Library = () => {
                 {!record.isPublic && <Tag color="orange">Private</Tag>}
               </Space>
               <Space>
-                {record.tags.map(tag => (
-                  <Tag key={tag} color="blue">{tag}</Tag>
+                {record.tags.map((tag) => (
+                  <Tag key={tag} color="blue">
+                    {tag}
+                  </Tag>
                 ))}
               </Space>
             </Space>
@@ -390,9 +403,7 @@ const Library = () => {
                 </Space>
                 <Text strong>{record.novel}</Text>
                 <Space>
-                  <span style={{ color: typeDisplay.color }}>
-                    {typeDisplay.icon}
-                  </span>
+                  <span style={{ color: typeDisplay.color }}>{typeDisplay.icon}</span>
                   <Tag color={typeDisplay.color}>
                     {record.bookmarkType.replace('_', ' ').toUpperCase()}
                   </Tag>
@@ -406,7 +417,9 @@ const Library = () => {
           key: 'chapter',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Text strong>Ch. {record.chapterNumber}: {record.chapter}</Text>
+              <Text strong>
+                Ch. {record.chapterNumber}: {record.chapter}
+              </Text>
               <Text type="secondary" style={{ fontStyle: 'italic' }}>
                 "{record.note}"
               </Text>
@@ -425,10 +438,10 @@ const Library = () => {
                 <Avatar icon={<UserOutlined />} />
                 <Text strong>{record.user}</Text>
               </Space>
-              <Text strong style={{ fontSize: '15px' }}>{record.novel}</Text>
-              <Tag color={getReadingStatusColor(record.status)}>
-                {record.status.toUpperCase()}
-              </Tag>
+              <Text strong style={{ fontSize: '15px' }}>
+                {record.novel}
+              </Text>
+              <Tag color={getReadingStatusColor(record.status)}>{record.status.toUpperCase()}</Tag>
             </Space>
           ),
         },
@@ -440,13 +453,14 @@ const Library = () => {
               <Text>
                 Chapter {record.lastChapter} / {record.totalChapters}
               </Text>
-              <Progress 
-                percent={Math.round(record.readingProgress)} 
-                size="small" 
+              <Progress
+                percent={Math.round(record.readingProgress)}
+                size="small"
                 status={record.status === 'completed' ? 'success' : 'active'}
               />
               <Text type="secondary" style={{ fontSize: '12px' }}>
-                <ClockCircleOutlined /> {Math.round(record.timeSpent / 60)}h {record.timeSpent % 60}m
+                <ClockCircleOutlined /> {Math.round(record.timeSpent / 60)}h {record.timeSpent % 60}
+                m
               </Text>
             </Space>
           ),
@@ -521,7 +535,12 @@ const Library = () => {
     ...getColumns(),
     {
       title: activeTab === 'reading_history' ? 'Last Read' : 'Updated',
-      dataIndex: activeTab === 'reading_history' ? 'lastRead' : activeTab === 'bookmarks' ? 'lastAccessed' : 'updatedAt',
+      dataIndex:
+        activeTab === 'reading_history'
+          ? 'lastRead'
+          : activeTab === 'bookmarks'
+            ? 'lastAccessed'
+            : 'updatedAt',
       key: 'date',
       render: (date) => (
         <Tooltip title={new Date(date).toLocaleString()}>
@@ -544,30 +563,34 @@ const Library = () => {
           onDelete={handleDelete}
           showMore={true}
           customActions={
-            activeTab === 'collections' ? [
-              {
-                key: 'share',
-                icon: <ShareAltOutlined />,
-                label: 'Share Collection',
-              },
-              {
-                key: 'export',
-                icon: <DownloadOutlined />,
-                label: 'Export',
-              }
-            ] : activeTab === 'bookmarks' ? [
-              {
-                key: 'goto',
-                icon: <BookOutlined />,
-                label: 'Go to Chapter',
-              }
-            ] : [
-              {
-                key: 'resume',
-                icon: <BookOutlined />,
-                label: 'Resume Reading',
-              }
-            ]
+            activeTab === 'collections'
+              ? [
+                  {
+                    key: 'share',
+                    icon: <ShareAltOutlined />,
+                    label: 'Share Collection',
+                  },
+                  {
+                    key: 'export',
+                    icon: <DownloadOutlined />,
+                    label: 'Export',
+                  },
+                ]
+              : activeTab === 'bookmarks'
+                ? [
+                    {
+                      key: 'goto',
+                      icon: <BookOutlined />,
+                      label: 'Go to Chapter',
+                    },
+                  ]
+                : [
+                    {
+                      key: 'resume',
+                      icon: <BookOutlined />,
+                      label: 'Resume Reading',
+                    },
+                  ]
           }
         />
       ),
@@ -579,24 +602,21 @@ const Library = () => {
       <PageHeader
         title="Library Management"
         subtitle="Manage user collections, bookmarks, and reading history"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Library' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Library' }]}
         actions={[
           <Button key="export" type="default" icon={<DownloadOutlined />}>
             Export Data
           </Button>,
           <Button key="analytics" type="primary" icon={<BarsOutlined />}>
             Reading Analytics
-          </Button>
+          </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         {/* Tab Navigation */}
         <Space>
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <Button
               key={tab.key}
               type={activeTab === tab.key ? 'primary' : 'default'}
@@ -635,7 +655,7 @@ const Library = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -646,7 +666,7 @@ const Library = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
+              showTotal: (total, range) =>
                 `${range[0]}-${range[1]} of ${total} ${activeTab.replace('_', ' ')}`,
             }}
             onChange={handleTableChange}

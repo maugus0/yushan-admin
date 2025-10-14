@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Card, 
-  Descriptions, 
-  Button, 
-  Space, 
-  Typography, 
+import {
+  Card,
+  Descriptions,
+  Button,
+  Space,
+  Typography,
   message,
   Avatar,
   Tag,
@@ -14,7 +14,7 @@ import {
   Col,
   List,
   Table,
-  Badge
+  Badge,
 } from 'antd';
 import {
   UserOutlined,
@@ -31,7 +31,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   StarOutlined,
-  EyeOutlined
+  EyeOutlined,
 } from '@ant-design/icons';
 
 // Import modals
@@ -52,11 +52,11 @@ const { Title, Text, Paragraph } = Typography;
 const WriterDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   // State management
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  
+
   // Modal states
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -155,64 +155,74 @@ const WriterDetail = () => {
 
   // Field configurations for edit modal
   const editFields = [
-    fieldTypes.text('username', 'Username', { 
+    fieldTypes.text('username', 'Username', {
       rules: [{ required: true, message: 'Username is required' }],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.text('email', 'Email', { 
+    fieldTypes.text('email', 'Email', {
       rules: [
         { required: true, message: 'Email is required' },
-        { type: 'email', message: 'Please enter a valid email' }
+        { type: 'email', message: 'Please enter a valid email' },
       ],
-      span: 12
+      span: 12,
     }),
-    fieldTypes.select('status', 'Status', [
-      { label: 'Active', value: 'active' },
-      { label: 'Inactive', value: 'inactive' },
-      { label: 'Suspended', value: 'suspended' },
-      { label: 'Pending', value: 'pending' }
-    ], { span: 12 }),
-    fieldTypes.textarea('profile.bio', 'Bio', { 
+    fieldTypes.select(
+      'status',
+      'Status',
+      [
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' },
+        { label: 'Suspended', value: 'suspended' },
+        { label: 'Pending', value: 'pending' },
+      ],
+      { span: 12 }
+    ),
+    fieldTypes.textarea('profile.bio', 'Bio', {
       rows: 3,
-      span: 24
+      span: 24,
     }),
     fieldTypes.text('profile.location', 'Location', { span: 12 }),
   ];
 
   // Mock novels data
   const writerNovels = [
-    { 
-      id: 1, 
-      title: 'Dragon Realm Chronicles', 
-      status: 'published', 
-      chapters: 245, 
+    {
+      id: 1,
+      title: 'Dragon Realm Chronicles',
+      status: 'published',
+      chapters: 245,
       views: 125000,
       rating: 4.8,
-      revenue: 2500
+      revenue: 2500,
     },
-    { 
-      id: 2, 
-      title: 'Mystic Sword Master', 
-      status: 'ongoing', 
-      chapters: 156, 
+    {
+      id: 2,
+      title: 'Mystic Sword Master',
+      status: 'ongoing',
+      chapters: 156,
       views: 89000,
       rating: 4.6,
-      revenue: 1800
+      revenue: 1800,
     },
-    { 
-      id: 3, 
-      title: 'Shadow Hunter', 
-      status: 'draft', 
-      chapters: 23, 
+    {
+      id: 3,
+      title: 'Shadow Hunter',
+      status: 'draft',
+      chapters: 23,
       views: 0,
       rating: 0,
-      revenue: 0
+      revenue: 0,
     },
   ];
 
   // Mock recent activity
   const recentActivity = [
-    { id: 1, action: 'Published Chapter 245', novel: 'Dragon Realm Chronicles', time: '2 hours ago' },
+    {
+      id: 1,
+      action: 'Published Chapter 245',
+      novel: 'Dragon Realm Chronicles',
+      time: '2 hours ago',
+    },
     { id: 2, action: 'Updated Chapter 156', novel: 'Mystic Sword Master', time: '1 day ago' },
     { id: 3, action: 'Created new novel', novel: 'Shadow Hunter', time: '3 days ago' },
     { id: 4, action: 'Responded to review', novel: 'Dragon Realm Chronicles', time: '1 week ago' },
@@ -227,9 +237,15 @@ const WriterDetail = () => {
         <Space>
           <BookOutlined />
           <span style={{ fontWeight: 500 }}>{text}</span>
-          <Badge 
-            status={record.status === 'published' ? 'success' : record.status === 'ongoing' ? 'processing' : 'default'} 
-            text={record.status} 
+          <Badge
+            status={
+              record.status === 'published'
+                ? 'success'
+                : record.status === 'ongoing'
+                  ? 'processing'
+                  : 'default'
+            }
+            text={record.status}
           />
         </Space>
       ),
@@ -273,8 +289,7 @@ const WriterDetail = () => {
       key: 'revenue',
       render: (revenue) => (
         <Space>
-          <DollarOutlined style={{ color: '#52c41a' }} />
-          ${revenue}
+          <DollarOutlined style={{ color: '#52c41a' }} />${revenue}
         </Space>
       ),
     },
@@ -298,7 +313,7 @@ const WriterDetail = () => {
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
-      
+
       <PageHeader
         title={`Writer Details - ${user.username}`}
         subtitle="View and manage writer information"
@@ -324,17 +339,17 @@ const WriterDetail = () => {
         <Row gutter={24}>
           <Col span={6}>
             <div style={{ textAlign: 'center' }}>
-              <Avatar 
-                size={120} 
-                src={user.avatar} 
+              <Avatar
+                size={120}
+                src={user.avatar}
                 icon={<UserOutlined />}
                 style={{ marginBottom: 16 }}
               />
               <Title level={4}>
                 {user.username}
                 {user.verification?.verified && (
-                  <CheckCircleOutlined 
-                    style={{ color: '#52c41a', marginLeft: 8 }} 
+                  <CheckCircleOutlined
+                    style={{ color: '#52c41a', marginLeft: 8 }}
                     title="Verified Writer"
                   />
                 )}
@@ -369,8 +384,10 @@ const WriterDetail = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Genres" span={2}>
                 <Space wrap>
-                  {user.profile?.genres?.map(genre => (
-                    <Tag key={genre} color="blue">{genre}</Tag>
+                  {user.profile?.genres?.map((genre) => (
+                    <Tag key={genre} color="blue">
+                      {genre}
+                    </Tag>
                   ))}
                 </Space>
               </Descriptions.Item>
@@ -457,7 +474,7 @@ const WriterDetail = () => {
           <Card title="Recent Activity">
             <List
               dataSource={recentActivity}
-              renderItem={item => (
+              renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={<FileTextOutlined />}
@@ -492,12 +509,15 @@ const WriterDetail = () => {
               )}
               <Descriptions.Item label="Documents Submitted">
                 <Space wrap>
-                  {user.verification?.documents?.length > 0 ? 
-                    user.verification.documents.map(doc => (
-                      <Tag key={doc} color="blue">{doc}</Tag>
-                    )) : 
+                  {user.verification?.documents?.length > 0 ? (
+                    user.verification.documents.map((doc) => (
+                      <Tag key={doc} color="blue">
+                        {doc}
+                      </Tag>
+                    ))
+                  ) : (
                     <Text type="secondary">No documents submitted</Text>
-                  }
+                  )}
                 </Space>
               </Descriptions.Item>
             </Descriptions>
@@ -541,7 +561,7 @@ const WriterDetail = () => {
           'All published novels will be archived',
           'All earnings history will be preserved but inaccessible',
           'All comments and interactions will be deleted',
-          'This action cannot be undone'
+          'This action cannot be undone',
         ]}
       />
 

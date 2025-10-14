@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress } from 'antd';
-import { 
+import {
   FlagOutlined,
   UserOutlined,
   BookOutlined,
@@ -14,14 +14,14 @@ import {
   WarningOutlined,
   SafetyOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 
 const { Text, Paragraph } = Typography;
@@ -43,7 +43,8 @@ const Reports = () => {
       id: 1,
       type: 'inappropriate_content',
       reportedContentType: 'comment',
-      reportedContent: 'This is spam content with inappropriate links and promotional material that violates our community guidelines.',
+      reportedContent:
+        'This is spam content with inappropriate links and promotional material that violates our community guidelines.',
       reportedItem: 'Comment #1234',
       reportedBy: 'concerned_user',
       reportedUser: 'spam_user',
@@ -62,7 +63,8 @@ const Reports = () => {
       id: 2,
       type: 'harassment',
       reportedContentType: 'review',
-      reportedContent: 'This review contains personal attacks against the author and uses inappropriate language.',
+      reportedContent:
+        'This review contains personal attacks against the author and uses inappropriate language.',
       reportedItem: 'Review #5678',
       reportedBy: 'author_defender',
       reportedUser: 'toxic_reviewer',
@@ -119,7 +121,8 @@ const Reports = () => {
       id: 5,
       type: 'misinformation',
       reportedContentType: 'comment',
-      reportedContent: 'Comment spreads false information about the platform and author payment systems.',
+      reportedContent:
+        'Comment spreads false information about the platform and author payment systems.',
       reportedItem: 'Comment #9876',
       reportedBy: 'fact_checker',
       reportedUser: 'misinform_user',
@@ -137,63 +140,67 @@ const Reports = () => {
   ];
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      let filteredData = mockReports;
-      
-      // Apply search filter
-      if (searchValue) {
-        filteredData = filteredData.filter(item => 
-          item.reportedContent.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.reportedBy.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.reportedUser.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.reportedItem.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.reason.toLowerCase().includes(searchValue.toLowerCase())
-        );
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let filteredData = mockReports;
+
+        // Apply search filter
+        if (searchValue) {
+          filteredData = filteredData.filter(
+            (item) =>
+              item.reportedContent.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.reportedBy.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.reportedUser.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.reportedItem.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.reason.toLowerCase().includes(searchValue.toLowerCase())
+          );
+        }
+
+        // Apply filters
+        if (filters.status) {
+          filteredData = filteredData.filter((item) => item.status === filters.status);
+        }
+
+        if (filters.type) {
+          filteredData = filteredData.filter((item) => item.type === filters.type);
+        }
+
+        if (filters.priority) {
+          filteredData = filteredData.filter((item) => item.priority === filters.priority);
+        }
+
+        if (filters.category) {
+          filteredData = filteredData.filter((item) => item.category === filters.category);
+        }
+
+        if (filters.assignedTo) {
+          filteredData = filteredData.filter((item) => item.assignedTo === filters.assignedTo);
+        }
+
+        const pageSize = params.pageSize || pagination.pageSize;
+        const current = params.current || pagination.current;
+        const startIndex = (current - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        setData(filteredData.slice(startIndex, endIndex));
+        setPagination((prev) => ({
+          ...prev,
+          current: current,
+          total: filteredData.length,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch reports:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Apply filters
-      if (filters.status) {
-        filteredData = filteredData.filter(item => item.status === filters.status);
-      }
-      
-      if (filters.type) {
-        filteredData = filteredData.filter(item => item.type === filters.type);
-      }
-      
-      if (filters.priority) {
-        filteredData = filteredData.filter(item => item.priority === filters.priority);
-      }
-      
-      if (filters.category) {
-        filteredData = filteredData.filter(item => item.category === filters.category);
-      }
-      
-      if (filters.assignedTo) {
-        filteredData = filteredData.filter(item => item.assignedTo === filters.assignedTo);
-      }
-      
-      const pageSize = params.pageSize || pagination.pageSize;
-      const current = params.current || pagination.current;
-      const startIndex = (current - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      
-      setData(filteredData.slice(startIndex, endIndex));
-      setPagination(prev => ({
-        ...prev,
-        current: current,
-        total: filteredData.length,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch reports:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, pagination.pageSize, pagination.current]);
+    },
+    [searchValue, filters, pagination.pageSize, pagination.current]
+  );
 
   useEffect(() => {
     fetchData();
@@ -291,9 +298,7 @@ const Reports = () => {
               <Text strong>{record.reportedUser}</Text>
             </Space>
             <Space>
-              <span style={{ color: priorityDisplay.color }}>
-                {priorityDisplay.icon}
-              </span>
+              <span style={{ color: priorityDisplay.color }}>{priorityDisplay.icon}</span>
               <Text strong style={{ color: priorityDisplay.color }}>
                 {record.priority.toUpperCase()}
               </Text>
@@ -305,7 +310,7 @@ const Reports = () => {
               <BookOutlined style={{ marginRight: 4 }} />
               {record.reportedItem}
             </Text>
-            <Paragraph 
+            <Paragraph
               ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
               style={{ margin: 0, maxWidth: 400 }}
             >
@@ -320,7 +325,7 @@ const Reports = () => {
       dataIndex: 'reportedContent',
       key: 'content',
       render: (text) => (
-        <Paragraph 
+        <Paragraph
           ellipsis={{ rows: 3, expandable: true, symbol: 'more' }}
           style={{ margin: 0, maxWidth: 300 }}
         >
@@ -401,7 +406,7 @@ const Reports = () => {
               key: 'investigate',
               icon: <EyeOutlined />,
               label: 'Investigate',
-            }
+            },
           ]}
         />
       ),
@@ -440,9 +445,9 @@ const Reports = () => {
 
   // Calculate statistics
   const getStats = () => {
-    const pending = mockReports.filter(r => r.status === 'pending').length;
-    const investigating = mockReports.filter(r => r.status === 'investigating').length;
-    const critical = mockReports.filter(r => r.priority === 'critical').length;
+    const pending = mockReports.filter((r) => r.status === 'pending').length;
+    const investigating = mockReports.filter((r) => r.status === 'investigating').length;
+    const critical = mockReports.filter((r) => r.priority === 'critical').length;
     return { pending, investigating, critical };
   };
 
@@ -453,10 +458,7 @@ const Reports = () => {
       <PageHeader
         title="Reports Management"
         subtitle="Review and resolve user reports and violations"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Reports' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Reports' }]}
         actions={[
           <Button key="critical" type="default" danger icon={<ExclamationCircleOutlined />}>
             Critical ({stats.critical})
@@ -466,7 +468,7 @@ const Reports = () => {
           </Button>,
           <Button key="pending" type="primary" icon={<FlagOutlined />}>
             Pending ({stats.pending})
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -498,7 +500,7 @@ const Reports = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -509,8 +511,7 @@ const Reports = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} reports`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} reports`,
             }}
             onChange={handleTableChange}
             loading={loading}

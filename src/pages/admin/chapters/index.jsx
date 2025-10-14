@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Badge, Progress } from 'antd';
-import { 
+import {
   PlusOutlined,
   FileTextOutlined,
   BookOutlined,
@@ -9,14 +9,14 @@ import {
   EyeOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 
 const Chapters = () => {
@@ -73,7 +73,7 @@ const Chapters = () => {
     },
     {
       id: 4,
-      title: 'Dragon\'s First Flight',
+      title: "Dragon's First Flight",
       chapterNumber: 1,
       novel: 'Dragon Emperor',
       author: 'dragon_writer',
@@ -100,52 +100,56 @@ const Chapters = () => {
   ];
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      let filteredData = mockChapters;
-      
-      // Apply search filter
-      if (searchValue) {
-        filteredData = filteredData.filter(item => 
-          item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.novel.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.author.toLowerCase().includes(searchValue.toLowerCase())
-        );
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let filteredData = mockChapters;
+
+        // Apply search filter
+        if (searchValue) {
+          filteredData = filteredData.filter(
+            (item) =>
+              item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.novel.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.author.toLowerCase().includes(searchValue.toLowerCase())
+          );
+        }
+
+        // Apply filters
+        if (filters.status) {
+          filteredData = filteredData.filter((item) => item.status === filters.status);
+        }
+
+        if (filters.wordCountRange) {
+          const [min, max] = filters.wordCountRange;
+          filteredData = filteredData.filter(
+            (item) => item.wordCount >= (min || 0) && item.wordCount <= (max || Infinity)
+          );
+        }
+
+        const pageSize = params.pageSize || pagination.pageSize;
+        const current = params.current || pagination.current;
+        const startIndex = (current - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        setData(filteredData.slice(startIndex, endIndex));
+        setPagination((prev) => ({
+          ...prev,
+          current: current,
+          total: filteredData.length,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch chapters:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Apply filters
-      if (filters.status) {
-        filteredData = filteredData.filter(item => item.status === filters.status);
-      }
-      
-      if (filters.wordCountRange) {
-        const [min, max] = filters.wordCountRange;
-        filteredData = filteredData.filter(item => 
-          item.wordCount >= (min || 0) && item.wordCount <= (max || Infinity)
-        );
-      }
-      
-      const pageSize = params.pageSize || pagination.pageSize;
-      const current = params.current || pagination.current;
-      const startIndex = (current - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      
-      setData(filteredData.slice(startIndex, endIndex));
-      setPagination(prev => ({
-        ...prev,
-        current: current,
-        total: filteredData.length,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch chapters:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, pagination.pageSize, pagination.current]);
+    },
+    [searchValue, filters, pagination.pageSize, pagination.current]
+  );
 
   useEffect(() => {
     fetchData();
@@ -214,9 +218,9 @@ const Chapters = () => {
       render: (count) => (
         <Space direction="vertical" size={0}>
           <div style={{ fontWeight: 500 }}>{count.toLocaleString()}</div>
-          <Progress 
-            percent={Math.min((count / 3000) * 100, 100)} 
-            showInfo={false} 
+          <Progress
+            percent={Math.min((count / 3000) * 100, 100)}
+            showInfo={false}
             size="small"
             strokeColor={count >= 3000 ? '#52c41a' : count >= 2000 ? '#faad14' : '#ff4d4f'}
           />
@@ -249,7 +253,7 @@ const Chapters = () => {
       title: 'Published',
       dataIndex: 'publishedAt',
       key: 'publishedAt',
-      render: (date) => (
+      render: (date) =>
         date ? (
           <Tooltip title={new Date(date).toLocaleString()}>
             <Space>
@@ -259,8 +263,7 @@ const Chapters = () => {
           </Tooltip>
         ) : (
           <span style={{ color: '#999' }}>Not published</span>
-        )
-      ),
+        ),
     },
     {
       title: 'Actions',
@@ -283,7 +286,7 @@ const Chapters = () => {
               key: 'preview',
               icon: <EyeOutlined />,
               label: 'Preview',
-            }
+            },
           ]}
         />
       ),
@@ -329,14 +332,11 @@ const Chapters = () => {
       <PageHeader
         title="Chapters Management"
         subtitle="Manage and monitor novel chapters"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Chapters' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Chapters' }]}
         actions={[
           <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
             Add Chapter
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -370,7 +370,7 @@ const Chapters = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -381,8 +381,7 @@ const Chapters = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} chapters`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} chapters`,
             }}
             onChange={handleTableChange}
             loading={loading}

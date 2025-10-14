@@ -1,10 +1,9 @@
-import React from 'react';
 import { Breadcrumb } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import { HomeOutlined } from '@ant-design/icons';
 
-const Breadcrumbs = ({ 
-  items = [], 
+const Breadcrumbs = ({
+  items = [],
   showHome = true,
   homeIcon = <HomeOutlined />,
   homePath = '/admin/dashboard',
@@ -13,7 +12,7 @@ const Breadcrumbs = ({
   style = {},
   className = '',
   autoGenerate = false,
-  ...props 
+  ...props
 }) => {
   const location = useLocation();
 
@@ -40,13 +39,13 @@ const Breadcrumbs = ({
     let currentPath = '';
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
-      
+
       // Skip the first 'admin' segment for cleaner display
       if (segment === 'admin') return;
-      
+
       const isLast = index === pathSegments.length - 1;
       const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/[-_]/g, ' ');
-      
+
       if (isLast) {
         // Last item should not be a link
         breadcrumbs.push({ title });
@@ -61,7 +60,7 @@ const Breadcrumbs = ({
   };
 
   // Use provided items or auto-generate
-  const breadcrumbItems = items.length > 0 ? items : (autoGenerate ? generateBreadcrumbs() : []);
+  const breadcrumbItems = items.length > 0 ? items : autoGenerate ? generateBreadcrumbs() : [];
 
   // If no items and not auto-generating, don't render
   if (breadcrumbItems.length === 0) {
@@ -73,14 +72,14 @@ const Breadcrumbs = ({
     if (typeof item === 'string') {
       return { title: item };
     }
-    
+
     if (item.href && !item.title.props) {
       return {
         ...item,
         title: <Link to={item.href}>{item.title}</Link>,
       };
     }
-    
+
     return item;
   });
 
@@ -91,7 +90,7 @@ const Breadcrumbs = ({
       style={{
         margin: '8px 0',
         fontSize: '14px',
-        ...style
+        ...style,
       }}
       className={className}
       {...props}

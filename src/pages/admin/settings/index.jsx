@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Button, 
-  Space, 
-  Card, 
-  Form, 
-  Input, 
-  Select, 
-  Switch, 
-  InputNumber, 
-  Typography, 
+import {
+  Button,
+  Space,
+  Card,
+  Form,
+  Input,
+  Select,
+  Switch,
+  InputNumber,
+  Typography,
   Divider,
   message,
   Row,
@@ -17,7 +17,7 @@ import {
   ColorPicker,
   Slider,
 } from 'antd';
-import { 
+import {
   SettingOutlined,
   SaveOutlined,
   ReloadOutlined,
@@ -31,10 +31,7 @@ import {
   ThunderboltOutlined,
   PictureOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  LoadingSpinner 
-} from '../../../components/admin/common';
+import { PageHeader, LoadingSpinner } from '../../../components/admin/common';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -129,7 +126,7 @@ const Settings = () => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       form.setFieldsValue(settings[activeSection]);
     } catch (error) {
       message.error('Failed to load settings');
@@ -148,15 +145,15 @@ const Settings = () => {
     try {
       const values = await form.validateFields();
       setLoading(true);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSettings(prev => ({
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      setSettings((prev) => ({
         ...prev,
         [activeSection]: values,
       }));
-      
+
       setHasChanges(false);
       message.success('Settings saved successfully');
     } catch (error) {
@@ -197,7 +194,11 @@ const Settings = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="siteUrl" label="Site URL" rules={[{ required: true, type: 'url' }]}>
+                <Form.Item
+                  name="siteUrl"
+                  label="Site URL"
+                  rules={[{ required: true, type: 'url' }]}
+                >
                   <Input placeholder="https://example.com" />
                 </Form.Item>
               </Col>
@@ -209,7 +210,11 @@ const Settings = () => {
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="adminEmail" label="Admin Email" rules={[{ required: true, type: 'email' }]}>
+                <Form.Item
+                  name="adminEmail"
+                  label="Admin Email"
+                  rules={[{ required: true, type: 'email' }]}
+                >
                   <Input placeholder="admin@example.com" />
                 </Form.Item>
               </Col>
@@ -354,13 +359,25 @@ const Settings = () => {
             </Form.Item>
 
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Form.Item name="autoApproveChapters" label="Auto-approve Chapters" valuePropName="checked">
+              <Form.Item
+                name="autoApproveChapters"
+                label="Auto-approve Chapters"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
-              <Form.Item name="allowGuestReading" label="Allow Guest Reading" valuePropName="checked">
+              <Form.Item
+                name="allowGuestReading"
+                label="Allow Guest Reading"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
-              <Form.Item name="requireEmailVerification" label="Require Email Verification" valuePropName="checked">
+              <Form.Item
+                name="requireEmailVerification"
+                label="Require Email Verification"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
             </Space>
@@ -373,12 +390,12 @@ const Settings = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="yuanExchangeRate" label="Yuan Exchange Rate (USD)">
-                  <InputNumber 
-                    min={0.001} 
-                    max={1} 
-                    step={0.001} 
+                  <InputNumber
+                    min={0.001}
+                    max={1}
+                    step={0.001}
                     precision={3}
-                    style={{ width: '100%' }} 
+                    style={{ width: '100%' }}
                   />
                 </Form.Item>
               </Col>
@@ -415,7 +432,11 @@ const Settings = () => {
               <Form.Item name="enableTipping" label="Enable Tipping" valuePropName="checked">
                 <Switch />
               </Form.Item>
-              <Form.Item name="enablePremiumContent" label="Enable Premium Content" valuePropName="checked">
+              <Form.Item
+                name="enablePremiumContent"
+                label="Enable Premium Content"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
             </Space>
@@ -428,29 +449,53 @@ const Settings = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Space direction="vertical" style={{ width: '100%' }}>
-                  <Form.Item name="emailNotifications" label="Email Notifications" valuePropName="checked">
+                  <Form.Item
+                    name="emailNotifications"
+                    label="Email Notifications"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
-                  <Form.Item name="pushNotifications" label="Push Notifications" valuePropName="checked">
+                  <Form.Item
+                    name="pushNotifications"
+                    label="Push Notifications"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
-                  <Form.Item name="newChapterNotifications" label="New Chapter Alerts" valuePropName="checked">
+                  <Form.Item
+                    name="newChapterNotifications"
+                    label="New Chapter Alerts"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
-                  <Form.Item name="commentNotifications" label="Comment Notifications" valuePropName="checked">
+                  <Form.Item
+                    name="commentNotifications"
+                    label="Comment Notifications"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
                 </Space>
               </Col>
               <Col span={12}>
                 <Space direction="vertical" style={{ width: '100%' }}>
-                  <Form.Item name="reviewNotifications" label="Review Notifications" valuePropName="checked">
+                  <Form.Item
+                    name="reviewNotifications"
+                    label="Review Notifications"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
                   <Form.Item name="systemAlerts" label="System Alerts" valuePropName="checked">
                     <Switch />
                   </Form.Item>
-                  <Form.Item name="marketingEmails" label="Marketing Emails" valuePropName="checked">
+                  <Form.Item
+                    name="marketingEmails"
+                    label="Marketing Emails"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
                 </Space>
@@ -488,16 +533,28 @@ const Settings = () => {
             </Form.Item>
 
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Form.Item name="requireStrongPassword" label="Require Strong Password" valuePropName="checked">
+              <Form.Item
+                name="requireStrongPassword"
+                label="Require Strong Password"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
-              <Form.Item name="enableTwoFactor" label="Enable Two-Factor Auth" valuePropName="checked">
+              <Form.Item
+                name="enableTwoFactor"
+                label="Enable Two-Factor Auth"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item name="enableCaptcha" label="Enable CAPTCHA" valuePropName="checked">
                 <Switch />
               </Form.Item>
-              <Form.Item name="enableRateLimiting" label="Enable Rate Limiting" valuePropName="checked">
+              <Form.Item
+                name="enableRateLimiting"
+                label="Enable Rate Limiting"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
             </Space>
@@ -528,13 +585,21 @@ const Settings = () => {
               <Form.Item name="enableCaching" label="Enable Caching" valuePropName="checked">
                 <Switch />
               </Form.Item>
-              <Form.Item name="enableCompression" label="Enable Compression" valuePropName="checked">
+              <Form.Item
+                name="enableCompression"
+                label="Enable Compression"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item name="enableCDN" label="Enable CDN" valuePropName="checked">
                 <Switch />
               </Form.Item>
-              <Form.Item name="databaseOptimization" label="Database Optimization" valuePropName="checked">
+              <Form.Item
+                name="databaseOptimization"
+                label="Database Optimization"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item name="enableBackups" label="Enable Backups" valuePropName="checked">
@@ -554,29 +619,26 @@ const Settings = () => {
       <PageHeader
         title="Platform Settings"
         subtitle="Configure and manage platform settings"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Settings' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Settings' }]}
         actions={[
-          <Button 
-            key="reset" 
-            icon={<ReloadOutlined />} 
+          <Button
+            key="reset"
+            icon={<ReloadOutlined />}
             onClick={handleReset}
             disabled={!hasChanges}
           >
             Reset
           </Button>,
-          <Button 
-            key="save" 
-            type="primary" 
-            icon={<SaveOutlined />} 
+          <Button
+            key="save"
+            type="primary"
+            icon={<SaveOutlined />}
             loading={loading}
             onClick={handleSave}
             disabled={!hasChanges}
           >
             Save Settings
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -585,7 +647,7 @@ const Settings = () => {
         <Col span={6}>
           <Card title="Settings Categories" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
-              {sections.map(section => (
+              {sections.map((section) => (
                 <Button
                   key={section.key}
                   type={activeSection === section.key ? 'primary' : 'text'}
@@ -607,11 +669,11 @@ const Settings = () => {
 
         {/* Settings Form */}
         <Col span={18}>
-          <Card 
+          <Card
             title={
               <Space>
-                {sections.find(s => s.key === activeSection)?.icon}
-                <span>{sections.find(s => s.key === activeSection)?.label} Settings</span>
+                {sections.find((s) => s.key === activeSection)?.icon}
+                <span>{sections.find((s) => s.key === activeSection)?.label} Settings</span>
               </Space>
             }
             loading={loading}

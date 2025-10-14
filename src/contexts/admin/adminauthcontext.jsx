@@ -32,8 +32,8 @@ export const AdminAuthProvider = ({ children }) => {
     setLoading(true);
     try {
       // Mock login - in real app, this would call your API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+
       if (credentials.username === 'admin' && credentials.password === 'admin123') {
         const mockAdmin = {
           id: 1,
@@ -44,7 +44,7 @@ export const AdminAuthProvider = ({ children }) => {
           avatar: null,
           lastLogin: new Date().toISOString(),
         };
-        
+
         setAdmin(mockAdmin);
         localStorage.setItem('admin', JSON.stringify(mockAdmin));
         message.success('Login successful!');
@@ -74,9 +74,5 @@ export const AdminAuthProvider = ({ children }) => {
     isAuthenticated: !!admin,
   };
 
-  return (
-    <AdminAuthContext.Provider value={value}>
-      {children}
-    </AdminAuthContext.Provider>
-  );
+  return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
 };

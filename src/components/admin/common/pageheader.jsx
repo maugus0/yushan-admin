@@ -1,4 +1,3 @@
-import React from 'react';
 import { Space, Typography, Divider } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Breadcrumbs from './breadcrumbs';
@@ -43,55 +42,52 @@ const PageHeader = ({
       )}
 
       {/* Main Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
-        marginBottom: footer ? '16px' : '0'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: footer ? '16px' : '0',
+        }}
+      >
         <div style={{ flex: 1 }}>
           <Space align="start" size="middle">
             {showBackButton && (
-              <span 
+              <span
                 onClick={onBack}
-                style={{ 
-                  cursor: 'pointer', 
+                style={{
+                  cursor: 'pointer',
                   fontSize: '16px',
                   color: '#1890ff',
                   display: 'flex',
                   alignItems: 'center',
-                  height: '32px'
+                  height: '32px',
                 }}
               >
                 {backIcon}
               </span>
             )}
-            
+
             {avatar && <div>{avatar}</div>}
-            
+
             <div>
               <Title level={2} style={{ margin: 0, lineHeight: 1.2 }}>
                 {title}
               </Title>
               {subtitle && (
-                <Text type="secondary" style={{ fontSize: '14px', display: 'block', marginTop: '4px' }}>
+                <Text
+                  type="secondary"
+                  style={{ fontSize: '14px', display: 'block', marginTop: '4px' }}
+                >
                   {subtitle}
                 </Text>
               )}
-              {tags && (
-                <div style={{ marginTop: '8px' }}>
-                  {tags}
-                </div>
-              )}
+              {tags && <div style={{ marginTop: '8px' }}>{tags}</div>}
             </div>
           </Space>
         </div>
 
-        {(actions.length > 0 || extra) && (
-          <div style={{ marginLeft: '16px' }}>
-            {headerExtra}
-          </div>
-        )}
+        {(actions.length > 0 || extra) && <div style={{ marginLeft: '16px' }}>{headerExtra}</div>}
       </div>
 
       {/* Footer */}

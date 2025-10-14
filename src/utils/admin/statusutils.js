@@ -12,7 +12,7 @@ export const STATUS_DEFINITIONS = {
     banned: { label: '已封禁', color: 'error', variant: 'outlined' },
     pending: { label: '待审核', color: 'info', variant: 'filled' },
   },
-  
+
   // Novel statuses
   NOVEL: {
     draft: { label: '草稿', color: 'default', variant: 'outlined' },
@@ -28,7 +28,7 @@ export const STATUS_DEFINITIONS = {
     paused: { label: '暂停更新', color: 'warning', variant: 'outlined' },
     cancelled: { label: '已取消', color: 'error', variant: 'outlined' },
   },
-  
+
   // Chapter statuses
   CHAPTER: {
     draft: { label: '草稿', color: 'default', variant: 'outlined' },
@@ -40,7 +40,7 @@ export const STATUS_DEFINITIONS = {
     premium: { label: '付费章节', color: 'warning', variant: 'filled' },
     free: { label: '免费章节', color: 'success', variant: 'outlined' },
   },
-  
+
   // Comment statuses
   COMMENT: {
     pending: { label: '待审核', color: 'info', variant: 'filled' },
@@ -50,7 +50,7 @@ export const STATUS_DEFINITIONS = {
     hidden: { label: '已隐藏', color: 'default', variant: 'outlined' },
     deleted: { label: '已删除', color: 'error', variant: 'outlined' },
   },
-  
+
   // Review statuses
   REVIEW: {
     pending: { label: '待审核', color: 'info', variant: 'filled' },
@@ -60,7 +60,7 @@ export const STATUS_DEFINITIONS = {
     helpful: { label: '有用', color: 'primary', variant: 'outlined' },
     reported: { label: '被举报', color: 'error', variant: 'outlined' },
   },
-  
+
   // Report statuses
   REPORT: {
     open: { label: '待处理', color: 'warning', variant: 'filled' },
@@ -70,7 +70,7 @@ export const STATUS_DEFINITIONS = {
     escalated: { label: '已升级', color: 'error', variant: 'filled' },
     closed: { label: '已关闭', color: 'default', variant: 'outlined' },
   },
-  
+
   // Transaction statuses
   TRANSACTION: {
     pending: { label: '处理中', color: 'info', variant: 'filled' },
@@ -80,7 +80,7 @@ export const STATUS_DEFINITIONS = {
     refunded: { label: '已退款', color: 'warning', variant: 'filled' },
     expired: { label: '已过期', color: 'error', variant: 'outlined' },
   },
-  
+
   // Order statuses
   ORDER: {
     pending: { label: '待付款', color: 'warning', variant: 'filled' },
@@ -91,7 +91,7 @@ export const STATUS_DEFINITIONS = {
     cancelled: { label: '已取消', color: 'error', variant: 'filled' },
     refunded: { label: '已退款', color: 'warning', variant: 'filled' },
   },
-  
+
   // Subscription statuses
   SUBSCRIPTION: {
     active: { label: '活跃', color: 'success', variant: 'filled' },
@@ -101,7 +101,7 @@ export const STATUS_DEFINITIONS = {
     trial: { label: '试用期', color: 'info', variant: 'outlined' },
     pending: { label: '待激活', color: 'info', variant: 'filled' },
   },
-  
+
   // System statuses
   SYSTEM: {
     online: { label: '在线', color: 'success', variant: 'filled' },
@@ -135,12 +135,12 @@ export const getStatusConfig = (category, status) => {
   if (!categoryDef) {
     return { label: status, color: 'default', variant: 'outlined' };
   }
-  
+
   const statusDef = categoryDef[status?.toLowerCase()];
   if (!statusDef) {
     return { label: status, color: 'default', variant: 'outlined' };
   }
-  
+
   return statusDef;
 };
 
@@ -154,7 +154,7 @@ export const getPriorityConfig = (priority) => {
   if (!priorityDef) {
     return { label: priority, color: 'default', icon: '❓' };
   }
-  
+
   return priorityDef;
 };
 
@@ -166,7 +166,7 @@ export const getPriorityConfig = (priority) => {
  */
 export const getStatusBadgeProps = (category, status) => {
   const config = getStatusConfig(category, status);
-  
+
   const colorMap = {
     default: 'default',
     primary: 'blue',
@@ -176,7 +176,7 @@ export const getStatusBadgeProps = (category, status) => {
     error: 'red',
     info: 'blue',
   };
-  
+
   return {
     status: config.variant === 'outlined' ? 'default' : 'processing',
     color: colorMap[config.color] || 'default',
@@ -192,7 +192,7 @@ export const getStatusBadgeProps = (category, status) => {
  */
 export const getStatusTagProps = (category, status) => {
   const config = getStatusConfig(category, status);
-  
+
   const colorMap = {
     default: 'default',
     primary: 'blue',
@@ -202,7 +202,7 @@ export const getStatusTagProps = (category, status) => {
     error: 'red',
     info: 'blue',
   };
-  
+
   return {
     color: colorMap[config.color] || 'default',
     bordered: config.variant === 'outlined',
@@ -225,7 +225,7 @@ export const getStatusTransitions = (category, currentStatus) => {
       banned: ['active'],
       pending: ['active', 'rejected'],
     },
-    
+
     NOVEL: {
       draft: ['pending'],
       pending: ['approved', 'rejected'],
@@ -240,7 +240,7 @@ export const getStatusTransitions = (category, currentStatus) => {
       paused: ['ongoing', 'cancelled'],
       cancelled: ['ongoing'],
     },
-    
+
     CHAPTER: {
       draft: ['pending'],
       pending: ['approved', 'rejected'],
@@ -251,7 +251,7 @@ export const getStatusTransitions = (category, currentStatus) => {
       premium: ['free'],
       free: ['premium'],
     },
-    
+
     COMMENT: {
       pending: ['approved', 'rejected'],
       approved: ['flagged', 'hidden', 'deleted'],
@@ -260,7 +260,7 @@ export const getStatusTransitions = (category, currentStatus) => {
       hidden: ['approved', 'deleted'],
       deleted: [],
     },
-    
+
     REVIEW: {
       pending: ['approved', 'rejected'],
       approved: ['featured', 'reported'],
@@ -269,7 +269,7 @@ export const getStatusTransitions = (category, currentStatus) => {
       helpful: ['approved'],
       reported: ['approved', 'rejected'],
     },
-    
+
     REPORT: {
       open: ['investigating', 'dismissed'],
       investigating: ['resolved', 'escalated', 'dismissed'],
@@ -278,7 +278,7 @@ export const getStatusTransitions = (category, currentStatus) => {
       escalated: ['resolved', 'dismissed'],
       closed: [],
     },
-    
+
     TRANSACTION: {
       pending: ['completed', 'failed', 'cancelled'],
       completed: ['refunded'],
@@ -288,14 +288,14 @@ export const getStatusTransitions = (category, currentStatus) => {
       expired: [],
     },
   };
-  
+
   const categoryTransitions = transitions[category?.toUpperCase()];
   if (!categoryTransitions) return [];
-  
+
   const availableTransitions = categoryTransitions[currentStatus?.toLowerCase()];
   if (!availableTransitions) return [];
-  
-  return availableTransitions.map(status => ({
+
+  return availableTransitions.map((status) => ({
     value: status,
     label: getStatusConfig(category, status).label,
   }));
@@ -310,7 +310,7 @@ export const getStatusTransitions = (category, currentStatus) => {
  */
 export const isValidStatusTransition = (category, fromStatus, toStatus) => {
   const availableTransitions = getStatusTransitions(category, fromStatus);
-  return availableTransitions.some(transition => transition.value === toStatus);
+  return availableTransitions.some((transition) => transition.value === toStatus);
 };
 
 /**
@@ -322,11 +322,11 @@ export const isValidStatusTransition = (category, fromStatus, toStatus) => {
  */
 export const getStatusStatistics = (items, category, statusField = 'status') => {
   if (!Array.isArray(items)) return {};
-  
+
   const stats = {};
   const total = items.length;
-  
-  items.forEach(item => {
+
+  items.forEach((item) => {
     const status = item[statusField];
     if (!stats[status]) {
       stats[status] = {
@@ -337,12 +337,12 @@ export const getStatusStatistics = (items, category, statusField = 'status') => 
     }
     stats[status].count++;
   });
-  
+
   // Calculate percentages
-  Object.keys(stats).forEach(status => {
+  Object.keys(stats).forEach((status) => {
     stats[status].percentage = total > 0 ? (stats[status].count / total) * 100 : 0;
   });
-  
+
   return stats;
 };
 
@@ -355,10 +355,10 @@ export const getStatusStatistics = (items, category, statusField = 'status') => 
  */
 export const filterByStatus = (items, statuses, statusField = 'status') => {
   if (!Array.isArray(items)) return [];
-  
+
   const statusArray = Array.isArray(statuses) ? statuses : [statuses];
-  
-  return items.filter(item => statusArray.includes(item[statusField]));
+
+  return items.filter((item) => statusArray.includes(item[statusField]));
 };
 
 /**
@@ -369,9 +369,14 @@ export const filterByStatus = (items, statuses, statusField = 'status') => {
  * @param {string} direction - Sort direction ('asc' or 'desc')
  * @returns {Array} - Sorted items
  */
-export const sortByStatusPriority = (items, category, statusField = 'status', direction = 'asc') => {
+export const sortByStatusPriority = (
+  items,
+  category,
+  statusField = 'status',
+  direction = 'asc'
+) => {
   if (!Array.isArray(items)) return [];
-  
+
   const priorityMap = {
     // Higher number = higher priority
     pending: 10,
@@ -388,11 +393,11 @@ export const sortByStatusPriority = (items, category, statusField = 'status', di
     cancelled: 0,
     rejected: 0,
   };
-  
+
   return [...items].sort((a, b) => {
     const aPriority = priorityMap[a[statusField]] || 0;
     const bPriority = priorityMap[b[statusField]] || 0;
-    
+
     return direction === 'asc' ? aPriority - bPriority : bPriority - aPriority;
   });
 };
@@ -405,7 +410,7 @@ export const sortByStatusPriority = (items, category, statusField = 'status', di
  */
 export const getStatusColor = (category, status) => {
   const config = getStatusConfig(category, status);
-  
+
   const colorMap = {
     default: '#d9d9d9',
     primary: '#1890ff',
@@ -415,7 +420,7 @@ export const getStatusColor = (category, status) => {
     error: '#f5222d',
     info: '#13c2c2',
   };
-  
+
   return colorMap[config.color] || colorMap.default;
 };
 
@@ -429,17 +434,17 @@ export const getStatusColor = (category, status) => {
 export const formatStatus = (category, status, options = {}) => {
   const config = getStatusConfig(category, status);
   const { uppercase = false, withIcon = false } = options;
-  
+
   let result = config.label;
-  
+
   if (uppercase) {
     result = result.toUpperCase();
   }
-  
+
   if (withIcon && config.icon) {
     result = `${config.icon} ${result}`;
   }
-  
+
   return result;
 };
 
@@ -451,8 +456,8 @@ export const formatStatus = (category, status, options = {}) => {
  */
 export const formatStatusHistory = (statusHistory, category) => {
   if (!Array.isArray(statusHistory)) return [];
-  
-  return statusHistory.map(entry => ({
+
+  return statusHistory.map((entry) => ({
     ...entry,
     fromStatusLabel: entry.fromStatus ? getStatusConfig(category, entry.fromStatus).label : '',
     toStatusLabel: getStatusConfig(category, entry.toStatus).label,

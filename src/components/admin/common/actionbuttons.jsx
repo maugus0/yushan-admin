@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Space, Dropdown, Popconfirm, Tooltip } from 'antd';
 import {
   EditOutlined,
@@ -34,37 +33,57 @@ const ActionButtons = ({
   ...props
 }) => {
   const moreActions = [
-    ...(onCopy ? [{
-      key: 'copy',
-      icon: <CopyOutlined />,
-      label: 'Copy',
-      onClick: () => onCopy(record),
-    }] : []),
-    ...(onExport ? [{
-      key: 'export',
-      icon: <ExportOutlined />,
-      label: 'Export',
-      onClick: () => onExport(record),
-    }] : []),
-    ...(onShare ? [{
-      key: 'share',
-      icon: <ShareAltOutlined />,
-      label: 'Share',
-      onClick: () => onShare(record),
-    }] : []),
-    ...(onDownload ? [{
-      key: 'download',
-      icon: <DownloadOutlined />,
-      label: 'Download',
-      onClick: () => onDownload(record),
-    }] : []),
-    ...(onPrint ? [{
-      key: 'print',
-      icon: <PrinterOutlined />,
-      label: 'Print',
-      onClick: () => onPrint(record),
-    }] : []),
-    ...customActions.map(action => ({
+    ...(onCopy
+      ? [
+          {
+            key: 'copy',
+            icon: <CopyOutlined />,
+            label: 'Copy',
+            onClick: () => onCopy(record),
+          },
+        ]
+      : []),
+    ...(onExport
+      ? [
+          {
+            key: 'export',
+            icon: <ExportOutlined />,
+            label: 'Export',
+            onClick: () => onExport(record),
+          },
+        ]
+      : []),
+    ...(onShare
+      ? [
+          {
+            key: 'share',
+            icon: <ShareAltOutlined />,
+            label: 'Share',
+            onClick: () => onShare(record),
+          },
+        ]
+      : []),
+    ...(onDownload
+      ? [
+          {
+            key: 'download',
+            icon: <DownloadOutlined />,
+            label: 'Download',
+            onClick: () => onDownload(record),
+          },
+        ]
+      : []),
+    ...(onPrint
+      ? [
+          {
+            key: 'print',
+            icon: <PrinterOutlined />,
+            label: 'Print',
+            onClick: () => onPrint(record),
+          },
+        ]
+      : []),
+    ...customActions.map((action) => ({
       ...action,
       onClick: () => action.onClick(record),
     })),
@@ -74,26 +93,16 @@ const ActionButtons = ({
     <Space size="small" {...props}>
       {showView && onView && (
         <Tooltip title="View">
-          <Button
-            type={type}
-            size={size}
-            icon={<EyeOutlined />}
-            onClick={() => onView(record)}
-          />
+          <Button type={type} size={size} icon={<EyeOutlined />} onClick={() => onView(record)} />
         </Tooltip>
       )}
-      
+
       {showEdit && onEdit && (
         <Tooltip title="Edit">
-          <Button
-            type={type}
-            size={size}
-            icon={<EditOutlined />}
-            onClick={() => onEdit(record)}
-          />
+          <Button type={type} size={size} icon={<EditOutlined />} onClick={() => onEdit(record)} />
         </Tooltip>
       )}
-      
+
       {showDelete && onDelete && (
         <Popconfirm
           title={deleteConfirmTitle}
@@ -104,27 +113,14 @@ const ActionButtons = ({
           okType="danger"
         >
           <Tooltip title="Delete">
-            <Button
-              type={type}
-              size={size}
-              icon={<DeleteOutlined />}
-              danger
-            />
+            <Button type={type} size={size} icon={<DeleteOutlined />} danger />
           </Tooltip>
         </Popconfirm>
       )}
 
-      {(showMore && moreActions.length > 0) && (
-        <Dropdown
-          menu={{ items: moreActions }}
-          placement="bottomRight"
-          arrow
-        >
-          <Button
-            type={type}
-            size={size}
-            icon={<MoreOutlined />}
-          />
+      {showMore && moreActions.length > 0 && (
+        <Dropdown menu={{ items: moreActions }} placement="bottomRight" arrow>
+          <Button type={type} size={size} icon={<MoreOutlined />} />
         </Dropdown>
       )}
     </Space>

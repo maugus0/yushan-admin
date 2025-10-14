@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Layout, Menu, Typography, Badge } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -149,15 +149,16 @@ const AdminSidebar = ({
     },
   ];
 
-  // Initialize openKeys based on current route
-  useEffect(() => {
+  // Calculate openKeys based on current route
+  const openKeysFromPath = useMemo(() => {
     const path = location.pathname;
-    if (path.includes('/users')) {
-      setOpenKeys(['users']);
-    } else {
-      setOpenKeys([]);
-    }
+    return path.includes('/users') ? ['users'] : [];
   }, [location.pathname]);
+
+  // Update openKeys when path changes
+  useEffect(() => {
+    setOpenKeys(openKeysFromPath);
+  }, [openKeysFromPath]);
 
   const handleMenuClick = ({ key }) => {
     // Use replace: true to ensure proper navigation
@@ -173,12 +174,14 @@ const AdminSidebar = ({
 
   const getSelectedKeys = () => {
     const path = location.pathname;
-    
+
     // Handle nested routes
-    if (path.includes('/users/readers/') || path === '/admin/users/readers') return ['/admin/users/readers'];
-    if (path.includes('/users/writers/') || path === '/admin/users/writers') return ['/admin/users/writers'];
+    if (path.includes('/users/readers/') || path === '/admin/users/readers')
+      return ['/admin/users/readers'];
+    if (path.includes('/users/writers/') || path === '/admin/users/writers')
+      return ['/admin/users/writers'];
     if (path === '/admin/users') return ['/admin/users'];
-    
+
     return [path];
   };
 
@@ -196,20 +199,22 @@ const AdminSidebar = ({
       style={{
         background: theme === 'light' ? '#fff' : undefined,
         borderRight: theme === 'light' ? '1px solid #f0f0f0' : undefined,
-        ...style
+        ...style,
       }}
       className={className}
       {...props}
     >
       {/* Logo/Brand Section */}
-      <div style={{
-        height: 64,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: theme === 'light' ? '1px solid #f0f0f0' : '1px solid #303030',
-        background: theme === 'light' ? '#1890ff' : '#001529',
-      }}>
+      <div
+        style={{
+          height: 64,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderBottom: theme === 'light' ? '1px solid #f0f0f0' : '1px solid #303030',
+          background: theme === 'light' ? '#1890ff' : '#001529',
+        }}
+      >
         <Title
           level={4}
           style={{
@@ -222,7 +227,7 @@ const AdminSidebar = ({
           {collapsed ? 'Y' : 'Yushan'}
         </Title>
       </div>
-      
+
       {/* Navigation Menu */}
       <Menu
         mode="inline"
@@ -232,10 +237,10 @@ const AdminSidebar = ({
         onOpenChange={handleOpenChange}
         items={menuItems}
         onClick={handleMenuClick}
-        style={{ 
+        style={{
           border: 'none',
           height: 'calc(100vh - 64px)',
-          overflowY: 'auto'
+          overflowY: 'auto',
         }}
       />
     </Sider>

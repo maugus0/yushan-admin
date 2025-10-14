@@ -1,35 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  Modal, 
-  Form, 
-  Input, 
-  Select, 
-  Space, 
-  Typography, 
-  Card,
-  Tag,
-  Divider,
-  message
-} from 'antd';
-import { 
-  FlagOutlined, 
-  UserOutlined, 
+import { Modal, Form, Input, Select, Space, Typography, Card, Tag, Divider, message } from 'antd';
+import {
+  FlagOutlined,
+  UserOutlined,
   CloseOutlined,
   ExclamationCircleOutlined,
-  EyeOutlined
+  EyeOutlined,
 } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Option } = Select;
 const { Text, Paragraph } = Typography;
 
-const ReportActionModal = ({
-  visible,
-  onCancel,
-  onResolve,
-  report = {},
-  loading = false,
-}) => {
+const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading = false }) => {
   const [form] = Form.useForm();
   const [actionType, setActionType] = useState('');
 
@@ -47,7 +30,7 @@ const ReportActionModal = ({
         notifyReported: values.notifyReported,
         resolvedAt: new Date().toISOString(),
       };
-      
+
       await onResolve(actionData);
       form.resetFields();
       setActionType('');
@@ -68,10 +51,11 @@ const ReportActionModal = ({
       low: '#52c41a',
       medium: '#fa8c16',
       high: '#ff4d4f',
-      critical: '#722ed1'
+      critical: '#722ed1',
     };
     return colors[priority] || '#fadb14';
-  };  return (
+  };
+  return (
     <Modal
       title={
         <Space>
@@ -95,24 +79,26 @@ const ReportActionModal = ({
             <Text strong>Report Type:</Text>
             <Tag color="orange">{report.type?.replace('_', ' ').toUpperCase()}</Tag>
             <Text strong>Priority:</Text>
-            <Tag color={getPriorityColor(report.priority)}>
-              {report.priority?.toUpperCase()}
-            </Tag>
+            <Tag color={getPriorityColor(report.priority)}>{report.priority?.toUpperCase()}</Tag>
           </Space>
-          
+
           <Space>
             <UserOutlined />
-            <Text><strong>Reported by:</strong> {report.reportedBy}</Text>
-            <Text><strong>Reported user:</strong> {report.reportedUser}</Text>
+            <Text>
+              <strong>Reported by:</strong> {report.reportedBy}
+            </Text>
+            <Text>
+              <strong>Reported user:</strong> {report.reportedUser}
+            </Text>
           </Space>
-          
+
           <div>
             <Text strong>Reason:</Text>
             <Paragraph style={{ margin: '4px 0', padding: 8, background: '#fff', borderRadius: 4 }}>
               {report.reason}
             </Paragraph>
           </div>
-          
+
           {report.evidence && (
             <div>
               <Text strong>Evidence:</Text>
@@ -181,10 +167,7 @@ const ReportActionModal = ({
         </Form.Item>
 
         {actionType && actionType !== 'dismiss' && (
-          <Form.Item
-            name="contentAction"
-            label="Content Action"
-          >
+          <Form.Item name="contentAction" label="Content Action">
             <Select placeholder="What to do with the reported content?">
               <Option value="no_action">No action required</Option>
               <Option value="edit_content">Edit/Moderate content</Option>
@@ -196,10 +179,7 @@ const ReportActionModal = ({
         )}
 
         {actionType && ['user_suspension', 'user_ban', 'warning'].includes(actionType) && (
-          <Form.Item
-            name="userAction"
-            label="User Account Action"
-          >
+          <Form.Item name="userAction" label="User Account Action">
             <Select placeholder="Additional user account actions">
               <Option value="no_action">No additional action</Option>
               <Option value="restrict_posting">Restrict posting privileges</Option>
@@ -215,23 +195,20 @@ const ReportActionModal = ({
           label="Resolution Summary"
           rules={[
             { required: true, message: 'Please provide a resolution summary' },
-            { min: 20, message: 'Summary must be at least 20 characters' }
+            { min: 20, message: 'Summary must be at least 20 characters' },
           ]}
         >
-          <TextArea 
-            rows={3} 
+          <TextArea
+            rows={3}
             placeholder="Provide a clear summary of your decision and actions taken"
             maxLength={1000}
             showCount
           />
         </Form.Item>
 
-        <Form.Item
-          name="moderatorNotes"
-          label="Internal Moderator Notes"
-        >
-          <TextArea 
-            rows={2} 
+        <Form.Item name="moderatorNotes" label="Internal Moderator Notes">
+          <TextArea
+            rows={2}
             placeholder="Internal notes for other moderators (not visible to users)"
             maxLength={500}
             showCount
@@ -239,19 +216,15 @@ const ReportActionModal = ({
         </Form.Item>
 
         <Space direction="vertical" style={{ width: '100%' }}>
-          <Form.Item 
-            name="notifyReporter" 
-            valuePropName="checked"
-            initialValue={true}
-          >
+          <Form.Item name="notifyReporter" valuePropName="checked" initialValue={true}>
             <Select defaultValue={true} style={{ width: '100%' }}>
               <Option value={true}>Notify reporter of resolution</Option>
               <Option value={false}>Do not notify reporter</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item 
-            name="notifyReported" 
+          <Form.Item
+            name="notifyReported"
             valuePropName="checked"
             initialValue={actionType !== 'dismiss'}
           >

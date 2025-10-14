@@ -1,10 +1,19 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useMemo } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import ChartWrapper from './chartwrapper';
 
-const CustomBarChart = ({ 
-  data = [], 
-  bars = [], 
+const CustomBarChart = ({
+  data = [],
+  bars = [],
   title = 'Bar Chart',
   subtitle,
   height = 300,
@@ -12,21 +21,21 @@ const CustomBarChart = ({
   showLegend = true,
   loading = false,
   layout = 'horizontal', // 'horizontal' or 'vertical'
-  ...props 
+  ...props
 }) => {
   // Default bar configuration
   const defaultBars = [
-    { 
-      dataKey: 'value', 
-      fill: '#1890ff', 
+    {
+      dataKey: 'value',
+      fill: '#1890ff',
       name: 'Value',
-      radius: [0, 4, 4, 0]
-    }
+      radius: [0, 4, 4, 0],
+    },
   ];
 
   const barConfig = bars.length > 0 ? bars : defaultBars;
 
-  const formatTooltip = (value, name, props) => {
+  const formatTooltip = (value, name, _props) => {
     if (typeof value === 'number') {
       return [value.toLocaleString(), name];
     }
@@ -43,28 +52,9 @@ const CustomBarChart = ({
     ));
   };
 
-  const ChartComponent = layout === 'vertical' ? 
-    ({ children }) => (
-      <BarChart 
-        data={data} 
-        layout="horizontal"
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        {children}
-      </BarChart>
-    ) : 
-    ({ children }) => (
-      <BarChart 
-        data={data} 
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        {children}
-      </BarChart>
-    );
-
   return (
-    <ChartWrapper 
-      title={title} 
+    <ChartWrapper
+      title={title}
       subtitle={subtitle}
       height={height}
       loading={loading}
@@ -72,12 +62,22 @@ const CustomBarChart = ({
       {...props}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <ChartComponent>
+        <BarChart
+          data={data}
+          layout={layout === 'vertical' ? 'horizontal' : undefined}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
           {layout === 'vertical' ? (
             <>
               <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-              <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12 }}
+              />
             </>
           ) : (
             <>
@@ -85,19 +85,19 @@ const CustomBarChart = ({
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
             </>
           )}
-          <Tooltip 
+          <Tooltip
             formatter={formatTooltip}
             labelStyle={{ color: '#666' }}
             contentStyle={{
               backgroundColor: '#fff',
               border: '1px solid #d9d9d9',
               borderRadius: '6px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           />
           {showLegend && <Legend />}
           {renderBars()}
-        </ChartComponent>
+        </BarChart>
       </ResponsiveContainer>
     </ChartWrapper>
   );

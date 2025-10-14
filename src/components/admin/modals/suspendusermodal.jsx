@@ -6,13 +6,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 const { Text } = Typography;
 
-const SuspendUserModal = ({ 
-  visible, 
-  onCancel, 
-  onConfirm, 
-  user = null, 
-  loading = false 
-}) => {
+const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading = false }) => {
   const [form] = Form.useForm();
   const [suspensionType, setSuspensionType] = useState('temporary');
 
@@ -37,7 +31,7 @@ const SuspendUserModal = ({
         suspendedAt: new Date().toISOString(),
         expiresAt: values.suspensionType === 'indefinite' ? null : values.expiresAt?.toISOString(),
       };
-      
+
       await onConfirm(suspensionData);
       form.resetFields();
       message.success(`User ${user.username} has been suspended successfully`);
@@ -102,8 +96,8 @@ const SuspendUserModal = ({
             label="Suspension Expires At"
             rules={[{ required: true, message: 'Please select expiration date' }]}
           >
-            <DatePicker 
-              showTime 
+            <DatePicker
+              showTime
               style={{ width: '100%' }}
               placeholder="Select suspension expiration date"
               disabledDate={(current) => current && current < new Date()}
@@ -150,20 +144,17 @@ const SuspendUserModal = ({
           label="Public Reason (shown to user)"
           rules={[{ required: true, message: 'Please provide a public reason' }]}
         >
-          <TextArea 
-            rows={3} 
+          <TextArea
+            rows={3}
             placeholder="This message will be shown to the user explaining their suspension"
             maxLength={500}
             showCount
           />
         </Form.Item>
 
-        <Form.Item
-          name="adminNotes"
-          label="Internal Admin Notes"
-        >
-          <TextArea 
-            rows={2} 
+        <Form.Item name="adminNotes" label="Internal Admin Notes">
+          <TextArea
+            rows={2}
             placeholder="Internal notes for other administrators (not visible to user)"
             maxLength={1000}
             showCount
@@ -176,21 +167,35 @@ const SuspendUserModal = ({
       </Form>
 
       {/* Preview of suspension effects */}
-      <div style={{ 
-        marginTop: 16, 
-        padding: 12, 
-        background: '#fff7e6', 
-        borderRadius: 6,
-        border: '1px solid #ffd591'
-      }}>
+      <div
+        style={{
+          marginTop: 16,
+          padding: 12,
+          background: '#fff7e6',
+          borderRadius: 6,
+          border: '1px solid #ffd591',
+        }}
+      >
         <Text strong style={{ color: '#fa8c16' }}>
           Suspension Effects:
         </Text>
         <ul style={{ margin: '8px 0 0 16px', padding: 0 }}>
-          <li><Text type="secondary">User will be logged out immediately</Text></li>
-          <li><Text type="secondary">Selected restrictions will be enforced</Text></li>
-          <li><Text type="secondary">User will see suspension notice when trying to access restricted features</Text></li>
-          <li><Text type="secondary">Suspension will be visible in user's profile for administrators</Text></li>
+          <li>
+            <Text type="secondary">User will be logged out immediately</Text>
+          </li>
+          <li>
+            <Text type="secondary">Selected restrictions will be enforced</Text>
+          </li>
+          <li>
+            <Text type="secondary">
+              User will see suspension notice when trying to access restricted features
+            </Text>
+          </li>
+          <li>
+            <Text type="secondary">
+              Suspension will be visible in user's profile for administrators
+            </Text>
+          </li>
         </ul>
       </div>
     </Modal>

@@ -9,7 +9,7 @@ export const USER_ROLES = {
   MODERATOR: 'moderator',
   EDITOR: 'editor',
   AUTHOR: 'author',
-  USER: 'user'
+  USER: 'user',
 };
 
 /**
@@ -27,7 +27,7 @@ export const PERMISSION_CATEGORIES = {
   YUAN: 'yuan',
   RANKINGS: 'rankings',
   LIBRARY: 'library',
-  DASHBOARD: 'dashboard'
+  DASHBOARD: 'dashboard',
 };
 
 /**
@@ -47,7 +47,7 @@ export const PERMISSION_ACTIONS = {
   ARCHIVE: 'archive',
   EXPORT: 'export',
   IMPORT: 'import',
-  MANAGE: 'manage'
+  MANAGE: 'manage',
 };
 
 /**
@@ -59,7 +59,7 @@ export const ROLE_HIERARCHY = {
   [USER_ROLES.EDITOR]: 3,
   [USER_ROLES.MODERATOR]: 4,
   [USER_ROLES.ADMIN]: 5,
-  [USER_ROLES.SUPER_ADMIN]: 6
+  [USER_ROLES.SUPER_ADMIN]: 6,
 };
 
 /**
@@ -79,7 +79,7 @@ export const DEFAULT_PERMISSIONS = {
     `${PERMISSION_CATEGORIES.YUAN}.${PERMISSION_ACTIONS.MANAGE}`,
     `${PERMISSION_CATEGORIES.RANKINGS}.${PERMISSION_ACTIONS.MANAGE}`,
     `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.MANAGE}`,
-    `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`
+    `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`,
   ],
 
   [USER_ROLES.ADMIN]: [
@@ -88,7 +88,7 @@ export const DEFAULT_PERMISSIONS = {
     `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.BAN}`,
     `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.SUSPEND}`,
-    
+
     // Content management
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.UPDATE}`,
@@ -96,99 +96,99 @@ export const DEFAULT_PERMISSIONS = {
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.APPROVE}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.FEATURE}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.ARCHIVE}`,
-    
+
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.DELETE}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.APPROVE}`,
-    
+
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.DELETE}`,
-    
+
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.DELETE}`,
-    
+
     `${PERMISSION_CATEGORIES.REPORTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REPORTS}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.CREATE}`,
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.YUAN}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.YUAN}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.RANKINGS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.RANKINGS}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`,
-    `${PERMISSION_CATEGORIES.SETTINGS}.${PERMISSION_ACTIONS.READ}`
+    `${PERMISSION_CATEGORIES.SETTINGS}.${PERMISSION_ACTIONS.READ}`,
   ],
 
   [USER_ROLES.MODERATOR]: [
     // Limited user management
     `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.SUSPEND}`,
-    
+
     // Content moderation
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.APPROVE}`,
-    
+
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.APPROVE}`,
-    
+
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.DELETE}`,
-    
+
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.UPDATE}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.DELETE}`,
-    
+
     `${PERMISSION_CATEGORIES.REPORTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REPORTS}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.RANKINGS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`,
-    `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`
+    `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`,
   ],
 
   [USER_ROLES.EDITOR]: [
     // Content editing
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.CREATE}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.UPDATE}`,
-    
+
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`,
-    `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`
+    `${PERMISSION_CATEGORIES.DASHBOARD}.${PERMISSION_ACTIONS.READ}`,
   ],
 
   [USER_ROLES.AUTHOR]: [
     // Own content management
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.CREATE}`,
-    
+
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CHAPTERS}.${PERMISSION_ACTIONS.CREATE}`,
-    
+
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.READ}`,
-    `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`
+    `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`,
   ],
 
   [USER_ROLES.USER]: [
@@ -198,8 +198,8 @@ export const DEFAULT_PERMISSIONS = {
     `${PERMISSION_CATEGORIES.COMMENTS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.REVIEWS}.${PERMISSION_ACTIONS.READ}`,
     `${PERMISSION_CATEGORIES.CATEGORIES}.${PERMISSION_ACTIONS.READ}`,
-    `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`
-  ]
+    `${PERMISSION_CATEGORIES.LIBRARY}.${PERMISSION_ACTIONS.READ}`,
+  ],
 };
 
 /**
@@ -210,29 +210,29 @@ export const DEFAULT_PERMISSIONS = {
  */
 export const hasPermission = (user, permission) => {
   if (!user || !permission) return false;
-  
+
   // Super admin has all permissions
   if (user.role === USER_ROLES.SUPER_ADMIN) {
     return true;
   }
-  
+
   // Check user's custom permissions first
   if (user.permissions && user.permissions.includes(permission)) {
     return true;
   }
-  
+
   // Check default role permissions
   const rolePermissions = DEFAULT_PERMISSIONS[user.role] || [];
-  
+
   // Check for exact permission match
   if (rolePermissions.includes(permission)) {
     return true;
   }
-  
+
   // Check for manage permission (covers all actions in category)
   const [category] = permission.split('.');
   const managePermission = `${category}.${PERMISSION_ACTIONS.MANAGE}`;
-  
+
   return rolePermissions.includes(managePermission);
 };
 
@@ -244,8 +244,8 @@ export const hasPermission = (user, permission) => {
  */
 export const hasAnyPermission = (user, permissions) => {
   if (!Array.isArray(permissions)) return false;
-  
-  return permissions.some(permission => hasPermission(user, permission));
+
+  return permissions.some((permission) => hasPermission(user, permission));
 };
 
 /**
@@ -256,8 +256,8 @@ export const hasAnyPermission = (user, permissions) => {
  */
 export const hasAllPermissions = (user, permissions) => {
   if (!Array.isArray(permissions)) return false;
-  
-  return permissions.every(permission => hasPermission(user, permission));
+
+  return permissions.every((permission) => hasPermission(user, permission));
 };
 
 /**
@@ -270,25 +270,25 @@ export const hasAllPermissions = (user, permissions) => {
  */
 export const canPerformAction = (user, action, category, resource = null) => {
   const permission = `${category}.${action}`;
-  
+
   // Check basic permission
   if (hasPermission(user, permission)) {
     return true;
   }
-  
+
   // Check ownership for certain actions
   if (resource && resource.userId === user.id) {
     const ownContentActions = [
       PERMISSION_ACTIONS.READ,
       PERMISSION_ACTIONS.UPDATE,
-      PERMISSION_ACTIONS.DELETE
+      PERMISSION_ACTIONS.DELETE,
     ];
-    
+
     if (ownContentActions.includes(action)) {
       return true;
     }
   }
-  
+
   return false;
 };
 
@@ -301,7 +301,7 @@ export const canPerformAction = (user, action, category, resource = null) => {
 export const hasHigherRole = (userRole, targetRole) => {
   const userLevel = ROLE_HIERARCHY[userRole] || 0;
   const targetLevel = ROLE_HIERARCHY[targetRole] || 0;
-  
+
   return userLevel > targetLevel;
 };
 
@@ -313,15 +313,15 @@ export const hasHigherRole = (userRole, targetRole) => {
  */
 export const canManageUser = (user, targetUser) => {
   if (!user || !targetUser) return false;
-  
+
   // Can't manage yourself
   if (user.id === targetUser.id) return false;
-  
+
   // Must have user management permission
   if (!hasPermission(user, `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.UPDATE}`)) {
     return false;
   }
-  
+
   // Must have higher role
   return hasHigherRole(user.role, targetUser.role);
 };
@@ -334,26 +334,28 @@ export const canManageUser = (user, targetUser) => {
  */
 export const getFilteredMenuItems = (user, menuItems) => {
   if (!Array.isArray(menuItems)) return [];
-  
-  return menuItems.filter(item => {
-    if (!item.permission) return true; // No permission required
-    
-    if (Array.isArray(item.permission)) {
-      return hasAnyPermission(user, item.permission);
-    }
-    
-    return hasPermission(user, item.permission);
-  }).map(item => {
-    // Recursively filter children
-    if (item.children) {
-      return {
-        ...item,
-        children: getFilteredMenuItems(user, item.children)
-      };
-    }
-    
-    return item;
-  });
+
+  return menuItems
+    .filter((item) => {
+      if (!item.permission) return true; // No permission required
+
+      if (Array.isArray(item.permission)) {
+        return hasAnyPermission(user, item.permission);
+      }
+
+      return hasPermission(user, item.permission);
+    })
+    .map((item) => {
+      // Recursively filter children
+      if (item.children) {
+        return {
+          ...item,
+          children: getFilteredMenuItems(user, item.children),
+        };
+      }
+
+      return item;
+    });
 };
 
 /**
@@ -365,13 +367,13 @@ export const getFilteredMenuItems = (user, menuItems) => {
  */
 export const getAvailableActions = (user, category, resource = null) => {
   const actions = [];
-  
-  Object.values(PERMISSION_ACTIONS).forEach(action => {
+
+  Object.values(PERMISSION_ACTIONS).forEach((action) => {
     if (canPerformAction(user, action, category, resource)) {
       actions.push(action);
     }
   });
-  
+
   return actions;
 };
 
@@ -383,19 +385,23 @@ export const getAvailableActions = (user, category, resource = null) => {
  */
 export const withPermission = (requiredPermissions, fallback = null) => {
   return (Component) => {
-    return (props) => {
+    const WrappedComponent = (props) => {
       const { user, ...otherProps } = props;
-      
+
       const hasRequiredPermission = Array.isArray(requiredPermissions)
         ? hasAnyPermission(user, requiredPermissions)
         : hasPermission(user, requiredPermissions);
-      
+
       if (!hasRequiredPermission) {
         return fallback;
       }
-      
+
       return <Component {...otherProps} user={user} />;
     };
+
+    WrappedComponent.displayName = `withPermission(${Component.displayName || Component.name || 'Component'})`;
+
+    return WrappedComponent;
   };
 };
 
@@ -406,11 +412,11 @@ export const withPermission = (requiredPermissions, fallback = null) => {
  */
 export const canAccessAdmin = (user) => {
   if (!user) return false;
-  
+
   const minRole = USER_ROLES.EDITOR;
   const userLevel = ROLE_HIERARCHY[user.role] || 0;
   const minLevel = ROLE_HIERARCHY[minRole] || 0;
-  
+
   return userLevel >= minLevel;
 };
 
@@ -426,9 +432,9 @@ export const getRoleDisplayName = (role) => {
     [USER_ROLES.MODERATOR]: '版主',
     [USER_ROLES.EDITOR]: '编辑',
     [USER_ROLES.AUTHOR]: '作者',
-    [USER_ROLES.USER]: '用户'
+    [USER_ROLES.USER]: '用户',
   };
-  
+
   return roleNames[role] || role;
 };
 
@@ -439,7 +445,7 @@ export const getRoleDisplayName = (role) => {
  */
 export const getPermissionDisplayName = (permission) => {
   const [category, action] = permission.split('.');
-  
+
   const categoryNames = {
     [PERMISSION_CATEGORIES.USERS]: '用户管理',
     [PERMISSION_CATEGORIES.NOVELS]: '小说管理',
@@ -452,9 +458,9 @@ export const getPermissionDisplayName = (permission) => {
     [PERMISSION_CATEGORIES.YUAN]: '元宝管理',
     [PERMISSION_CATEGORIES.RANKINGS]: '排行榜管理',
     [PERMISSION_CATEGORIES.LIBRARY]: '书库管理',
-    [PERMISSION_CATEGORIES.DASHBOARD]: '仪表板'
+    [PERMISSION_CATEGORIES.DASHBOARD]: '仪表板',
   };
-  
+
   const actionNames = {
     [PERMISSION_ACTIONS.CREATE]: '创建',
     [PERMISSION_ACTIONS.READ]: '查看',
@@ -469,12 +475,12 @@ export const getPermissionDisplayName = (permission) => {
     [PERMISSION_ACTIONS.ARCHIVE]: '归档',
     [PERMISSION_ACTIONS.EXPORT]: '导出',
     [PERMISSION_ACTIONS.IMPORT]: '导入',
-    [PERMISSION_ACTIONS.MANAGE]: '管理'
+    [PERMISSION_ACTIONS.MANAGE]: '管理',
   };
-  
+
   const categoryName = categoryNames[category] || category;
   const actionName = actionNames[action] || action;
-  
+
   return `${categoryName} - ${actionName}`;
 };
 
@@ -495,5 +501,5 @@ export default {
   withPermission,
   canAccessAdmin,
   getRoleDisplayName,
-  getPermissionDisplayName
+  getPermissionDisplayName,
 };

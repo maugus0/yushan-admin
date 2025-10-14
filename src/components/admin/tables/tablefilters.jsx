@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Form, 
-  Input, 
-  Select, 
-  DatePicker, 
-  Button, 
-  Space, 
-  Row, 
-  Col, 
+import {
+  Card,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Button,
+  Space,
+  Row,
+  Col,
   Collapse,
   Tag,
   Divider,
   InputNumber,
   Switch,
-  Checkbox
+  Checkbox,
 } from 'antd';
 import {
   SearchOutlined,
   ClearOutlined,
   FilterOutlined,
   DownOutlined,
-  UpOutlined
+  UpOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -48,7 +48,8 @@ const TableFilters = ({
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue(initialValues);
-      setActiveFilters(initialValues);
+      // Use setTimeout to avoid direct setState in effect
+      setTimeout(() => setActiveFilters(initialValues), 0);
     }
   }, [initialValues, form]);
 
@@ -74,7 +75,7 @@ const TableFilters = ({
 
   // Get active filter count
   const getActiveFilterCount = () => {
-    return Object.values(activeFilters).filter(value => {
+    return Object.values(activeFilters).filter((value) => {
       if (Array.isArray(value)) return value.length > 0;
       if (value === null || value === undefined || value === '') return false;
       return true;
@@ -83,38 +84,24 @@ const TableFilters = ({
 
   // Render filter component based on type
   const renderFilter = (filter) => {
-    const { 
-      key, 
-      label, 
-      type, 
-      options = [], 
-      placeholder, 
-      width,
-      rules = [],
-      ...props 
-    } = filter;
+    const { key, label, type, options = [], placeholder, width, rules = [], ...props } = filter;
 
     const commonProps = {
       placeholder: placeholder || `Select ${label}`,
       style: { width: width || '100%' },
       allowClear: true,
-      ...props
+      ...props,
     };
 
     switch (type) {
       case 'text':
       case 'search':
-        return (
-          <Input
-            {...commonProps}
-            prefix={type === 'search' ? <SearchOutlined /> : null}
-          />
-        );
+        return <Input {...commonProps} prefix={type === 'search' ? <SearchOutlined /> : null} />;
 
       case 'select':
         return (
           <Select {...commonProps} mode={props.multiple ? 'multiple' : undefined}>
-            {options.map(option => (
+            {options.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -125,7 +112,7 @@ const TableFilters = ({
       case 'multiselect':
         return (
           <Select {...commonProps} mode="multiple">
-            {options.map(option => (
+            {options.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -134,45 +121,27 @@ const TableFilters = ({
         );
 
       case 'date':
-        return (
-          <DatePicker {...commonProps} />
-        );
+        return <DatePicker {...commonProps} />;
 
       case 'daterange':
-        return (
-          <RangePicker {...commonProps} />
-        );
+        return <RangePicker {...commonProps} />;
 
       case 'number':
-        return (
-          <InputNumber {...commonProps} />
-        );
+        return <InputNumber {...commonProps} />;
 
       case 'numberrange':
         return (
           <Input.Group compact>
-            <InputNumber 
-              placeholder="Min" 
-              style={{ width: '50%' }} 
-              {...props.minProps}
-            />
-            <InputNumber 
-              placeholder="Max" 
-              style={{ width: '50%' }} 
-              {...props.maxProps}
-            />
+            <InputNumber placeholder="Min" style={{ width: '50%' }} {...props.minProps} />
+            <InputNumber placeholder="Max" style={{ width: '50%' }} {...props.maxProps} />
           </Input.Group>
         );
 
       case 'switch':
-        return (
-          <Switch {...props} />
-        );
+        return <Switch {...props} />;
 
       case 'checkbox':
-        return (
-          <Checkbox.Group options={options} {...props} />
-        );
+        return <Checkbox.Group options={options} {...props} />;
 
       default:
         return <Input {...commonProps} />;
@@ -180,23 +149,23 @@ const TableFilters = ({
   };
 
   // Separate filters into quick and advanced
-  const quickFilters = filters.filter(f => f.quickFilter);
-  const advancedFilters = filters.filter(f => !f.quickFilter);
+  const quickFilters = filters.filter((f) => f.quickFilter);
+  const advancedFilters = filters.filter((f) => !f.quickFilter);
 
   // Render active filter tags
   const renderActiveFilters = () => {
     if (!showActiveFilters || getActiveFilterCount() === 0) return null;
 
     const tags = [];
-    
+
     Object.entries(activeFilters).forEach(([key, value]) => {
       if (!value || (Array.isArray(value) && value.length === 0)) return;
-      
-      const filter = filters.find(f => f.key === key);
+
+      const filter = filters.find((f) => f.key === key);
       if (!filter) return;
 
       let displayValue = value;
-      
+
       // Format display value based on type
       if (filter.type === 'daterange' && Array.isArray(value)) {
         displayValue = `${dayjs(value[0]).format('MMM DD')} - ${dayjs(value[1]).format('MMM DD')}`;
@@ -205,7 +174,7 @@ const TableFilters = ({
       } else if (Array.isArray(value)) {
         displayValue = value.join(', ');
       } else if (filter.options) {
-        const option = filter.options.find(opt => opt.value === value);
+        const option = filter.options.find((opt) => opt.value === value);
         displayValue = option ? option.label : value;
       }
 
@@ -230,12 +199,7 @@ const TableFilters = ({
         <Space wrap>
           {tags}
           {tags.length > 0 && (
-            <Button 
-              type="link" 
-              size="small" 
-              onClick={handleReset}
-              icon={<ClearOutlined />}
-            >
+            <Button type="link" size="small" onClick={handleReset} icon={<ClearOutlined />}>
               Clear All
             </Button>
           )}
@@ -245,7 +209,7 @@ const TableFilters = ({
   };
 
   return (
-    <Card 
+    <Card
       className={className}
       style={{ marginBottom: 16, ...style }}
       bodyStyle={{ padding: '16px' }}
@@ -263,27 +227,23 @@ const TableFilters = ({
         {showQuickFilters && quickFilters.length > 0 && (
           <>
             <Row gutter={[16, 16]}>
-              {quickFilters.map(filter => (
+              {quickFilters.map((filter) => (
                 <Col key={filter.key} span={filter.span || 6}>
-                  <Form.Item
-                    name={filter.key}
-                    label={filter.label}
-                    rules={filter.rules}
-                  >
+                  <Form.Item name={filter.key} label={filter.label} rules={filter.rules}>
                     {renderFilter(filter)}
                   </Form.Item>
                 </Col>
               ))}
             </Row>
-            
+
             {showAdvanced && advancedFilters.length > 0 && <Divider />}
           </>
         )}
 
         {/* Advanced Filters */}
         {showAdvanced && advancedFilters.length > 0 && (
-          <Collapse 
-            ghost 
+          <Collapse
+            ghost
             activeKey={collapsed ? [] : ['advanced']}
             onChange={(keys) => setCollapsed(keys.length === 0)}
           >
@@ -301,13 +261,9 @@ const TableFilters = ({
               extra={collapsed ? <DownOutlined /> : <UpOutlined />}
             >
               <Row gutter={[16, 16]}>
-                {advancedFilters.map(filter => (
+                {advancedFilters.map((filter) => (
                   <Col key={filter.key} span={filter.span || 8}>
-                    <Form.Item
-                      name={filter.key}
-                      label={filter.label}
-                      rules={filter.rules}
-                    >
+                    <Form.Item name={filter.key} label={filter.label} rules={filter.rules}>
                       {renderFilter(filter)}
                     </Form.Item>
                   </Col>
@@ -320,13 +276,10 @@ const TableFilters = ({
         {/* Action Buttons */}
         <Row justify="end" style={{ marginTop: 16 }}>
           <Space>
-            <Button 
-              onClick={handleReset}
-              disabled={getActiveFilterCount() === 0}
-            >
+            <Button onClick={handleReset} disabled={getActiveFilterCount() === 0}>
               Reset
             </Button>
-            <Button 
+            <Button
               type="primary"
               icon={<SearchOutlined />}
               loading={loading}
@@ -347,7 +300,7 @@ export const useTableFilters = (initialFilters = {}) => {
   const [loading, setLoading] = useState(false);
 
   const updateFilters = (newFilters) => {
-    setFilters(prevFilters => ({ ...prevFilters, ...newFilters }));
+    setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
   };
 
   const resetFilters = () => {

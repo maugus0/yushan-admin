@@ -468,15 +468,15 @@
 }
 
 /* Dark Theme Adjustments */
-[data-theme="dark"] .admin-modal .ant-modal-content {
+[data-theme='dark'] .admin-modal .ant-modal-content {
   background: var(--bg-primary);
 }
 
-[data-theme="dark"] .admin-modal .ant-modal-header {
+[data-theme='dark'] .admin-modal .ant-modal-header {
   background: var(--bg-secondary);
 }
 
-[data-theme="dark"] .admin-modal .ant-modal-footer {
+[data-theme='dark'] .admin-modal .ant-modal-footer {
   background: var(--bg-secondary);
 }
 

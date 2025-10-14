@@ -14,13 +14,13 @@ class MockAPIClient {
 
   // Simulate network delay
   delay(ms = 300 + Math.random() * 700) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // Mock request interceptor
   async request(config) {
     await this.delay();
-    
+
     // Add auth token if available
     const token = localStorage.getItem('admin_token');
     if (token) {
@@ -29,7 +29,7 @@ class MockAPIClient {
         Authorization: `Bearer ${token}`,
       };
     }
-    
+
     return config;
   }
 
@@ -69,8 +69,8 @@ api.interceptors = {
     use: (successHandler, errorHandler) => {
       // Mock implementation
       return { successHandler, errorHandler };
-    }
-  }
+    },
+  },
 };
 
 export default api;

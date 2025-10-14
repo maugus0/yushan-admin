@@ -75,10 +75,12 @@ const YuanStatistics = () => {
   }
 
   // Prepare chart data
-  const transactionTypeData = Object.entries(stats.transactionsByType || {}).map(([type, count]) => ({
-    name: type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    value: count,
-  }));
+  const transactionTypeData = Object.entries(stats.transactionsByType || {}).map(
+    ([type, count]) => ({
+      name: type.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+      value: count,
+    })
+  );
 
   const flowData = [
     { name: 'Income', value: stats.periodIncome, fill: '#52c41a' },
@@ -106,10 +108,12 @@ const YuanStatistics = () => {
       render: (_, __, index) => (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           {index < 3 ? (
-            <TrophyOutlined style={{ 
-              color: index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : '#cd7f32',
-              marginRight: 8 
-            }} />
+            <TrophyOutlined
+              style={{
+                color: index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : '#cd7f32',
+                marginRight: 8,
+              }}
+            />
           ) : (
             <span style={{ marginRight: 8, fontWeight: 'bold' }}>{index + 1}</span>
           )}
@@ -142,11 +146,7 @@ const YuanStatistics = () => {
       title: 'Current Balance',
       dataIndex: 'currentBalance',
       key: 'currentBalance',
-      render: (balance) => (
-        <Text style={{ color: '#52c41a' }}>
-          {balance.toLocaleString()} 元
-        </Text>
-      ),
+      render: (balance) => <Text style={{ color: '#52c41a' }}>{balance.toLocaleString()} 元</Text>,
     },
   ];
 
@@ -162,16 +162,11 @@ const YuanStatistics = () => {
           { title: 'Statistics' },
         ]}
         actions={[
-          <Select
-            key="period"
-            value={period}
-            onChange={setPeriod}
-            style={{ width: 120 }}
-          >
+          <Select key="period" value={period} onChange={setPeriod} style={{ width: 120 }}>
             <Option value="7d">Last 7 days</Option>
             <Option value="30d">Last 30 days</Option>
             <Option value="90d">Last 90 days</Option>
-          </Select>
+          </Select>,
         ]}
       />
 
@@ -285,10 +280,7 @@ const YuanStatistics = () => {
               </Col>
               <Col xs={24} lg={8}>
                 <Card title="Transaction Types">
-                  <PieChart
-                    data={transactionTypeData}
-                    height={300}
-                  />
+                  <PieChart data={transactionTypeData} height={300} />
                 </Card>
               </Col>
             </Row>
@@ -358,8 +350,9 @@ const YuanStatistics = () => {
 
             <Card title="Reward Distribution">
               <Text type="secondary">
-                Reward programs have distributed a total of {stats.rewardStats.totalAwarded.toLocaleString()} Yuan 
-                across {stats.rewardStats.totalClaims.toLocaleString()} claims.
+                Reward programs have distributed a total of{' '}
+                {stats.rewardStats.totalAwarded.toLocaleString()} Yuan across{' '}
+                {stats.rewardStats.totalClaims.toLocaleString()} claims.
               </Text>
               <div style={{ marginTop: 16 }}>
                 <Progress
@@ -400,7 +393,7 @@ const YuanStatistics = () => {
 
             <Card title="Package Performance">
               <Text type="secondary">
-                Yuan packages have generated ${stats.packageRevenue.toLocaleString()} in revenue 
+                Yuan packages have generated ${stats.packageRevenue.toLocaleString()} in revenue
                 from {stats.packageSales.toLocaleString()} total sales.
               </Text>
               <div style={{ marginTop: 16 }}>

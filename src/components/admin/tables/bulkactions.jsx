@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  Space, 
-  Button, 
-  Dropdown, 
-  Typography, 
-  Popconfirm, 
-  Modal,
-  message 
-} from 'antd';
-import { 
-  CheckOutlined, 
-  DeleteOutlined, 
+import { Space, Button, Dropdown, Typography, Popconfirm, Modal, message } from 'antd';
+import {
+  CheckOutlined,
+  DeleteOutlined,
   DownOutlined,
   ExportOutlined,
   EditOutlined,
   FlagOutlined,
   UserDeleteOutlined,
-  CloseOutlined
+  CloseOutlined,
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -38,7 +30,7 @@ const BulkActions = ({
     }
 
     const executeAction = async () => {
-      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+      setActionLoading((prev) => ({ ...prev, [actionKey]: true }));
       try {
         await onAction(actionKey, selectedRowKeys, selectedRows);
         message.success(`${actionConfig.label} completed for ${selectedRowKeys.length} items`);
@@ -46,7 +38,7 @@ const BulkActions = ({
         message.error(`Failed to ${actionConfig.label.toLowerCase()}`);
         console.error('Bulk action error:', error);
       } finally {
-        setActionLoading(prev => ({ ...prev, [actionKey]: false }));
+        setActionLoading((prev) => ({ ...prev, [actionKey]: false }));
       }
     };
 
@@ -54,7 +46,8 @@ const BulkActions = ({
     if (actionConfig.confirm) {
       Modal.confirm({
         title: actionConfig.confirmTitle || `Confirm ${actionConfig.label}`,
-        content: actionConfig.confirmContent || 
+        content:
+          actionConfig.confirmContent ||
           `Are you sure you want to ${actionConfig.label.toLowerCase()} ${selectedRowKeys.length} selected items?`,
         okText: actionConfig.label,
         okButtonProps: actionConfig.danger ? { danger: true } : {},
@@ -81,7 +74,8 @@ const BulkActions = ({
       color: '#fa8c16',
       confirm: true,
       confirmTitle: 'Reject Items',
-      confirmContent: 'Are you sure you want to reject the selected items? This action may notify the creators.',
+      confirmContent:
+        'Are you sure you want to reject the selected items? This action may notify the creators.',
     },
     {
       key: 'delete',
@@ -91,7 +85,8 @@ const BulkActions = ({
       danger: true,
       confirm: true,
       confirmTitle: 'Delete Items',
-      confirmContent: 'Are you sure you want to permanently delete the selected items? This action cannot be undone.',
+      confirmContent:
+        'Are you sure you want to permanently delete the selected items? This action cannot be undone.',
     },
     {
       key: 'export',
@@ -115,7 +110,8 @@ const BulkActions = ({
       danger: true,
       confirm: true,
       confirmTitle: 'Ban Users',
-      confirmContent: 'Are you sure you want to ban the selected users? This will restrict their access to the platform.',
+      confirmContent:
+        'Are you sure you want to ban the selected users? This will restrict their access to the platform.',
     },
   ];
 
@@ -123,7 +119,7 @@ const BulkActions = ({
   const allActions = [...defaultActions, ...actions];
 
   // Create dropdown menu items
-  const menuItems = allActions.map(action => ({
+  const menuItems = allActions.map((action) => ({
     key: action.key,
     label: (
       <Space>
@@ -135,7 +131,7 @@ const BulkActions = ({
   }));
 
   const handleMenuClick = ({ key }) => {
-    const actionConfig = allActions.find(action => action.key === key);
+    const actionConfig = allActions.find((action) => action.key === key);
     if (actionConfig) {
       handleAction(key, actionConfig);
     }
@@ -150,7 +146,7 @@ const BulkActions = ({
       <Text strong>
         {selectedRowKeys.length} item{selectedRowKeys.length !== 1 ? 's' : ''} selected
       </Text>
-      
+
       <Dropdown
         menu={{
           items: menuItems,
@@ -172,15 +168,25 @@ const BulkActions = ({
           size="small"
           loading={actionLoading.approve}
           disabled={disabled}
-          onClick={() => handleAction('approve', allActions.find(a => a.key === 'approve'))}
+          onClick={() =>
+            handleAction(
+              'approve',
+              allActions.find((a) => a.key === 'approve')
+            )
+          }
         >
           Approve
         </Button>
-        
+
         <Popconfirm
           title="Delete selected items"
           description={`Are you sure you want to delete ${selectedRowKeys.length} selected items?`}
-          onConfirm={() => handleAction('delete', allActions.find(a => a.key === 'delete'))}
+          onConfirm={() =>
+            handleAction(
+              'delete',
+              allActions.find((a) => a.key === 'delete')
+            )
+          }
           okText="Delete"
           okButtonProps={{ danger: true }}
           disabled={disabled}

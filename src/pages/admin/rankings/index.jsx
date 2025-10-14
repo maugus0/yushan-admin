@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress, Statistic } from 'antd';
-import { 
+import {
   TrophyOutlined,
   UserOutlined,
   BookOutlined,
@@ -13,14 +13,14 @@ import {
   CrownOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 
 const { Text } = Typography;
@@ -215,58 +215,63 @@ const Rankings = () => {
   };
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      let filteredData = mockData[activeTab] || [];
-      
-      // Apply search filter
-      if (searchValue) {
-        filteredData = filteredData.filter(item => {
-          if (activeTab === 'novels') {
-            return item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-                   item.author.toLowerCase().includes(searchValue.toLowerCase());
-          } else if (activeTab === 'authors') {
-            return item.name.toLowerCase().includes(searchValue.toLowerCase());
-          } else {
-            return item.username.toLowerCase().includes(searchValue.toLowerCase());
-          }
-        });
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let filteredData = mockData[activeTab] || [];
+
+        // Apply search filter
+        if (searchValue) {
+          filteredData = filteredData.filter((item) => {
+            if (activeTab === 'novels') {
+              return (
+                item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.author.toLowerCase().includes(searchValue.toLowerCase())
+              );
+            } else if (activeTab === 'authors') {
+              return item.name.toLowerCase().includes(searchValue.toLowerCase());
+            } else {
+              return item.username.toLowerCase().includes(searchValue.toLowerCase());
+            }
+          });
+        }
+
+        // Apply filters
+        if (filters.category && activeTab === 'novels') {
+          filteredData = filteredData.filter((item) => item.category === filters.category);
+        }
+
+        if (filters.status) {
+          filteredData = filteredData.filter((item) => item.status === filters.status);
+        }
+
+        if (filters.trend) {
+          filteredData = filteredData.filter((item) => item.trend === filters.trend);
+        }
+
+        const pageSize = params.pageSize || pagination.pageSize;
+        const current = params.current || pagination.current;
+        const startIndex = (current - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        setData(filteredData.slice(startIndex, endIndex));
+        setPagination((prev) => ({
+          ...prev,
+          current: current,
+          total: filteredData.length,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch rankings:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Apply filters
-      if (filters.category && activeTab === 'novels') {
-        filteredData = filteredData.filter(item => item.category === filters.category);
-      }
-      
-      if (filters.status) {
-        filteredData = filteredData.filter(item => item.status === filters.status);
-      }
-      
-      if (filters.trend) {
-        filteredData = filteredData.filter(item => item.trend === filters.trend);
-      }
-      
-      const pageSize = params.pageSize || pagination.pageSize;
-      const current = params.current || pagination.current;
-      const startIndex = (current - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      
-      setData(filteredData.slice(startIndex, endIndex));
-      setPagination(prev => ({
-        ...prev,
-        current: current,
-        total: filteredData.length,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch rankings:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, pagination.pageSize, pagination.current, activeTab]);
+    },
+    [searchValue, filters, pagination.pageSize, pagination.current, activeTab]
+  );
 
   useEffect(() => {
     fetchData();
@@ -330,13 +335,15 @@ const Rankings = () => {
         render: (rank, record) => (
           <Space>
             {rank <= 3 && (
-              <CrownOutlined 
-                style={{ 
-                  color: rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : '#cd7f32' 
-                }} 
+              <CrownOutlined
+                style={{
+                  color: rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : '#cd7f32',
+                }}
               />
             )}
-            <Text strong style={{ fontSize: '16px' }}>#{rank}</Text>
+            <Text strong style={{ fontSize: '16px' }}>
+              #{rank}
+            </Text>
             {record.trend === 'rising' && <RiseOutlined style={{ color: '#52c41a' }} />}
             {record.trend === 'falling' && <FallOutlined style={{ color: '#ff4d4f' }} />}
           </Space>
@@ -352,7 +359,9 @@ const Rankings = () => {
           key: 'novel',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Text strong style={{ fontSize: '15px' }}>{record.title}</Text>
+              <Text strong style={{ fontSize: '15px' }}>
+                {record.title}
+              </Text>
               <Space>
                 <UserOutlined />
                 <Text type="secondary">{record.author}</Text>
@@ -370,9 +379,9 @@ const Rankings = () => {
           key: 'performance',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Statistic 
-                title="Score" 
-                value={record.score} 
+              <Statistic
+                title="Score"
+                value={record.score}
                 precision={1}
                 suffix="/10"
                 valueStyle={{ fontSize: '14px' }}
@@ -383,7 +392,9 @@ const Rankings = () => {
               </Space>
               <Space>
                 <StarOutlined />
-                <Text>{record.rating}/5 ({record.votes} votes)</Text>
+                <Text>
+                  {record.rating}/5 ({record.votes} votes)
+                </Text>
               </Space>
             </Space>
           ),
@@ -399,7 +410,9 @@ const Rankings = () => {
             <Space direction="vertical" size={4}>
               <Space>
                 <Avatar icon={<UserOutlined />} />
-                <Text strong style={{ fontSize: '15px' }}>{record.name}</Text>
+                <Text strong style={{ fontSize: '15px' }}>
+                  {record.name}
+                </Text>
               </Space>
               <Space>
                 <BookOutlined />
@@ -441,7 +454,9 @@ const Rankings = () => {
             <Space direction="vertical" size={4}>
               <Space>
                 <Avatar icon={<UserOutlined />} />
-                <Text strong style={{ fontSize: '15px' }}>{record.username}</Text>
+                <Text strong style={{ fontSize: '15px' }}>
+                  {record.username}
+                </Text>
               </Space>
               <Tag color="gold">{record.level}</Tag>
               <StatusBadge status={record.status} />
@@ -461,11 +476,13 @@ const Rankings = () => {
                 <Text type="secondary">{record.readingTime}h reading time</Text>
               </Space>
               <Space>
-                <Text type="secondary">{record.reviews} reviews • {record.comments} comments</Text>
+                <Text type="secondary">
+                  {record.reviews} reviews • {record.comments} comments
+                </Text>
               </Space>
-              <Progress 
-                percent={Math.min((record.points / 100000) * 100, 100)} 
-                size="small" 
+              <Progress
+                percent={Math.min((record.points / 100000) * 100, 100)}
+                size="small"
                 format={() => `${record.points.toLocaleString()} pts`}
               />
             </Space>
@@ -548,7 +565,7 @@ const Rankings = () => {
               key: 'promote',
               icon: <TrophyOutlined />,
               label: 'Promote',
-            }
+            },
           ]}
         />
       ),
@@ -560,24 +577,21 @@ const Rankings = () => {
       <PageHeader
         title="Rankings Management"
         subtitle="Manage and moderate platform rankings"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Rankings' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Rankings' }]}
         actions={[
           <Button key="refresh" type="default" icon={<TrophyOutlined />}>
             Update Rankings
           </Button>,
           <Button key="featured" type="primary" icon={<FireOutlined />}>
             Manage Featured
-          </Button>
+          </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         {/* Tab Navigation */}
         <Space>
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <Button
               key={tab.key}
               type={activeTab === tab.key ? 'primary' : 'default'}
@@ -616,7 +630,7 @@ const Rankings = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -627,8 +641,7 @@ const Rankings = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} ${activeTab}`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} ${activeTab}`,
             }}
             onChange={handleTableChange}
             loading={loading}

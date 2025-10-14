@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Avatar, Typography } from 'antd';
-import { 
+import {
   PlusOutlined,
   MessageOutlined,
   UserOutlined,
@@ -10,14 +10,14 @@ import {
   DislikeOutlined,
   FlagOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 
 const { Text, Paragraph } = Typography;
@@ -37,7 +37,8 @@ const Comments = () => {
   const mockComments = [
     {
       id: 1,
-      content: 'This chapter was absolutely amazing! The character development is incredible and I can\'t wait to see what happens next.',
+      content:
+        "This chapter was absolutely amazing! The character development is incredible and I can't wait to see what happens next.",
       author: 'john_reader',
       novel: 'The Cultivation Path',
       chapter: 'Chapter 5: The First Trial',
@@ -50,7 +51,8 @@ const Comments = () => {
     },
     {
       id: 2,
-      content: 'I disagree with the direction this story is taking. The protagonist seems too overpowered.',
+      content:
+        'I disagree with the direction this story is taking. The protagonist seems too overpowered.',
       author: 'critic_reader',
       novel: 'The Cultivation Path',
       chapter: 'Chapter 6: Power Unleashed',
@@ -76,7 +78,8 @@ const Comments = () => {
     },
     {
       id: 4,
-      content: 'Great world-building in this chapter! The author really knows how to paint a vivid picture.',
+      content:
+        'Great world-building in this chapter! The author really knows how to paint a vivid picture.',
       author: 'fantasy_lover',
       novel: 'Mystic Journey',
       chapter: 'Chapter 3: The Enchanted Forest',
@@ -103,49 +106,53 @@ const Comments = () => {
   ];
 
   // Fetch data
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      let filteredData = mockComments;
-      
-      // Apply search filter
-      if (searchValue) {
-        filteredData = filteredData.filter(item => 
-          item.content.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.author.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.novel.toLowerCase().includes(searchValue.toLowerCase())
-        );
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let filteredData = mockComments;
+
+        // Apply search filter
+        if (searchValue) {
+          filteredData = filteredData.filter(
+            (item) =>
+              item.content.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.author.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.novel.toLowerCase().includes(searchValue.toLowerCase())
+          );
+        }
+
+        // Apply filters
+        if (filters.status) {
+          filteredData = filteredData.filter((item) => item.status === filters.status);
+        }
+
+        if (filters.hasReports) {
+          filteredData = filteredData.filter((item) => item.reports > 0);
+        }
+
+        const pageSize = params.pageSize || pagination.pageSize;
+        const current = params.current || pagination.current;
+        const startIndex = (current - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        setData(filteredData.slice(startIndex, endIndex));
+        setPagination((prev) => ({
+          ...prev,
+          current: current,
+          total: filteredData.length,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Apply filters
-      if (filters.status) {
-        filteredData = filteredData.filter(item => item.status === filters.status);
-      }
-      
-      if (filters.hasReports) {
-        filteredData = filteredData.filter(item => item.reports > 0);
-      }
-      
-      const pageSize = params.pageSize || pagination.pageSize;
-      const current = params.current || pagination.current;
-      const startIndex = (current - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      
-      setData(filteredData.slice(startIndex, endIndex));
-      setPagination(prev => ({
-        ...prev,
-        current: current,
-        total: filteredData.length,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, pagination.pageSize, pagination.current]);
+    },
+    [searchValue, filters, pagination.pageSize, pagination.current]
+  );
 
   useEffect(() => {
     fetchData();
@@ -168,9 +175,7 @@ const Comments = () => {
       name: 'hasReports',
       label: 'Has Reports',
       type: 'checkbox',
-      options: [
-        { value: true, label: 'Show only comments with reports' },
-      ],
+      options: [{ value: true, label: 'Show only comments with reports' }],
     },
     {
       name: 'createdDateRange',
@@ -194,7 +199,7 @@ const Comments = () => {
               on {record.novel}
             </Text>
           </Space>
-          <Paragraph 
+          <Paragraph
             ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
             style={{ margin: 0, maxWidth: 400 }}
           >
@@ -268,7 +273,7 @@ const Comments = () => {
               icon: <FlagOutlined />,
               label: 'Flag as Inappropriate',
               danger: true,
-            }
+            },
           ]}
         />
       ),
@@ -314,17 +319,14 @@ const Comments = () => {
       <PageHeader
         title="Comments Management"
         subtitle="Moderate and manage user comments"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Comments' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Comments' }]}
         actions={[
           <Button key="flagged" type="default" icon={<FlagOutlined />}>
-            View Flagged ({data.filter(item => item.status === 'flagged').length})
+            View Flagged ({data.filter((item) => item.status === 'flagged').length})
           </Button>,
           <Button key="pending" type="primary" icon={<MessageOutlined />}>
-            Review Pending ({data.filter(item => item.status === 'pending').length})
-          </Button>
+            Review Pending ({data.filter((item) => item.status === 'pending').length})
+          </Button>,
         ]}
       />
 
@@ -356,7 +358,7 @@ const Comments = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -367,8 +369,7 @@ const Comments = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} comments`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} comments`,
             }}
             onChange={handleTableChange}
             loading={loading}

@@ -2,28 +2,44 @@
 // This file exports all admin services for easy importing
 
 // Core services
-export { default as api, MockAPIClient } from './api';
-export { default as authService } from './authservice';
+import api, { MockAPIClient } from './api';
+import authService from './authservice';
 
 // Content management services
-export { default as dashboardService } from './dashboardservice';
-export { default as categoryService } from './categoryservice';
-export { default as novelService } from './novelservice';
-export { default as chapterService } from './chapterservice';
+import dashboardService from './dashboardservice';
+import categoryService from './categoryservice';
+import novelService from './novelservice';
+import chapterService from './chapterservice';
 
 // User interaction services
-export { default as commentService } from './commentservice';
-export { default as reviewService } from './reviewservice';
-export { default as reportService } from './reportservice';
+import commentService from './commentservice';
+import reviewService from './reviewservice';
+import reportService from './reportservice';
 
 // User management services
-export { default as userService } from './userservice';
-export { default as libraryService } from './libraryservice';
+import userService from './userservice';
+import libraryService from './libraryservice';
 
 // Platform services
-export { default as rankingService } from './rankingservice';
-export { default as settingsService } from './settingsservice';
-export { default as yuanService } from './yuanservice';
+import rankingService from './rankingservice';
+import settingsService from './settingsservice';
+import yuanService from './yuanservice';
+
+// Re-export for named imports
+export { api, MockAPIClient };
+export { authService };
+export { dashboardService };
+export { categoryService };
+export { novelService };
+export { chapterService };
+export { commentService };
+export { reviewService };
+export { reportService };
+export { userService };
+export { libraryService };
+export { rankingService };
+export { settingsService };
+export { yuanService };
 
 // Service availability check
 export const checkServiceAvailability = async () => {
@@ -43,11 +59,11 @@ export const checkServiceAvailability = async () => {
     settings: true,
     yuan: true,
   };
-  
+
   // In a real application, you would check actual service health here
   // For now, we'll simulate all services being available
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
   return {
     success: true,
     services,
@@ -86,21 +102,23 @@ export const serviceConfig = {
 export const initializeServices = async () => {
   try {
     console.log('🚀 Initializing Yushan Admin Services...');
-    
+
     // Check service availability
     const availability = await checkServiceAvailability();
     console.log('✅ Service availability check completed');
-    
+
     // Initialize mock data if in mock mode
     if (serviceConfig.mockMode) {
       console.log('🔧 Running in mock mode - using generated data');
     } else {
       console.log('🌐 Running in production mode - connecting to real APIs');
     }
-    
-    console.log(`📊 ${availability.availableServices}/${availability.totalServices} services available`);
+
+    console.log(
+      `📊 ${availability.availableServices}/${availability.totalServices} services available`
+    );
     console.log('🎉 Yushan Admin Services initialized successfully');
-    
+
     return {
       success: true,
       config: serviceConfig,
@@ -181,27 +199,27 @@ export default {
   // Core
   api,
   auth: authService,
-  
+
   // Content
   dashboard: dashboardService,
   categories: categoryService,
   novels: novelService,
   chapters: chapterService,
-  
+
   // Interaction
   comments: commentService,
   reviews: reviewService,
   reports: reportService,
-  
+
   // User
   users: userService,
   library: libraryService,
-  
+
   // Platform
   rankings: rankingService,
   settings: settingsService,
   yuan: yuanService,
-  
+
   // Utilities
   config: serviceConfig,
   initialize: initializeServices,

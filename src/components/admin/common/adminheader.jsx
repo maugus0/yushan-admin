@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Layout, Button, Dropdown, Avatar, Space, Typography, Badge, Tooltip } from 'antd';
 import {
   MenuFoldOutlined,
@@ -34,7 +34,7 @@ const AdminHeader = ({
   ...props
 }) => {
   const { admin, logout } = useAdminAuth();
-  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -79,28 +79,25 @@ const AdminHeader = ({
     key: `notification-${index}`,
     label: (
       <div style={{ maxWidth: 250 }}>
-        <div style={{ fontWeight: 500, marginBottom: 4 }}>
-          {notification.title}
-        </div>
-        <div style={{ fontSize: 12, color: '#666' }}>
-          {notification.description}
-        </div>
-        <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
-          {notification.time}
-        </div>
+        <div style={{ fontWeight: 500, marginBottom: 4 }}>{notification.title}</div>
+        <div style={{ fontSize: 12, color: '#666' }}>{notification.description}</div>
+        <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>{notification.time}</div>
       </div>
     ),
     onClick: () => onNotificationClick && onNotificationClick(notification),
   }));
 
   if (notifications.length > 5) {
-    notificationMenuItems.push({
-      type: 'divider'
-    }, {
-      key: 'view-all',
-      label: 'View All Notifications',
-      onClick: () => onNotificationClick && onNotificationClick('view-all'),
-    });
+    notificationMenuItems.push(
+      {
+        type: 'divider',
+      },
+      {
+        key: 'view-all',
+        label: 'View All Notifications',
+        onClick: () => onNotificationClick && onNotificationClick('view-all'),
+      }
+    );
   }
 
   return (
@@ -112,7 +109,7 @@ const AdminHeader = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        ...style
+        ...style,
       }}
       className={className}
       {...props}
@@ -123,16 +120,16 @@ const AdminHeader = ({
           type="text"
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={onToggleCollapsed}
-          style={{ 
-            fontSize: '16px', 
-            width: 64, 
+          style={{
+            fontSize: '16px',
+            width: 64,
             height: 64,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}
         />
-        
+
         {showSearch && (
           <div style={{ marginLeft: 16 }}>
             <Button
@@ -150,7 +147,7 @@ const AdminHeader = ({
       {/* Right Section */}
       <Space size="middle" style={{ alignItems: 'center' }}>
         {extra}
-        
+
         {showFullscreen && (
           <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}>
             <Button
@@ -161,7 +158,7 @@ const AdminHeader = ({
             />
           </Tooltip>
         )}
-        
+
         {showNotifications && (
           <Dropdown
             menu={{ items: notificationMenuItems }}
@@ -170,15 +167,11 @@ const AdminHeader = ({
             trigger={['click']}
           >
             <Badge count={unreadCount} size="small">
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                style={{ fontSize: '16px' }}
-              />
+              <Button type="text" icon={<BellOutlined />} style={{ fontSize: '16px' }} />
             </Badge>
           </Dropdown>
         )}
-        
+
         {showUserMenu && admin && (
           <Dropdown
             menu={{ items: userMenuItems }}

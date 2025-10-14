@@ -8,7 +8,15 @@ const mockAdmins = [
     email: 'admin@yushan.com',
     password: 'admin123', // In real app, this would be hashed
     role: 'super_admin',
-    permissions: ['read', 'write', 'delete', 'manage_users', 'manage_content', 'manage_settings', 'view_analytics'],
+    permissions: [
+      'read',
+      'write',
+      'delete',
+      'manage_users',
+      'manage_content',
+      'manage_settings',
+      'view_analytics',
+    ],
     profile: {
       firstName: 'Super',
       lastName: 'Admin',
@@ -23,7 +31,7 @@ const mockAdmins = [
       language: 'en',
       notifications: true,
       twoFactorEnabled: true,
-    }
+    },
   },
   {
     id: 2,
@@ -46,7 +54,7 @@ const mockAdmins = [
       language: 'en',
       notifications: true,
       twoFactorEnabled: false,
-    }
+    },
   },
   {
     id: 3,
@@ -69,8 +77,8 @@ const mockAdmins = [
       language: 'en',
       notifications: false,
       twoFactorEnabled: true,
-    }
-  }
+    },
+  },
 ];
 
 export const authService = {
@@ -78,11 +86,11 @@ export const authService = {
   login: async (credentials) => {
     try {
       await api.delay(800);
-      
+
       const { username, password, rememberMe } = credentials;
       const admin = mockAdmins.find(
-        admin => (admin.username === username || admin.email === username) && 
-                admin.password === password
+        (admin) =>
+          (admin.username === username || admin.email === username) && admin.password === password
       );
 
       if (!admin) {
@@ -94,7 +102,7 @@ export const authService = {
 
       // Generate mock token
       const token = `yushan_token_${admin.id}_${Date.now()}`;
-      
+
       // Store token
       if (rememberMe) {
         localStorage.setItem('admin_token', token);
@@ -102,15 +110,18 @@ export const authService = {
       } else {
         sessionStorage.setItem('admin_token', token);
       }
-      
-      localStorage.setItem('admin_user', JSON.stringify({
-        id: admin.id,
-        username: admin.username,
-        email: admin.email,
-        role: admin.role,
-        permissions: admin.permissions,
-        profile: admin.profile,
-      }));
+
+      localStorage.setItem(
+        'admin_user',
+        JSON.stringify({
+          id: admin.id,
+          username: admin.username,
+          email: admin.email,
+          role: admin.role,
+          permissions: admin.permissions,
+          profile: admin.profile,
+        })
+      );
 
       return {
         success: true,
@@ -125,7 +136,7 @@ export const authService = {
           },
           token,
           expiresIn: rememberMe ? '30d' : '24h',
-        }
+        },
       };
     } catch (error) {
       throw new Error(error.message || 'Login failed');
@@ -136,12 +147,12 @@ export const authService = {
   logout: async () => {
     try {
       await api.delay(200);
-      
+
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');
       localStorage.removeItem('admin_remember');
       sessionStorage.removeItem('admin_token');
-      
+
       return { success: true };
     } catch (error) {
       throw new Error('Logout failed');
@@ -152,15 +163,15 @@ export const authService = {
   getCurrentUser: async () => {
     try {
       await api.delay(300);
-      
+
       const userJson = localStorage.getItem('admin_user');
       if (!userJson) {
         throw new Error('No authenticated user');
       }
-      
+
       const user = JSON.parse(userJson);
-      const admin = mockAdmins.find(a => a.id === user.id);
-      
+      const admin = mockAdmins.find((a) => a.id === user.id);
+
       return {
         success: true,
         data: {
@@ -171,7 +182,7 @@ export const authService = {
           permissions: admin.permissions,
           profile: admin.profile,
           settings: admin.settings,
-        }
+        },
       };
     } catch (error) {
       throw new Error('Failed to get current user');
@@ -182,26 +193,27 @@ export const authService = {
   refreshToken: async () => {
     try {
       await api.delay(300);
-      
-      const currentToken = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+
+      const currentToken =
+        localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
       if (!currentToken) {
         throw new Error('No token to refresh');
       }
-      
+
       const newToken = `yushan_token_refreshed_${Date.now()}`;
-      
+
       if (localStorage.getItem('admin_remember')) {
         localStorage.setItem('admin_token', newToken);
       } else {
         sessionStorage.setItem('admin_token', newToken);
       }
-      
+
       return {
         success: true,
         data: {
           token: newToken,
           expiresIn: localStorage.getItem('admin_remember') ? '30d' : '24h',
-        }
+        },
       };
     } catch (error) {
       throw new Error('Token refresh failed');
@@ -212,27 +224,27 @@ export const authService = {
   changePassword: async (passwordData) => {
     try {
       await api.delay(600);
-      
+
       const { currentPassword, newPassword } = passwordData;
       const userJson = localStorage.getItem('admin_user');
-      
+
       if (!userJson) {
         throw new Error('No authenticated user');
       }
-      
+
       const user = JSON.parse(userJson);
-      const admin = mockAdmins.find(a => a.id === user.id);
-      
+      const admin = mockAdmins.find((a) => a.id === user.id);
+
       if (admin.password !== currentPassword) {
         throw new Error('Current password is incorrect');
       }
-      
+
       // Update password
       admin.password = newPassword;
-      
+
       return {
         success: true,
-        message: 'Password changed successfully'
+        message: 'Password changed successfully',
       };
     } catch (error) {
       throw new Error(error.message || 'Password change failed');
@@ -243,28 +255,28 @@ export const authService = {
   updateProfile: async (profileData) => {
     try {
       await api.delay(500);
-      
+
       const userJson = localStorage.getItem('admin_user');
       if (!userJson) {
         throw new Error('No authenticated user');
       }
-      
+
       const user = JSON.parse(userJson);
-      const admin = mockAdmins.find(a => a.id === user.id);
-      
+      const admin = mockAdmins.find((a) => a.id === user.id);
+
       // Update profile
       admin.profile = { ...admin.profile, ...profileData };
-      
+
       // Update local storage
       const updatedUser = {
         ...user,
         profile: admin.profile,
       };
       localStorage.setItem('admin_user', JSON.stringify(updatedUser));
-      
+
       return {
         success: true,
-        data: updatedUser
+        data: updatedUser,
       };
     } catch (error) {
       throw new Error('Profile update failed');
@@ -283,7 +295,7 @@ export const authService = {
     try {
       const userJson = localStorage.getItem('admin_user');
       if (!userJson) return [];
-      
+
       const user = JSON.parse(userJson);
       return user.permissions || [];
     } catch {

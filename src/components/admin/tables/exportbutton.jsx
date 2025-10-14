@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Dropdown, Space, Typography, message } from 'antd';
-import { 
-  DownloadOutlined, 
-  FileExcelOutlined, 
+import {
+  DownloadOutlined,
+  FileExcelOutlined,
   FilePdfOutlined,
   FileTextOutlined,
-  DownOutlined
+  DownOutlined,
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -27,21 +27,23 @@ const ExportButton = ({
   // Convert data to CSV format
   const convertToCSV = (data) => {
     if (!data || data.length === 0) return '';
-    
+
     const headers = Object.keys(data[0]);
     const csvHeaders = headers.join(',');
-    
-    const csvRows = data.map(row => 
-      headers.map(header => {
-        const value = row[header];
-        // Handle values that might contain commas or quotes
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value || '';
-      }).join(',')
+
+    const csvRows = data.map((row) =>
+      headers
+        .map((header) => {
+          const value = row[header];
+          // Handle values that might contain commas or quotes
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value || '';
+        })
+        .join(',')
     );
-    
+
     return [csvHeaders, ...csvRows].join('\n');
   };
 
@@ -76,7 +78,7 @@ const ExportButton = ({
       return;
     }
 
-    setExportLoading(prev => ({ ...prev, [format]: true }));
+    setExportLoading((prev) => ({ ...prev, [format]: true }));
 
     try {
       let content, mimeType, extension;
@@ -121,7 +123,7 @@ const ExportButton = ({
       message.error(`Export failed: ${error.message}`);
       console.error('Export error:', error);
     } finally {
-      setExportLoading(prev => ({ ...prev, [format]: false }));
+      setExportLoading((prev) => ({ ...prev, [format]: false }));
     }
   };
 
@@ -157,7 +159,7 @@ const ExportButton = ({
   // Multiple formats (dropdown)
   const menuItems = [
     // Export all data
-    ...formats.map(format => ({
+    ...formats.map((format) => ({
       key: `all_${format}`,
       label: (
         <Space>
@@ -168,21 +170,23 @@ const ExportButton = ({
       ),
       disabled: data.length === 0,
     })),
-    
+
     // Separator if selection exists
     ...(hasSelection && selectedData.length > 0 ? [{ type: 'divider' }] : []),
-    
+
     // Export selected data
-    ...(hasSelection && selectedData.length > 0 ? formats.map(format => ({
-      key: `selected_${format}`,
-      label: (
-        <Space>
-          {getFormatIcon(format)}
-          <span>Export Selected as {format.toUpperCase()}</span>
-          <Text type="secondary">({selectedData.length} items)</Text>
-        </Space>
-      ),
-    })) : []),
+    ...(hasSelection && selectedData.length > 0
+      ? formats.map((format) => ({
+          key: `selected_${format}`,
+          label: (
+            <Space>
+              {getFormatIcon(format)}
+              <span>Export Selected as {format.toUpperCase()}</span>
+              <Text type="secondary">({selectedData.length} items)</Text>
+            </Space>
+          ),
+        }))
+      : []),
   ];
 
   const handleMenuClick = ({ key }) => {
@@ -200,12 +204,7 @@ const ExportButton = ({
       disabled={disabled || (data.length === 0 && selectedData.length === 0)}
       trigger={['click']}
     >
-      <Button
-        icon={<DownloadOutlined />}
-        loading={loading}
-        type={type}
-        size={size}
-      >
+      <Button icon={<DownloadOutlined />} loading={loading} type={type} size={size}>
         Export <DownOutlined />
       </Button>
     </Dropdown>
@@ -220,7 +219,7 @@ export const useExport = () => {
   const handleExport = async (exportFunction) => {
     setExporting(true);
     setExportProgress(0);
-    
+
     try {
       await exportFunction((progress) => setExportProgress(progress));
       message.success('Export completed successfully');
@@ -246,17 +245,17 @@ export const exportPresets = {
     formats: ['csv'],
     filename: 'data',
   },
-  
+
   standard: {
     formats: ['csv', 'excel', 'json'],
     filename: 'export',
   },
-  
+
   comprehensive: {
     formats: ['csv', 'excel', 'json', 'txt'],
     filename: 'comprehensive_export',
   },
-  
+
   reports: {
     formats: ['excel', 'pdf'],
     filename: 'report',

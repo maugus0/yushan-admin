@@ -1,26 +1,32 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import ChartWrapper from './chartwrapper';
 
-const CustomLineChart = ({ 
-  data = [], 
-  lines = [], 
+const CustomLineChart = ({
+  data = [],
+  lines = [],
   title = 'Line Chart',
   subtitle,
   height = 300,
   showGrid = true,
   showLegend = true,
   loading = false,
-  ...props 
+  ...props
 }) => {
   // Default line configuration
-  const defaultLines = [
-    { dataKey: 'value', stroke: '#1890ff', strokeWidth: 2, name: 'Value' }
-  ];
+  const defaultLines = [{ dataKey: 'value', stroke: '#1890ff', strokeWidth: 2, name: 'Value' }];
 
   const lineConfig = lines.length > 0 ? lines : defaultLines;
 
-  const formatTooltip = (value, name, props) => {
+  const formatTooltip = (value, name, _props) => {
     if (typeof value === 'number') {
       return [value.toLocaleString(), name];
     }
@@ -41,8 +47,8 @@ const CustomLineChart = ({
   };
 
   return (
-    <ChartWrapper 
-      title={title} 
+    <ChartWrapper
+      title={title}
       subtitle={subtitle}
       height={height}
       loading={loading}
@@ -52,25 +58,16 @@ const CustomLineChart = ({
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
-          <XAxis 
-            dataKey="name" 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 12 }}
-          />
-          <YAxis 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 12 }}
-          />
-          <Tooltip 
+          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+          <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+          <Tooltip
             formatter={formatTooltip}
             labelStyle={{ color: '#666' }}
             contentStyle={{
               backgroundColor: '#fff',
               border: '1px solid #d9d9d9',
               borderRadius: '6px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           />
           {showLegend && <Legend />}

@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
-import { 
-  Card, 
-  Form, 
-  Select, 
-  DatePicker, 
-  Button, 
-  Space, 
+import {
+  Card,
+  Form,
+  Select,
+  DatePicker,
+  Button,
+  Space,
   Input,
   InputNumber,
   Checkbox,
   Radio,
   Slider,
   Typography,
-  Divider
+  Divider,
 } from 'antd';
-import { 
-  FilterOutlined, 
-  ClearOutlined, 
+import {
+  FilterOutlined,
+  ClearOutlined,
   SearchOutlined,
   DownOutlined,
-  UpOutlined
+  UpOutlined,
 } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -47,12 +47,12 @@ const FilterPanel = ({
 
   const handleFilter = (values) => {
     // Count active filters
-    const activeCount = Object.values(values).filter(value => {
+    const activeCount = Object.values(values).filter((value) => {
       if (Array.isArray(value)) return value.length > 0;
       if (value === null || value === undefined || value === '') return false;
       return true;
     }).length;
-    
+
     setActiveFilters(activeCount);
     onFilter && onFilter(values);
   };
@@ -69,12 +69,8 @@ const FilterPanel = ({
     switch (type) {
       case 'select':
         return (
-          <Select 
-            placeholder={placeholder || `Select ${label}`}
-            allowClear
-            {...fieldProps}
-          >
-            {options?.map(option => (
+          <Select placeholder={placeholder || `Select ${label}`} allowClear {...fieldProps}>
+            {options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -84,13 +80,13 @@ const FilterPanel = ({
 
       case 'multiselect':
         return (
-          <Select 
+          <Select
             mode="multiple"
             placeholder={placeholder || `Select ${label}`}
             allowClear
             {...fieldProps}
           >
-            {options?.map(option => (
+            {options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -100,7 +96,7 @@ const FilterPanel = ({
 
       case 'date':
         return (
-          <DatePicker 
+          <DatePicker
             placeholder={placeholder || `Select ${label}`}
             style={{ width: '100%' }}
             {...fieldProps}
@@ -109,7 +105,7 @@ const FilterPanel = ({
 
       case 'daterange':
         return (
-          <RangePicker 
+          <RangePicker
             placeholder={['Start Date', 'End Date']}
             style={{ width: '100%' }}
             {...fieldProps}
@@ -118,7 +114,7 @@ const FilterPanel = ({
 
       case 'number':
         return (
-          <InputNumber 
+          <InputNumber
             placeholder={placeholder || `Enter ${label}`}
             style={{ width: '100%' }}
             {...fieldProps}
@@ -128,35 +124,21 @@ const FilterPanel = ({
       case 'numberrange':
         return (
           <Space.Compact style={{ width: '100%' }}>
-            <InputNumber 
-              placeholder="Min"
-              style={{ width: '50%' }}
-              {...fieldProps.min}
-            />
-            <InputNumber 
-              placeholder="Max"
-              style={{ width: '50%' }}
-              {...fieldProps.max}
-            />
+            <InputNumber placeholder="Min" style={{ width: '50%' }} {...fieldProps.min} />
+            <InputNumber placeholder="Max" style={{ width: '50%' }} {...fieldProps.max} />
           </Space.Compact>
         );
 
       case 'slider':
-        return (
-          <Slider 
-            {...fieldProps}
-          />
-        );
+        return <Slider {...fieldProps} />;
 
       case 'checkbox':
-        return (
-          <Checkbox.Group options={options} {...fieldProps} />
-        );
+        return <Checkbox.Group options={options} {...fieldProps} />;
 
       case 'radio':
         return (
           <Radio.Group {...fieldProps}>
-            {options?.map(option => (
+            {options?.map((option) => (
               <Radio key={option.value} value={option.value}>
                 {option.label}
               </Radio>
@@ -166,7 +148,7 @@ const FilterPanel = ({
 
       case 'search':
         return (
-          <Input 
+          <Input
             placeholder={placeholder || `Search ${label}`}
             suffix={<SearchOutlined />}
             {...fieldProps}
@@ -174,12 +156,7 @@ const FilterPanel = ({
         );
 
       default:
-        return (
-          <Input 
-            placeholder={placeholder || `Enter ${label}`}
-            {...fieldProps}
-          />
-        );
+        return <Input placeholder={placeholder || `Enter ${label}`} {...fieldProps} />;
     }
   };
 
@@ -202,22 +179,15 @@ const FilterPanel = ({
             {renderFilterField(filter)}
           </Form.Item>
         ))}
-        
+
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
           {showClearButton && (
-            <Button 
-              icon={<ClearOutlined />}
-              onClick={handleClear}
-            >
+            <Button icon={<ClearOutlined />} onClick={handleClear}>
               Clear
             </Button>
           )}
           {showApplyButton && (
-            <Button 
-              type="primary"
-              icon={<FilterOutlined />}
-              onClick={() => form.submit()}
-            >
+            <Button type="primary" icon={<FilterOutlined />} onClick={() => form.submit()}>
               Apply Filters
             </Button>
           )}
@@ -233,12 +203,12 @@ const FilterPanel = ({
         className={className}
         bodyStyle={{ padding: isCollapsed ? '12px 16px' : '16px' }}
       >
-        <div 
-          style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
@@ -246,22 +216,24 @@ const FilterPanel = ({
             <FilterOutlined />
             <Text strong>{title}</Text>
             {activeFilters > 0 && (
-              <span style={{
-                background: '#1890ff',
-                color: 'white',
-                borderRadius: '10px',
-                padding: '2px 8px',
-                fontSize: '12px',
-                minWidth: '18px',
-                textAlign: 'center'
-              }}>
+              <span
+                style={{
+                  background: '#1890ff',
+                  color: 'white',
+                  borderRadius: '10px',
+                  padding: '2px 8px',
+                  fontSize: '12px',
+                  minWidth: '18px',
+                  textAlign: 'center',
+                }}
+              >
                 {activeFilters}
               </span>
             )}
           </Space>
           {isCollapsed ? <DownOutlined /> : <UpOutlined />}
         </div>
-        
+
         {!isCollapsed && (
           <>
             <Divider style={{ margin: '12px 0' }} />
@@ -279,13 +251,15 @@ const FilterPanel = ({
           <FilterOutlined />
           {title}
           {activeFilters > 0 && (
-            <span style={{
-              background: '#1890ff',
-              color: 'white',
-              borderRadius: '10px',
-              padding: '2px 8px',
-              fontSize: '12px'
-            }}>
+            <span
+              style={{
+                background: '#1890ff',
+                color: 'white',
+                borderRadius: '10px',
+                padding: '2px 8px',
+                fontSize: '12px',
+              }}
+            >
               {activeFilters}
             </span>
           )}

@@ -10,10 +10,10 @@ export const formatCurrency = (amount, currency = '¥') => {
   if (typeof amount !== 'number' || isNaN(amount)) {
     return `${currency}0.00`;
   }
-  
+
   return `${currency}${amount.toLocaleString('zh-CN', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   })}`;
 };
 
@@ -27,10 +27,10 @@ export const formatNumber = (number, decimals = 0) => {
   if (typeof number !== 'number' || isNaN(number)) {
     return '0';
   }
-  
+
   return number.toLocaleString('zh-CN', {
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   });
 };
 
@@ -44,7 +44,7 @@ export const formatPercentage = (value, decimals = 1) => {
   if (typeof value !== 'number' || isNaN(value)) {
     return '0%';
   }
-  
+
   return `${(value * 100).toFixed(decimals)}%`;
 };
 
@@ -56,13 +56,13 @@ export const formatPercentage = (value, decimals = 1) => {
  */
 export const formatFileSize = (bytes, decimals = 2) => {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  
+
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
@@ -74,38 +74,38 @@ export const formatFileSize = (bytes, decimals = 2) => {
  */
 export const formatDate = (date, format = 'short') => {
   if (!date) return '';
-  
+
   const dateObj = date instanceof Date ? date : new Date(date);
-  
+
   if (isNaN(dateObj.getTime())) {
     return 'Invalid Date';
   }
-  
+
   const options = {
     short: {
       year: 'numeric',
       month: '2-digit',
-      day: '2-digit'
+      day: '2-digit',
     },
     long: {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     },
     datetime: {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     },
     time: {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
-    }
+      second: '2-digit',
+    },
   };
-  
+
   return dateObj.toLocaleDateString('zh-CN', options[format] || options.short);
 };
 
@@ -116,15 +116,15 @@ export const formatDate = (date, format = 'short') => {
  */
 export const formatRelativeTime = (date) => {
   if (!date) return '';
-  
+
   const dateObj = date instanceof Date ? date : new Date(date);
   const now = new Date();
   const diff = now - dateObj;
-  
+
   if (isNaN(dateObj.getTime())) {
     return 'Invalid Date';
   }
-  
+
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -132,7 +132,7 @@ export const formatRelativeTime = (date) => {
   const weeks = Math.floor(days / 7);
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
-  
+
   if (seconds < 60) return '刚刚';
   if (minutes < 60) return `${minutes}分钟前`;
   if (hours < 24) return `${hours}小时前`;
@@ -151,15 +151,15 @@ export const formatDuration = (seconds) => {
   if (typeof seconds !== 'number' || isNaN(seconds)) {
     return '0:00';
   }
-  
+
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
-  
+
   if (hours > 0) {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
-  
+
   return `${minutes}:${secs.toString().padStart(2, '0')}`;
 };
 
@@ -170,20 +170,20 @@ export const formatDuration = (seconds) => {
  */
 export const formatPhone = (phone) => {
   if (!phone) return '';
-  
+
   // Remove all non-numeric characters
   const cleaned = phone.replace(/\D/g, '');
-  
+
   // Chinese mobile number format
   if (cleaned.length === 11 && cleaned.startsWith('1')) {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 7)} ${cleaned.slice(7)}`;
   }
-  
+
   // International format
   if (cleaned.length > 11) {
     return `+${cleaned.slice(0, -10)} ${cleaned.slice(-10, -7)} ${cleaned.slice(-7, -4)} ${cleaned.slice(-4)}`;
   }
-  
+
   return phone;
 };
 
@@ -195,11 +195,11 @@ export const formatPhone = (phone) => {
  */
 export const formatDisplayName = (name, maxLength = 20) => {
   if (!name) return '';
-  
+
   if (name.length <= maxLength) {
     return name;
   }
-  
+
   return `${name.slice(0, maxLength - 3)}...`;
 };
 
@@ -236,9 +236,9 @@ export const formatStatus = (status) => {
     urgent: '紧急',
     resolved: '已解决',
     investigating: '调查中',
-    closed: '已关闭'
+    closed: '已关闭',
   };
-  
+
   return statusMap[status] || status;
 };
 
@@ -259,9 +259,9 @@ export const formatPriority = (priority) => {
     medium: '中',
     high: '高',
     urgent: '紧急',
-    critical: '关键'
+    critical: '关键',
   };
-  
+
   return priorityMap[priority] || priority;
 };
 
@@ -291,9 +291,9 @@ export const formatGenre = (genre) => {
     drama: '剧情',
     action: '动作',
     adventure: '冒险',
-    supernatural: '超自然'
+    supernatural: '超自然',
   };
-  
+
   return genreMap[genre] || genre;
 };
 
@@ -307,15 +307,15 @@ export const formatRating = (rating, showNumber = true) => {
   if (typeof rating !== 'number' || isNaN(rating)) {
     return '☆☆☆☆☆';
   }
-  
+
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-  
+
   let stars = '★'.repeat(fullStars);
   if (hasHalfStar) stars += '⭐';
   stars += '☆'.repeat(emptyStars);
-  
+
   return showNumber ? `${stars} (${rating.toFixed(1)})` : stars;
 };
 
@@ -328,19 +328,19 @@ export const formatRating = (rating, showNumber = true) => {
  */
 export const formatExcerpt = (text, maxLength = 100, suffix = '...') => {
   if (!text) return '';
-  
+
   if (text.length <= maxLength) {
     return text;
   }
-  
+
   // Try to break at word boundary
   const truncated = text.slice(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
-  
+
   if (lastSpace > maxLength * 0.8) {
     return truncated.slice(0, lastSpace) + suffix;
   }
-  
+
   return truncated + suffix;
 };
 
@@ -351,7 +351,7 @@ export const formatExcerpt = (text, maxLength = 100, suffix = '...') => {
  */
 export const formatSlug = (text) => {
   if (!text) return '';
-  
+
   return text
     .toLowerCase()
     .trim()
@@ -368,10 +368,10 @@ export const formatSlug = (text) => {
  */
 export const formatColumnWidth = (content, minWidth = 80, maxWidth = 300) => {
   if (!content) return minWidth;
-  
+
   const length = content.toString().length;
   const calculatedWidth = Math.max(length * 8, minWidth);
-  
+
   return Math.min(calculatedWidth, maxWidth);
 };
 
@@ -383,7 +383,7 @@ export const formatColumnWidth = (content, minWidth = 80, maxWidth = 300) => {
  */
 export const formatHighlight = (text, query) => {
   if (!text || !query) return text;
-  
+
   const regex = new RegExp(`(${query})`, 'gi');
   return text.replace(regex, '<mark>$1</mark>');
 };
@@ -396,17 +396,17 @@ export const formatHighlight = (text, query) => {
  */
 export const formatSocialHandle = (handle, platform = 'general') => {
   if (!handle) return '';
-  
+
   // Remove @ symbol if present
   const cleanHandle = handle.replace(/^@/, '');
-  
+
   const prefixes = {
     twitter: '@',
     instagram: '@',
     weibo: '@',
-    general: '@'
+    general: '@',
   };
-  
+
   return `${prefixes[platform] || '@'}${cleanHandle}`;
 };
 
@@ -418,7 +418,7 @@ export const formatSocialHandle = (handle, platform = 'general') => {
  */
 export const formatMessage = (message, type = 'info') => {
   if (!message) return '';
-  
+
   // Capitalize first letter
   return message.charAt(0).toUpperCase() + message.slice(1);
 };
@@ -434,18 +434,18 @@ export const formatList = (items, separator = ', ', lastSeparator = ' 和 ') => 
   if (!Array.isArray(items) || items.length === 0) {
     return '';
   }
-  
+
   if (items.length === 1) {
     return items[0].toString();
   }
-  
+
   if (items.length === 2) {
     return items.join(lastSeparator);
   }
-  
+
   const allButLast = items.slice(0, -1).join(separator);
   const last = items[items.length - 1];
-  
+
   return `${allButLast}${lastSeparator}${last}`;
 };
 
@@ -469,5 +469,5 @@ export default {
   formatHighlight,
   formatSocialHandle,
   formatMessage,
-  formatList
+  formatList,
 };

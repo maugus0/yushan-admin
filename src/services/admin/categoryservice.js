@@ -16,7 +16,8 @@ const generateMockCategories = () => {
       icon: 'crown',
       color: '#722ed1',
       seoTitle: 'Fantasy Novels - Yushan',
-      seoDescription: 'Discover amazing fantasy novels with magic, adventure, and mythical creatures.',
+      seoDescription:
+        'Discover amazing fantasy novels with magic, adventure, and mythical creatures.',
       createdAt: '2023-01-15T00:00:00.000Z',
       updatedAt: '2024-10-01T00:00:00.000Z',
       children: [
@@ -59,7 +60,7 @@ const generateMockCategories = () => {
           createdAt: '2023-02-01T00:00:00.000Z',
           updatedAt: '2024-09-10T00:00:00.000Z',
         },
-      ]
+      ],
     },
     {
       id: 2,
@@ -117,7 +118,7 @@ const generateMockCategories = () => {
           createdAt: '2023-02-01T00:00:00.000Z',
           updatedAt: '2024-09-12T00:00:00.000Z',
         },
-      ]
+      ],
     },
     {
       id: 3,
@@ -162,7 +163,7 @@ const generateMockCategories = () => {
           createdAt: '2023-02-01T00:00:00.000Z',
           updatedAt: '2024-09-22T00:00:00.000Z',
         },
-      ]
+      ],
     },
     {
       id: 4,
@@ -207,7 +208,7 @@ const generateMockCategories = () => {
           createdAt: '2023-02-01T00:00:00.000Z',
           updatedAt: '2024-09-05T00:00:00.000Z',
         },
-      ]
+      ],
     },
     {
       id: 5,
@@ -252,7 +253,7 @@ const generateMockCategories = () => {
           createdAt: '2023-02-01T00:00:00.000Z',
           updatedAt: '2024-09-07T00:00:00.000Z',
         },
-      ]
+      ],
     },
     {
       id: 6,
@@ -270,7 +271,7 @@ const generateMockCategories = () => {
       seoDescription: 'Experience spine-chilling horror stories.',
       createdAt: '2023-01-15T00:00:00.000Z',
       updatedAt: '2024-10-01T00:00:00.000Z',
-      children: []
+      children: [],
     },
     {
       id: 7,
@@ -288,8 +289,8 @@ const generateMockCategories = () => {
       seoDescription: 'Read emotional drama and character stories.',
       createdAt: '2023-01-15T00:00:00.000Z',
       updatedAt: '2024-10-01T00:00:00.000Z',
-      children: []
-    }
+      children: [],
+    },
   ];
 };
 
@@ -300,38 +301,45 @@ export const categoryService = {
   getAllCategories: async (params = {}) => {
     try {
       await api.delay(400);
-      
-      const { includeInactive = false, includeChildren = true, search = '', page = 1, pageSize = 50 } = params;
-      
+
+      const {
+        includeInactive = false,
+        includeChildren = true,
+        search = '',
+        page = 1,
+        pageSize = 50,
+      } = params;
+
       let categories = [...mockCategories];
-      
+
       // Filter by active status
       if (!includeInactive) {
-        categories = categories.filter(cat => cat.isActive);
+        categories = categories.filter((cat) => cat.isActive);
       }
-      
+
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
-        categories = categories.filter(cat => 
-          cat.name.toLowerCase().includes(searchLower) ||
-          cat.description.toLowerCase().includes(searchLower)
+        categories = categories.filter(
+          (cat) =>
+            cat.name.toLowerCase().includes(searchLower) ||
+            cat.description.toLowerCase().includes(searchLower)
         );
       }
-      
+
       // Remove children if not requested
       if (!includeChildren) {
-        categories = categories.map(cat => {
+        categories = categories.map((cat) => {
           const { children, ...categoryWithoutChildren } = cat;
           return categoryWithoutChildren;
         });
       }
-      
+
       // Apply pagination
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       const paginatedCategories = categories.slice(start, end);
-      
+
       return {
         success: true,
         data: paginatedCategories,
@@ -348,7 +356,7 @@ export const categoryService = {
   getCategoryById: async (id) => {
     try {
       await api.delay(300);
-      
+
       const findCategory = (categories, targetId) => {
         for (const category of categories) {
           if (category.id === parseInt(targetId)) {
@@ -361,13 +369,13 @@ export const categoryService = {
         }
         return null;
       };
-      
+
       const category = findCategory(mockCategories, id);
-      
+
       if (!category) {
         throw new Error('Category not found');
       }
-      
+
       return {
         success: true,
         data: category,
@@ -381,16 +389,16 @@ export const categoryService = {
   createCategory: async (categoryData) => {
     try {
       await api.delay(600);
-      
+
       const newCategory = {
-        id: Math.max(...mockCategories.map(c => c.id)) + 1,
+        id: Math.max(...mockCategories.map((c) => c.id)) + 1,
         ...categoryData,
         novelCount: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         children: [],
       };
-      
+
       if (categoryData.parentId) {
         // Add as child category
         const findAndAddChild = (categories, parentId, child) => {
@@ -405,13 +413,13 @@ export const categoryService = {
           }
           return false;
         };
-        
+
         findAndAddChild(mockCategories, categoryData.parentId, newCategory);
       } else {
         // Add as top-level category
         mockCategories.push(newCategory);
       }
-      
+
       return {
         success: true,
         data: newCategory,
@@ -425,7 +433,7 @@ export const categoryService = {
   updateCategory: async (id, updateData) => {
     try {
       await api.delay(500);
-      
+
       const findAndUpdateCategory = (categories, targetId, data) => {
         for (let i = 0; i < categories.length; i++) {
           if (categories[i].id === parseInt(targetId)) {
@@ -443,13 +451,13 @@ export const categoryService = {
         }
         return null;
       };
-      
+
       const updatedCategory = findAndUpdateCategory(mockCategories, id, updateData);
-      
+
       if (!updatedCategory) {
         throw new Error('Category not found');
       }
-      
+
       return {
         success: true,
         data: updatedCategory,
@@ -463,7 +471,7 @@ export const categoryService = {
   deleteCategory: async (id) => {
     try {
       await api.delay(400);
-      
+
       const findAndDeleteCategory = (categories, targetId) => {
         for (let i = 0; i < categories.length; i++) {
           if (categories[i].id === parseInt(targetId)) {
@@ -477,13 +485,13 @@ export const categoryService = {
         }
         return null;
       };
-      
+
       const deletedCategory = findAndDeleteCategory(mockCategories, id);
-      
+
       if (!deletedCategory) {
         throw new Error('Category not found');
       }
-      
+
       return {
         success: true,
         data: deletedCategory,
@@ -497,10 +505,10 @@ export const categoryService = {
   getCategoryTree: async () => {
     try {
       await api.delay(300);
-      
+
       return {
         success: true,
-        data: mockCategories.filter(cat => cat.isActive),
+        data: mockCategories.filter((cat) => cat.isActive),
       };
     } catch (error) {
       throw new Error('Failed to fetch category tree');
@@ -511,48 +519,53 @@ export const categoryService = {
   reorderCategories: async (reorderData) => {
     try {
       await api.delay(400);
-      
+
       const { parentId, categoryIds } = reorderData;
-      
+
       if (parentId) {
         // Reorder children of a specific parent
         const findAndReorderChildren = (categories, targetParentId, newOrder) => {
           for (const category of categories) {
             if (category.id === targetParentId && category.children) {
-              const reorderedChildren = newOrder.map(id => 
-                category.children.find(child => child.id === id)
-              ).filter(Boolean);
-              
+              const reorderedChildren = newOrder
+                .map((id) => category.children.find((child) => child.id === id))
+                .filter(Boolean);
+
               category.children = reorderedChildren.map((child, index) => ({
                 ...child,
                 order: index + 1,
                 updatedAt: new Date().toISOString(),
               }));
-              
+
               return true;
             }
-            if (category.children && findAndReorderChildren(category.children, targetParentId, newOrder)) {
+            if (
+              category.children &&
+              findAndReorderChildren(category.children, targetParentId, newOrder)
+            ) {
               return true;
             }
           }
           return false;
         };
-        
+
         findAndReorderChildren(mockCategories, parentId, categoryIds);
       } else {
         // Reorder top-level categories
-        const reorderedCategories = categoryIds.map(id => 
-          mockCategories.find(cat => cat.id === id)
-        ).filter(Boolean);
-        
+        const reorderedCategories = categoryIds
+          .map((id) => mockCategories.find((cat) => cat.id === id))
+          .filter(Boolean);
+
         mockCategories.length = 0;
-        mockCategories.push(...reorderedCategories.map((cat, index) => ({
-          ...cat,
-          order: index + 1,
-          updatedAt: new Date().toISOString(),
-        })));
+        mockCategories.push(
+          ...reorderedCategories.map((cat, index) => ({
+            ...cat,
+            order: index + 1,
+            updatedAt: new Date().toISOString(),
+          }))
+        );
       }
-      
+
       return {
         success: true,
         message: 'Categories reordered successfully',
@@ -566,9 +579,9 @@ export const categoryService = {
   getCategoryStats: async (id) => {
     try {
       await api.delay(300);
-      
+
       const category = await categoryService.getCategoryById(id);
-      
+
       return {
         success: true,
         data: {
@@ -580,7 +593,7 @@ export const categoryService = {
           recentActivity: Math.floor(Math.random() * 50) + 10,
           trending: Math.random() > 0.5,
           growthRate: ((Math.random() - 0.5) * 20).toFixed(1),
-        }
+        },
       };
     } catch (error) {
       throw new Error('Failed to fetch category statistics');

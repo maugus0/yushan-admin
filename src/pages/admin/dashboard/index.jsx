@@ -1,4 +1,3 @@
-import React from 'react';
 import { Row, Col, Typography, Space, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -8,19 +7,19 @@ import {
   StarOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
-import { 
-  StatCard, 
-  LineChart, 
-  AreaChart, 
-  BarChart, 
-  PieChart 
+import {
+  StatCard,
+  LineChart,
+  AreaChart,
+  BarChart,
+  PieChart,
 } from '../../../components/admin/charts';
 
 const { Title } = Typography;
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  
+
   // Mock data - in real app, this would come from your API
   const stats = {
     totalUsers: 15847,
@@ -92,7 +91,7 @@ const Dashboard = () => {
               trend={{ value: 12.5, isPositive: true }}
             />
           </Col>
-          
+
           <Col xs={24} sm={12} lg={8} xl={4}>
             <StatCard
               title="Total Novels"
@@ -102,7 +101,7 @@ const Dashboard = () => {
               trend={{ value: 8.2, isPositive: true }}
             />
           </Col>
-          
+
           <Col xs={24} sm={12} lg={8} xl={4}>
             <StatCard
               title="Total Chapters"
@@ -112,7 +111,7 @@ const Dashboard = () => {
               trend={{ value: 15.3, isPositive: true }}
             />
           </Col>
-          
+
           <Col xs={24} sm={12} lg={8} xl={4}>
             <StatCard
               title="Comments"
@@ -122,7 +121,7 @@ const Dashboard = () => {
               trend={{ value: 3.1, isPositive: false }}
             />
           </Col>
-          
+
           <Col xs={24} sm={12} lg={8} xl={4}>
             <StatCard
               title="Reviews"
@@ -132,7 +131,7 @@ const Dashboard = () => {
               trend={{ value: 6.7, isPositive: true }}
             />
           </Col>
-          
+
           <Col xs={24} sm={12} lg={8} xl={4}>
             <StatCard
               title="Total Views"
@@ -153,12 +152,12 @@ const Dashboard = () => {
               data={userGrowthData}
               lines={[
                 { dataKey: 'users', stroke: '#1890ff', name: 'Users' },
-                { dataKey: 'novels', stroke: '#52c41a', name: 'Novels' }
+                { dataKey: 'novels', stroke: '#52c41a', name: 'Novels' },
               ]}
               height={350}
             />
           </Col>
-          
+
           <Col xs={24} lg={8}>
             <PieChart
               title="Novel Categories"
@@ -179,13 +178,13 @@ const Dashboard = () => {
               areas={[
                 { dataKey: 'views', fill: '#1890ff', name: 'Views' },
                 { dataKey: 'comments', fill: '#52c41a', name: 'Comments' },
-                { dataKey: 'reviews', fill: '#faad14', name: 'Reviews' }
+                { dataKey: 'reviews', fill: '#faad14', name: 'Reviews' },
               ]}
               height={350}
               stackId="activity"
             />
           </Col>
-          
+
           <Col xs={24} lg={12}>
             <BarChart
               title="Top Novels by Views"
@@ -206,51 +205,46 @@ const Dashboard = () => {
               value=""
               extra={
                 <Space direction="vertical" style={{ width: '100%' }}>
-                  <Button 
-                    type="primary" 
-                    icon={<UserOutlined />} 
+                  <Button
+                    type="primary"
+                    icon={<UserOutlined />}
                     block
                     onClick={() => navigate('/admin/users')}
                   >
                     Manage Users
                   </Button>
-                  <Button 
-                    icon={<BookOutlined />} 
-                    block
-                    onClick={() => navigate('/admin/novels')}
-                  >
+                  <Button icon={<BookOutlined />} block onClick={() => navigate('/admin/novels')}>
                     Add New Novel
                   </Button>
-                  <Button 
-                    icon={<MessageOutlined />} 
+                  <Button
+                    icon={<MessageOutlined />}
                     block
                     onClick={() => navigate('/admin/comments')}
                   >
                     Review Comments
                   </Button>
-                  <Button 
-                    icon={<StarOutlined />} 
-                    block
-                    onClick={() => navigate('/admin/reviews')}
-                  >
+                  <Button icon={<StarOutlined />} block onClick={() => navigate('/admin/reviews')}>
                     Check Reviews
                   </Button>
                 </Space>
               }
             />
           </Col>
-          
+
           <Col xs={24} lg={12}>
             <StatCard
               title="Recent Activity"
               value=""
               extra={
                 <Space direction="vertical" style={{ width: '100%' }}>
-                  {recentActivity.map(activity => (
-                    <div key={activity.id} style={{ 
-                      padding: '8px 0', 
-                      borderBottom: '1px solid #f0f0f0' 
-                    }}>
+                  {recentActivity.map((activity) => (
+                    <div
+                      key={activity.id}
+                      style={{
+                        padding: '8px 0',
+                        borderBottom: '1px solid #f0f0f0',
+                      }}
+                    >
                       <div style={{ fontWeight: 500 }}>{activity.action}</div>
                       <div style={{ fontSize: '12px', color: '#666' }}>
                         by {activity.user} • {activity.time}

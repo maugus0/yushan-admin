@@ -1,13 +1,12 @@
-import React from 'react';
 import { Card, Typography, Space, Button, Dropdown } from 'antd';
 import { MoreOutlined, DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
-const ChartWrapper = ({ 
-  title, 
+const ChartWrapper = ({
+  title,
   subtitle,
-  children, 
+  children,
   loading = false,
   actions = [],
   showMoreMenu = false,
@@ -15,7 +14,7 @@ const ChartWrapper = ({
   onFullscreen,
   extra,
   height = 300,
-  ...props 
+  ...props
 }) => {
   const moreMenuItems = [
     {
@@ -39,11 +38,7 @@ const ChartWrapper = ({
       ))}
       {extra}
       {showMoreMenu && (
-        <Dropdown 
-          menu={{ items: moreMenuItems }} 
-          placement="bottomRight"
-          arrow
-        >
+        <Dropdown menu={{ items: moreMenuItems }} placement="bottomRight" arrow>
           <Button type="text" icon={<MoreOutlined />} />
         </Dropdown>
       )}
@@ -66,23 +61,21 @@ const ChartWrapper = ({
         </Space>
       }
       extra={headerExtra}
-      bodyStyle={{ 
+      bodyStyle={{
         padding: '16px',
         height: height,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
       style={{
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        ...props.style
+        ...props.style,
       }}
       {...props}
     >
-      <div style={{ width: '100%', height: '100%' }}>
-        {children}
-      </div>
+      <div style={{ width: '100%', height: '100%' }}>{children}</div>
     </Card>
   );
 };

@@ -3,7 +3,7 @@
 
 class MockAPI {
   constructor() {
-    this.delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
+    this.delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // Auth endpoints
@@ -19,7 +19,7 @@ class MockAPI {
           role: 'super_admin',
           permissions: ['read', 'write', 'delete', 'manage_users', 'manage_content'],
           token: 'mock-jwt-token',
-        }
+        },
       };
     }
     throw new Error('Invalid credentials');
@@ -49,11 +49,41 @@ class MockAPI {
   async getRecentActivity() {
     await this.delay();
     return [
-      { id: 1, action: 'New user registered', user: 'john_reader', time: '2 minutes ago', type: 'user' },
-      { id: 2, action: 'Novel published', user: 'author_jane', time: '5 minutes ago', type: 'novel' },
-      { id: 3, action: 'Chapter updated', user: 'writer_bob', time: '10 minutes ago', type: 'chapter' },
-      { id: 4, action: 'Review submitted', user: 'reviewer_alice', time: '15 minutes ago', type: 'review' },
-      { id: 5, action: 'Comment reported', user: 'moderator', time: '20 minutes ago', type: 'report' },
+      {
+        id: 1,
+        action: 'New user registered',
+        user: 'john_reader',
+        time: '2 minutes ago',
+        type: 'user',
+      },
+      {
+        id: 2,
+        action: 'Novel published',
+        user: 'author_jane',
+        time: '5 minutes ago',
+        type: 'novel',
+      },
+      {
+        id: 3,
+        action: 'Chapter updated',
+        user: 'writer_bob',
+        time: '10 minutes ago',
+        type: 'chapter',
+      },
+      {
+        id: 4,
+        action: 'Review submitted',
+        user: 'reviewer_alice',
+        time: '15 minutes ago',
+        type: 'review',
+      },
+      {
+        id: 5,
+        action: 'Comment reported',
+        user: 'moderator',
+        time: '20 minutes ago',
+        type: 'report',
+      },
     ];
   }
 
@@ -61,7 +91,7 @@ class MockAPI {
   async getUsers(params = {}) {
     await this.delay();
     const { page = 1, limit = 10, type = 'all', search = '' } = params;
-    
+
     // Mock user data
     const users = Array.from({ length: 50 }, (_, i) => ({
       id: i + 1,
@@ -75,7 +105,7 @@ class MockAPI {
       chaptersCount: i % 3 === 0 ? Math.floor(Math.random() * 100) : 0,
     }));
 
-    const filteredUsers = users.filter(user => {
+    const filteredUsers = users.filter((user) => {
       if (type !== 'all' && user.type !== type) return false;
       if (search && !user.username.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
@@ -83,7 +113,7 @@ class MockAPI {
 
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    
+
     return {
       data: filteredUsers.slice(startIndex, endIndex),
       total: filteredUsers.length,
@@ -96,7 +126,7 @@ class MockAPI {
   async getNovels(params = {}) {
     await this.delay();
     const { page = 1, limit = 10, status = 'all', search = '' } = params;
-    
+
     // Mock novel data
     const novels = Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
@@ -111,7 +141,7 @@ class MockAPI {
       updatedAt: new Date().toISOString(),
     }));
 
-    const filteredNovels = novels.filter(novel => {
+    const filteredNovels = novels.filter((novel) => {
       if (status !== 'all' && novel.status !== status) return false;
       if (search && !novel.title.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
@@ -119,7 +149,7 @@ class MockAPI {
 
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    
+
     return {
       data: filteredNovels.slice(startIndex, endIndex),
       total: filteredNovels.length,

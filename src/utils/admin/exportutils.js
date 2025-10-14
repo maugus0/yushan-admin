@@ -13,24 +13,26 @@ export const exportToCSV = (data, columns, filename = 'export') => {
   }
 
   // Create CSV headers
-  const headers = columns.map(col => col.title || col.label || col.key);
-  
+  const headers = columns.map((col) => col.title || col.label || col.key);
+
   // Create CSV rows
   const csvRows = [
     headers.join(','), // Header row
-    ...data.map(row => {
-      return columns.map(col => {
-        const value = getNestedValue(row, col.dataIndex || col.key);
-        const formattedValue = col.render ? col.render(value, row) : value;
-        
-        // Escape commas and quotes in CSV
-        const cleanValue = String(formattedValue || '')
-          .replace(/"/g, '""')
-          .replace(/,/g, '，'); // Use Chinese comma
-        
-        return `"${cleanValue}"`;
-      }).join(',');
-    })
+    ...data.map((row) => {
+      return columns
+        .map((col) => {
+          const value = getNestedValue(row, col.dataIndex || col.key);
+          const formattedValue = col.render ? col.render(value, row) : value;
+
+          // Escape commas and quotes in CSV
+          const cleanValue = String(formattedValue || '')
+            .replace(/"/g, '""')
+            .replace(/,/g, '，'); // Use Chinese comma
+
+          return `"${cleanValue}"`;
+        })
+        .join(',');
+    }),
   ];
 
   // Create and download file
@@ -75,12 +77,12 @@ export const exportToJSON = (data, columns = null, filename = 'export') => {
   }
 
   let exportData = data;
-  
+
   // Filter fields if columns are specified
   if (columns && Array.isArray(columns)) {
-    exportData = data.map(row => {
+    exportData = data.map((row) => {
       const filteredRow = {};
-      columns.forEach(col => {
+      columns.forEach((col) => {
         const key = col.dataIndex || col.key;
         const value = getNestedValue(row, key);
         filteredRow[key] = col.render ? col.render(value, row) : value;
@@ -130,19 +132,26 @@ export const exportToPDF = (data, columns, filename = 'export', options = {}) =>
 const createTableHTML = (data, columns, options = {}) => {
   const { title = 'Export Report', showDate = true } = options;
   const currentDate = new Date().toLocaleDateString('zh-CN');
-  
-  const headers = columns.map(col => 
-    `<th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">${col.title || col.label || col.key}</th>`
-  ).join('');
-  
-  const rows = data.map(row => {
-    const cells = columns.map(col => {
-      const value = getNestedValue(row, col.dataIndex || col.key);
-      const formattedValue = col.render ? col.render(value, row) : value;
-      return `<td style="border: 1px solid #ddd; padding: 8px;">${formattedValue || ''}</td>`;
-    }).join('');
-    return `<tr>${cells}</tr>`;
-  }).join('');
+
+  const headers = columns
+    .map(
+      (col) =>
+        `<th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">${col.title || col.label || col.key}</th>`
+    )
+    .join('');
+
+  const rows = data
+    .map((row) => {
+      const cells = columns
+        .map((col) => {
+          const value = getNestedValue(row, col.dataIndex || col.key);
+          const formattedValue = col.render ? col.render(value, row) : value;
+          return `<td style="border: 1px solid #ddd; padding: 8px;">${formattedValue || ''}</td>`;
+        })
+        .join('');
+      return `<tr>${cells}</tr>`;
+    })
+    .join('');
 
   return `
     <!DOCTYPE html>
@@ -192,7 +201,7 @@ const createTableHTML = (data, columns, options = {}) => {
  */
 const getNestedValue = (obj, path) => {
   if (!obj || !path) return '';
-  
+
   return path.split('.').reduce((current, key) => {
     return current && current[key] !== undefined ? current[key] : '';
   }, obj);
@@ -222,29 +231,35 @@ const downloadFile = (blob, filename) => {
  * @param {string} format - Export format
  * @param {string} filename - Export filename
  */
-export const exportTableData = async (fetchData, params, columns, format = 'csv', filename = 'export') => {
+export const exportTableData = async (
+  fetchData,
+  params,
+  columns,
+  format = 'csv',
+  filename = 'export'
+) => {
   try {
     // Show loading state
     const loadingToast = showLoadingToast('正在导出数据...');
-    
+
     // Fetch all data (remove pagination)
     const exportParams = {
       ...params,
       page: 1,
       pageSize: 10000, // Large number to get all data
     };
-    
+
     const response = await fetchData(exportParams);
     const data = response.data || response.list || response;
-    
+
     // Hide loading toast
     hideToast(loadingToast);
-    
+
     if (!Array.isArray(data) || data.length === 0) {
       showErrorToast('没有数据可导出');
       return;
     }
-    
+
     // Export based on format
     switch (format.toLowerCase()) {
       case 'csv':
@@ -262,7 +277,7 @@ export const exportTableData = async (fetchData, params, columns, format = 'csv'
       default:
         exportToCSV(data, columns, filename);
     }
-    
+
     showSuccessToast(`成功导出 ${data.length} 条记录`);
   } catch (error) {
     console.error('Export error:', error);
@@ -283,10 +298,10 @@ export const batchExport = async (datasets, format = 'csv') => {
 
   try {
     const loadingToast = showLoadingToast('正在批量导出...');
-    
+
     for (const dataset of datasets) {
       const { data, columns, filename } = dataset;
-      
+
       switch (format.toLowerCase()) {
         case 'csv':
           exportToCSV(data, columns, filename);
@@ -303,11 +318,11 @@ export const batchExport = async (datasets, format = 'csv') => {
         default:
           exportToCSV(data, columns, filename);
       }
-      
+
       // Add delay between exports to avoid overwhelming the browser
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
-    
+
     hideToast(loadingToast);
     showSuccessToast(`成功批量导出 ${datasets.length} 个文件`);
   } catch (error) {
@@ -336,41 +351,39 @@ export const getTimestampedFilename = (baseName, format = 'csv') => {
  */
 export const prepareDataForExport = (data, columns, options = {}) => {
   if (!Array.isArray(data)) return [];
-  
-  const { 
-    includeHidden = false, 
-    formatDates = true, 
+
+  const {
+    includeHidden = false,
+    formatDates = true,
     removeHtml = true,
-    maxLength = 1000 
+    maxLength = 1000,
   } = options;
-  
+
   // Filter columns
-  const visibleColumns = includeHidden 
-    ? columns 
-    : columns.filter(col => !col.hidden);
-  
-  return data.map(row => {
+  const visibleColumns = includeHidden ? columns : columns.filter((col) => !col.hidden);
+
+  return data.map((row) => {
     const exportRow = {};
-    
-    visibleColumns.forEach(col => {
+
+    visibleColumns.forEach((col) => {
       const key = col.dataIndex || col.key;
       let value = getNestedValue(row, key);
-      
+
       // Apply column renderer
       if (col.render && typeof col.render === 'function') {
         value = col.render(value, row);
       }
-      
+
       // Format value
       value = formatValueForExport(value, {
         formatDates,
         removeHtml,
-        maxLength
+        maxLength,
       });
-      
+
       exportRow[col.title || col.label || key] = value;
     });
-    
+
     return exportRow;
   });
 };
@@ -383,18 +396,18 @@ export const prepareDataForExport = (data, columns, options = {}) => {
  */
 const formatValueForExport = (value, options = {}) => {
   const { formatDates = true, removeHtml = true, maxLength = 1000 } = options;
-  
+
   if (value === null || value === undefined) {
     return '';
   }
-  
+
   let formattedValue = String(value);
-  
+
   // Remove HTML tags
   if (removeHtml) {
     formattedValue = formattedValue.replace(/<[^>]*>/g, '');
   }
-  
+
   // Format dates
   if (formatDates && isDateString(formattedValue)) {
     const date = new Date(formattedValue);
@@ -402,12 +415,12 @@ const formatValueForExport = (value, options = {}) => {
       formattedValue = date.toLocaleDateString('zh-CN');
     }
   }
-  
+
   // Truncate long values
   if (formattedValue.length > maxLength) {
     formattedValue = formattedValue.substring(0, maxLength) + '...';
   }
-  
+
   return formattedValue;
 };
 
@@ -463,27 +476,27 @@ export const getSupportedFormats = () => {
  */
 export const validateExportParams = (data, columns, format) => {
   const errors = [];
-  
+
   if (!Array.isArray(data) || data.length === 0) {
     errors.push('没有数据可导出');
   }
-  
+
   if (!Array.isArray(columns) || columns.length === 0) {
     errors.push('没有列配置');
   }
-  
+
   const supportedFormats = ['csv', 'excel', 'json', 'pdf'];
   if (!supportedFormats.includes(format?.toLowerCase())) {
     errors.push('不支持的导出格式');
   }
-  
+
   if (data && data.length > 50000) {
     errors.push('数据量过大，建议分批导出');
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 

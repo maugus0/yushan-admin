@@ -515,7 +515,10 @@ export const validationRules = {
   email: { type: 'email', message: '请输入有效的邮箱地址' },
   phone: { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号码' },
   password: { min: 8, message: '密码至少8位字符' },
-  username: { pattern: /^[a-zA-Z0-9_-]{3,20}$/, message: '用户名3-20位，只能包含字母、数字、下划线和连字符' },
+  username: {
+    pattern: /^[a-zA-Z0-9_-]{3,20}$/,
+    message: '用户名3-20位，只能包含字母、数字、下划线和连字符',
+  },
   positiveNumber: { type: 'number', min: 0, message: '请输入大于等于0的数字' },
   integer: { type: 'integer', message: '请输入整数' },
   url: { type: 'url', message: '请输入有效的URL地址' },

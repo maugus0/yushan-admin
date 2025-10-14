@@ -1,4 +1,3 @@
-import React from 'react';
 import { Spin, Space, Typography } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
@@ -24,13 +23,7 @@ const LoadingSpinner = ({
 
   const spinnerContent = (
     <Space direction="vertical" align="center" style={{ width: '100%' }}>
-      <Spin 
-        spinning={spinning}
-        size={size}
-        indicator={customIndicator}
-        delay={delay}
-        {...props}
-      >
+      <Spin spinning={spinning} size={size} indicator={customIndicator} delay={delay} {...props}>
         {children}
       </Spin>
       {showText && tip && (
@@ -88,7 +81,7 @@ const LoadingSpinner = ({
 
   if (children && !overlay) {
     return (
-      <Spin 
+      <Spin
         spinning={spinning}
         size={size}
         tip={showText ? tip : ''}
@@ -112,30 +105,15 @@ const LoadingSpinner = ({
 
 // Pre-configured spinner variations
 export const PageLoader = (props) => (
-  <LoadingSpinner
-    size="large"
-    tip="Loading page..."
-    centered
-    fullScreen
-    {...props}
-  />
+  <LoadingSpinner size="large" tip="Loading page..." centered fullScreen {...props} />
 );
 
 export const TableLoader = (props) => (
-  <LoadingSpinner
-    tip="Loading data..."
-    style={{ minHeight: '300px' }}
-    {...props}
-  />
+  <LoadingSpinner tip="Loading data..." style={{ minHeight: '300px' }} {...props} />
 );
 
 export const ButtonLoader = (props) => (
-  <LoadingSpinner
-    size="small"
-    showText={false}
-    centered={false}
-    {...props}
-  />
+  <LoadingSpinner size="small" showText={false} centered={false} {...props} />
 );
 
 export const InlineLoader = (props) => (

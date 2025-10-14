@@ -1,6 +1,5 @@
-import React from 'react';
 import { Empty, Button, Space, Typography } from 'antd';
-import { 
+import {
   InboxOutlined,
   FileOutlined,
   UserOutlined,
@@ -72,7 +71,7 @@ const EmptyState = ({
   };
 
   const config = emptyConfigs[type] || emptyConfigs.default;
-  
+
   const finalTitle = title || config.title;
   const finalDescription = description || config.description;
   const finalImage = image || config.image;
@@ -80,15 +79,11 @@ const EmptyState = ({
   const actionButtons = (
     <Space direction="vertical" align="center">
       {showDefaultAction && onDefaultAction && (
-        <Button 
-          type="primary" 
-          icon={defaultActionIcon}
-          onClick={onDefaultAction}
-        >
+        <Button type="primary" icon={defaultActionIcon} onClick={onDefaultAction}>
           {defaultActionText}
         </Button>
       )}
-      
+
       {actions.length > 0 && (
         <Space>
           {actions.map((action, index) => (
@@ -100,20 +95,23 @@ const EmptyState = ({
   );
 
   return (
-    <div style={{ 
-      padding: '40px 20px',
-      textAlign: 'center',
-      minHeight: '300px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...style 
-    }} className={className}>
+    <div
+      style={{
+        padding: '40px 20px',
+        textAlign: 'center',
+        minHeight: '300px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...style,
+      }}
+      className={className}
+    >
       <Empty
         image={finalImage}
         imageStyle={{
           height: 100,
-          ...imageStyle
+          ...imageStyle,
         }}
         description={
           <Space direction="vertical" size="small">
@@ -143,34 +141,22 @@ export const NoSearchResults = (props) => (
         icon: <ReloadOutlined />,
         children: 'Clear Filters',
         onClick: props.onClearFilters,
-      }
+      },
     ]}
     {...props}
   />
 );
 
 export const NoUsers = (props) => (
-  <EmptyState
-    type="users"
-    defaultActionText="Add User"
-    {...props}
-  />
+  <EmptyState type="users" defaultActionText="Add User" {...props} />
 );
 
 export const NoNovels = (props) => (
-  <EmptyState
-    type="novels"
-    defaultActionText="Add Novel"
-    {...props}
-  />
+  <EmptyState type="novels" defaultActionText="Add Novel" {...props} />
 );
 
 export const EmptyInbox = (props) => (
-  <EmptyState
-    type="inbox"
-    showDefaultAction={false}
-    {...props}
-  />
+  <EmptyState type="inbox" showDefaultAction={false} {...props} />
 );
 
 export const ErrorState = (props) => (
@@ -182,7 +168,7 @@ export const ErrorState = (props) => (
         icon: <ReloadOutlined />,
         children: 'Try Again',
         onClick: props.onRetry,
-      }
+      },
     ]}
     {...props}
   />

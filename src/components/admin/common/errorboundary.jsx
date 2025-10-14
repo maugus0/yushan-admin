@@ -1,10 +1,10 @@
 import React from 'react';
 import { Result, Button, Typography, Card, Space, Collapse } from 'antd';
-import { 
-  ExclamationCircleOutlined, 
-  ReloadOutlined, 
+import {
+  ExclamationCircleOutlined,
+  ReloadOutlined,
   HomeOutlined,
-  BugOutlined 
+  BugOutlined,
 } from '@ant-design/icons';
 
 const { Text, Paragraph } = Typography;
@@ -13,15 +13,15 @@ const { Panel } = Collapse;
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      hasError: false, 
-      error: null, 
+    this.state = {
+      hasError: false,
+      error: null,
       errorInfo: null,
-      showDetails: false 
+      showDetails: false,
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
@@ -29,10 +29,10 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     // Log the error to console and potentially to error reporting service
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
-    
+
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
 
     // You can also log the error to an error reporting service here
@@ -42,13 +42,13 @@ class ErrorBoundary extends React.Component {
   }
 
   handleRetry = () => {
-    this.setState({ 
-      hasError: false, 
-      error: null, 
+    this.setState({
+      hasError: false,
+      error: null,
       errorInfo: null,
-      showDetails: false 
+      showDetails: false,
     });
-    
+
     if (this.props.onRetry) {
       this.props.onRetry();
     }
@@ -68,25 +68,28 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      const { 
+      const {
         title = 'Something went wrong',
         subTitle = 'An unexpected error occurred. Please try again.',
         showHomeButton = true,
         showRetryButton = true,
         showErrorDetails = true,
         style = {},
-        className = ''
+        className = '',
       } = this.props;
 
       return (
-        <div style={{ 
-          padding: '50px 20px',
-          minHeight: '400px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          ...style 
-        }} className={className}>
+        <div
+          style={{
+            padding: '50px 20px',
+            minHeight: '400px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            ...style,
+          }}
+          className={className}
+        >
           <Card style={{ maxWidth: '600px', width: '100%' }}>
             <Result
               status="error"
@@ -97,27 +100,20 @@ class ErrorBoundary extends React.Component {
                 <Space direction="vertical" align="center">
                   <Space>
                     {showRetryButton && (
-                      <Button 
-                        type="primary" 
-                        icon={<ReloadOutlined />}
-                        onClick={this.handleRetry}
-                      >
+                      <Button type="primary" icon={<ReloadOutlined />} onClick={this.handleRetry}>
                         Try Again
                       </Button>
                     )}
                     {showHomeButton && (
-                      <Button 
-                        icon={<HomeOutlined />}
-                        onClick={this.handleGoHome}
-                      >
+                      <Button icon={<HomeOutlined />} onClick={this.handleGoHome}>
                         Go Home
                       </Button>
                     )}
                   </Space>
-                  
+
                   {showErrorDetails && this.state.error && (
-                    <Button 
-                      type="link" 
+                    <Button
+                      type="link"
                       icon={<BugOutlined />}
                       onClick={this.toggleDetails}
                       style={{ padding: 0 }}
@@ -128,40 +124,40 @@ class ErrorBoundary extends React.Component {
                 </Space>
               }
             />
-            
+
             {this.state.showDetails && this.state.error && (
               <Collapse ghost>
                 <Panel header="Error Details" key="error">
                   <Space direction="vertical" style={{ width: '100%' }}>
                     <div>
                       <Text strong>Error Message:</Text>
-                      <Paragraph 
-                        code 
+                      <Paragraph
+                        code
                         copyable
-                        style={{ 
-                          background: '#f5f5f5', 
-                          padding: '8px', 
+                        style={{
+                          background: '#f5f5f5',
+                          padding: '8px',
                           marginTop: '4px',
-                          fontSize: '12px'
+                          fontSize: '12px',
                         }}
                       >
                         {this.state.error.toString()}
                       </Paragraph>
                     </div>
-                    
+
                     {this.state.errorInfo && (
                       <div>
                         <Text strong>Stack Trace:</Text>
-                        <Paragraph 
-                          code 
+                        <Paragraph
+                          code
                           copyable
-                          style={{ 
-                            background: '#f5f5f5', 
-                            padding: '8px', 
+                          style={{
+                            background: '#f5f5f5',
+                            padding: '8px',
                             marginTop: '4px',
                             fontSize: '11px',
                             maxHeight: '200px',
-                            overflow: 'auto'
+                            overflow: 'auto',
                           }}
                         >
                           {this.state.errorInfo.componentStack}

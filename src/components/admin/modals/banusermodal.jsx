@@ -5,13 +5,7 @@ import { ExclamationCircleOutlined, UserDeleteOutlined } from '@ant-design/icons
 const { TextArea } = Input;
 const { Option } = Select;
 
-const BanUserModal = ({ 
-  visible, 
-  onCancel, 
-  onConfirm, 
-  user = null, 
-  loading = false 
-}) => {
+const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = false }) => {
   const [form] = Form.useForm();
   const [banType, setBanType] = useState('temporary');
 
@@ -36,7 +30,7 @@ const BanUserModal = ({
         banDate: new Date().toISOString(),
         expiresAt: values.banType === 'permanent' ? null : values.expiresAt?.toISOString(),
       };
-      
+
       await onConfirm(banData);
       form.resetFields();
       message.success(`User ${user.username} has been banned successfully`);
@@ -71,7 +65,8 @@ const BanUserModal = ({
       <div style={{ marginBottom: 16 }}>
         <ExclamationCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />
         <span style={{ color: '#666' }}>
-          This action will restrict the user's access to the platform. Please provide a clear reason.
+          This action will restrict the user's access to the platform. Please provide a clear
+          reason.
         </span>
       </div>
 
@@ -101,8 +96,8 @@ const BanUserModal = ({
             label="Ban Expires At"
             rules={[{ required: true, message: 'Please select expiration date' }]}
           >
-            <DatePicker 
-              showTime 
+            <DatePicker
+              showTime
               style={{ width: '100%' }}
               placeholder="Select ban expiration date"
               disabledDate={(current) => current && current < new Date()}
@@ -115,7 +110,7 @@ const BanUserModal = ({
           label="Ban Reason"
           rules={[
             { required: true, message: 'Please provide a ban reason' },
-            { min: 10, message: 'Reason must be at least 10 characters' }
+            { min: 10, message: 'Reason must be at least 10 characters' },
           ]}
         >
           <Select placeholder="Select a reason or choose 'Other'">
@@ -134,20 +129,17 @@ const BanUserModal = ({
           label="Public Reason (shown to user)"
           rules={[{ required: true, message: 'Please provide a public reason' }]}
         >
-          <TextArea 
-            rows={3} 
+          <TextArea
+            rows={3}
             placeholder="This will be shown to the user and other admins"
             maxLength={500}
             showCount
           />
         </Form.Item>
 
-        <Form.Item
-          name="adminNotes"
-          label="Internal Admin Notes"
-        >
-          <TextArea 
-            rows={2} 
+        <Form.Item name="adminNotes" label="Internal Admin Notes">
+          <TextArea
+            rows={2}
             placeholder="Internal notes for other administrators (not visible to user)"
             maxLength={1000}
             showCount

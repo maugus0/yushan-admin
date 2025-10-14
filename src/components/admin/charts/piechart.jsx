@@ -1,11 +1,19 @@
-import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import ChartWrapper from './chartwrapper';
 
-const COLORS = ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1', '#fa8c16', '#13c2c2', '#eb2f96'];
+const COLORS = [
+  '#1890ff',
+  '#52c41a',
+  '#faad14',
+  '#f5222d',
+  '#722ed1',
+  '#fa8c16',
+  '#13c2c2',
+  '#eb2f96',
+];
 
-const CustomPieChart = ({ 
-  data = [], 
+const CustomPieChart = ({
+  data = [],
   title = 'Pie Chart',
   subtitle,
   height = 300,
@@ -16,17 +24,25 @@ const CustomPieChart = ({
   colors = COLORS,
   showLabels = true,
   labelLine = false,
-  ...props 
+  ...props
 }) => {
-  const formatTooltip = (value, name, props) => {
+  const formatTooltip = (value, name, _props) => {
     const total = data.reduce((sum, entry) => sum + entry.value, 0);
     const percentage = ((value / total) * 100).toFixed(1);
     return [`${value.toLocaleString()} (${percentage}%)`, name];
   };
 
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+  const renderCustomLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    value,
+    index: _index,
+  }) => {
     if (!showLabels) return null;
-    
+
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -35,11 +51,11 @@ const CustomPieChart = ({
     const percentage = ((value / total) * 100).toFixed(1);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         fontSize="12"
         fontWeight="bold"
@@ -50,8 +66,8 @@ const CustomPieChart = ({
   };
 
   return (
-    <ChartWrapper 
-      title={title} 
+    <ChartWrapper
+      title={title}
       subtitle={subtitle}
       height={height}
       loading={loading}
@@ -72,28 +88,23 @@ const CustomPieChart = ({
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={colors[index % colors.length]} 
-              />
+              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Pie>
-          <Tooltip 
+          <Tooltip
             formatter={formatTooltip}
             contentStyle={{
               backgroundColor: '#fff',
               border: '1px solid #d9d9d9',
               borderRadius: '6px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           />
           {showLegend && (
-            <Legend 
-              verticalAlign="bottom" 
+            <Legend
+              verticalAlign="bottom"
               height={36}
-              formatter={(value, entry) => (
-                <span style={{ color: entry.color }}>{value}</span>
-              )}
+              formatter={(value, entry) => <span style={{ color: entry.color }}>{value}</span>}
             />
           )}
         </PieChart>

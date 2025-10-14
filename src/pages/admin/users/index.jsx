@@ -1,17 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Card, 
-  Row, 
-  Col, 
-  Statistic, 
-  Button, 
-  Space, 
-  Typography,
-  List,
-  Avatar,
-  Tag
-} from 'antd';
+import { Card, Row, Col, Statistic, Button, Space, Typography, List, Avatar, Tag } from 'antd';
 import {
   UserOutlined,
   TeamOutlined,
@@ -20,7 +9,7 @@ import {
   BookOutlined,
   DollarOutlined,
   TrophyOutlined,
-  RiseOutlined
+  RiseOutlined,
 } from '@ant-design/icons';
 
 // Import components
@@ -33,7 +22,7 @@ const { Text } = Typography;
 
 const UsersOverview = () => {
   const navigate = useNavigate();
-  
+
   // State management
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -51,7 +40,7 @@ const UsersOverview = () => {
       // Fetch recent users
       const [readersResponse, writersResponse] = await Promise.all([
         userService.getReaders({ page: 1, pageSize: 5 }),
-        userService.getWriters({ page: 1, pageSize: 5 })
+        userService.getWriters({ page: 1, pageSize: 5 }),
       ]);
 
       const allReaders = await userService.getReaders({ page: 1, pageSize: 100 });
@@ -60,8 +49,8 @@ const UsersOverview = () => {
       // Calculate statistics
       const totalReaders = allReaders.total;
       const totalWriters = allWriters.total;
-      const activeReaders = allReaders.data.filter(user => user.status === 'active').length;
-      const activeWriters = allWriters.data.filter(user => user.status === 'active').length;
+      const activeReaders = allReaders.data.filter((user) => user.status === 'active').length;
+      const activeWriters = allWriters.data.filter((user) => user.status === 'active').length;
 
       setStats({
         totalUsers: totalReaders + totalWriters,
@@ -72,9 +61,11 @@ const UsersOverview = () => {
 
       // Combine recent users
       const combinedUsers = [
-        ...readersResponse.data.map(user => ({ ...user, userType: 'reader' })),
-        ...writersResponse.data.map(user => ({ ...user, userType: 'writer' }))
-      ].sort((a, b) => new Date(b.joinDate) - new Date(a.joinDate)).slice(0, 6);
+        ...readersResponse.data.map((user) => ({ ...user, userType: 'reader' })),
+        ...writersResponse.data.map((user) => ({ ...user, userType: 'writer' })),
+      ]
+        .sort((a, b) => new Date(b.joinDate) - new Date(a.joinDate))
+        .slice(0, 6);
 
       setRecentUsers(combinedUsers);
     } catch (error) {
@@ -90,27 +81,56 @@ const UsersOverview = () => {
 
   // Mock top performers data
   const topReaders = [
-    { id: 1, name: 'Alice Johnson', booksRead: 156, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice' },
-    { id: 2, name: 'Bob Smith', booksRead: 134, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob' },
-    { id: 3, name: 'Carol Davis', booksRead: 98, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carol' },
+    {
+      id: 1,
+      name: 'Alice Johnson',
+      booksRead: 156,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+    },
+    {
+      id: 2,
+      name: 'Bob Smith',
+      booksRead: 134,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
+    },
+    {
+      id: 3,
+      name: 'Carol Davis',
+      booksRead: 98,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carol',
+    },
   ];
 
   const topWriters = [
-    { id: 1, name: 'Sarah Connor', earnings: 15420, novels: 12, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
-    { id: 2, name: 'Michael Scott', earnings: 12890, novels: 8, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael' },
-    { id: 3, name: 'Elena Vasquez', earnings: 9650, novels: 6, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena' },
+    {
+      id: 1,
+      name: 'Sarah Connor',
+      earnings: 15420,
+      novels: 12,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    },
+    {
+      id: 2,
+      name: 'Michael Scott',
+      earnings: 12890,
+      novels: 8,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
+    },
+    {
+      id: 3,
+      name: 'Elena Vasquez',
+      earnings: 9650,
+      novels: 6,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena',
+    },
   ];
 
-  const breadcrumbItems = [
-    { title: 'Admin' },
-    { title: 'User Management' },
-    { title: 'Overview' },
-  ];
+  const breadcrumbItems = [{ title: 'Admin' }, { title: 'User Management' }, { title: 'Overview' }];
 
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} />
-      
+
       <PageHeader
         title="User Management"
         subtitle="Overview of readers and writers on the platform"
@@ -128,7 +148,7 @@ const UsersOverview = () => {
             onClick={() => navigate('/admin/users/writers')}
           >
             Manage Writers
-          </Button>
+          </Button>,
         ]}
       />
 
@@ -179,13 +199,10 @@ const UsersOverview = () => {
       <Row gutter={24}>
         {/* Recent Users */}
         <Col span={8}>
-          <Card 
-            title="Recent Users" 
+          <Card
+            title="Recent Users"
             extra={
-              <Button 
-                type="link" 
-                onClick={() => navigate('/admin/users/readers')}
-              >
+              <Button type="link" onClick={() => navigate('/admin/users/readers')}>
                 View All
               </Button>
             }
@@ -193,15 +210,10 @@ const UsersOverview = () => {
             <List
               dataSource={recentUsers}
               loading={loading}
-              renderItem={user => (
+              renderItem={(user) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={
-                      <Avatar 
-                        src={user.avatar} 
-                        icon={<UserOutlined />}
-                      />
-                    }
+                    avatar={<Avatar src={user.avatar} icon={<UserOutlined />} />}
                     title={
                       <Space>
                         {user.username}
@@ -213,9 +225,7 @@ const UsersOverview = () => {
                     description={
                       <Space>
                         <StatusBadge status={user.status} />
-                        <Text type="secondary">
-                          {new Date(user.joinDate).toLocaleDateString()}
-                        </Text>
+                        <Text type="secondary">{new Date(user.joinDate).toLocaleDateString()}</Text>
                       </Space>
                     }
                   />
@@ -235,7 +245,9 @@ const UsersOverview = () => {
                   <List.Item.Meta
                     avatar={
                       <Space>
-                        <Text strong style={{ color: '#faad14' }}>#{index + 1}</Text>
+                        <Text strong style={{ color: '#faad14' }}>
+                          #{index + 1}
+                        </Text>
                         <Avatar src={reader.avatar} icon={<UserOutlined />} />
                       </Space>
                     }
@@ -263,7 +275,9 @@ const UsersOverview = () => {
                   <List.Item.Meta
                     avatar={
                       <Space>
-                        <Text strong style={{ color: '#faad14' }}>#{index + 1}</Text>
+                        <Text strong style={{ color: '#faad14' }}>
+                          #{index + 1}
+                        </Text>
                         <Avatar src={writer.avatar} icon={<EditOutlined />} />
                       </Space>
                     }
@@ -292,9 +306,9 @@ const UsersOverview = () => {
       <Card title="Quick Actions" style={{ marginTop: 24 }}>
         <Row gutter={16}>
           <Col span={6}>
-            <Button 
-              block 
-              size="large" 
+            <Button
+              block
+              size="large"
               icon={<PlusOutlined />}
               onClick={() => navigate('/admin/users/readers/new')}
             >
@@ -302,9 +316,9 @@ const UsersOverview = () => {
             </Button>
           </Col>
           <Col span={6}>
-            <Button 
-              block 
-              size="large" 
+            <Button
+              block
+              size="large"
               icon={<PlusOutlined />}
               onClick={() => navigate('/admin/users/writers/new')}
             >
@@ -312,9 +326,9 @@ const UsersOverview = () => {
             </Button>
           </Col>
           <Col span={6}>
-            <Button 
-              block 
-              size="large" 
+            <Button
+              block
+              size="large"
               icon={<UserOutlined />}
               onClick={() => navigate('/admin/users/readers')}
             >
@@ -322,9 +336,9 @@ const UsersOverview = () => {
             </Button>
           </Col>
           <Col span={6}>
-            <Button 
-              block 
-              size="large" 
+            <Button
+              block
+              size="large"
               icon={<EditOutlined />}
               onClick={() => navigate('/admin/users/writers')}
             >

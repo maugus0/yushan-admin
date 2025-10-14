@@ -1,4 +1,3 @@
-import React from 'react';
 import { Modal, Descriptions, Space, Typography, Tag, Avatar, Image, Divider } from 'antd';
 import { EyeOutlined, UserOutlined, CalendarOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -23,14 +22,14 @@ const ViewModal = ({
       case 'text':
       case 'textarea':
         return (
-          <Paragraph 
+          <Paragraph
             copyable={field.copyable}
             ellipsis={field.ellipsis ? { rows: 3, expandable: true } : false}
           >
             {value}
           </Paragraph>
         );
-      
+
       case 'number':
         return (
           <Text strong={field.strong}>
@@ -38,40 +37,37 @@ const ViewModal = ({
             {field.suffix && <span style={{ marginLeft: 4 }}>{field.suffix}</span>}
           </Text>
         );
-      
+
       case 'date':
         return (
           <Space>
             <CalendarOutlined />
-            <Text>
-              {dayjs(value).format(field.format || 'YYYY-MM-DD HH:mm:ss')}
-            </Text>
+            <Text>{dayjs(value).format(field.format || 'YYYY-MM-DD HH:mm:ss')}</Text>
           </Space>
         );
-      
+
       case 'status':
         return (
-          <Tag 
-            color={field.colorMap?.[value] || 'default'}
-            style={{ textTransform: 'capitalize' }}
-          >
+          <Tag color={field.colorMap?.[value] || 'default'} style={{ textTransform: 'capitalize' }}>
             {field.labelMap?.[value] || value}
           </Tag>
         );
-      
+
       case 'tags':
         return (
           <Space wrap>
-            {Array.isArray(value) ? value.map((tag, index) => (
-              <Tag key={index} color={field.tagColor || 'blue'}>
-                {tag}
-              </Tag>
-            )) : (
+            {Array.isArray(value) ? (
+              value.map((tag, index) => (
+                <Tag key={index} color={field.tagColor || 'blue'}>
+                  {tag}
+                </Tag>
+              ))
+            ) : (
               <Tag color={field.tagColor || 'blue'}>{value}</Tag>
             )}
           </Space>
         );
-      
+
       case 'user':
         return (
           <Space>
@@ -79,7 +75,7 @@ const ViewModal = ({
             <Text>{value.username || value.name || value}</Text>
           </Space>
         );
-      
+
       case 'image':
         return (
           <Image
@@ -90,56 +86,62 @@ const ViewModal = ({
             style={{ borderRadius: 4 }}
           />
         );
-      
+
       case 'link':
         return (
           <a href={value} target="_blank" rel="noopener noreferrer">
             {field.linkText || value}
           </a>
         );
-      
+
       case 'boolean':
         return (
           <Tag color={value ? 'green' : 'red'}>
-            {value ? (field.trueText || 'Yes') : (field.falseText || 'No')}
+            {value ? field.trueText || 'Yes' : field.falseText || 'No'}
           </Tag>
         );
-      
+
       case 'progress':
         return (
           <Space direction="vertical" style={{ width: '100%' }}>
             <Text>{value}%</Text>
-            <div style={{
-              width: '100%',
-              height: 8,
-              backgroundColor: '#f0f0f0',
-              borderRadius: 4,
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                width: `${Math.min(value, 100)}%`,
-                height: '100%',
-                backgroundColor: field.color || '#1890ff',
-                transition: 'width 0.3s ease'
-              }} />
+            <div
+              style={{
+                width: '100%',
+                height: 8,
+                backgroundColor: '#f0f0f0',
+                borderRadius: 4,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${Math.min(value, 100)}%`,
+                  height: '100%',
+                  backgroundColor: field.color || '#1890ff',
+                  transition: 'width 0.3s ease',
+                }}
+              />
             </div>
           </Space>
         );
-      
+
       case 'json':
         return (
-          <pre style={{ 
-            background: '#f6f8fa', 
-            padding: 12, 
-            borderRadius: 4, 
-            fontSize: '12px',
-            maxHeight: 200,
-            overflow: 'auto'
-          }}>
+          <pre
+            style={{
+              background: '#f6f8fa',
+              padding: 12,
+              borderRadius: 4,
+              fontSize: '12px',
+              maxHeight: 200,
+              overflow: 'auto',
+            }}
+          >
             {JSON.stringify(value, null, 2)}
           </pre>
         );
-      
+
       case 'rating':
         return (
           <Space>
@@ -148,30 +150,39 @@ const ViewModal = ({
             <Text type="secondary">({value}/5)</Text>
           </Space>
         );
-      
+
       case 'currency':
         return (
           <Text strong style={{ color: '#52c41a' }}>
-            {field.symbol || '$'}{typeof value === 'number' ? value.toFixed(2) : value}
+            {field.symbol || '$'}
+            {typeof value === 'number' ? value.toFixed(2) : value}
           </Text>
         );
-      
+
       case 'list':
         return (
           <ul style={{ margin: 0, paddingLeft: 16 }}>
-            {Array.isArray(value) ? value.map((item, index) => (
-              <li key={index}><Text>{item}</Text></li>
-            )) : <li><Text>{value}</Text></li>}
+            {Array.isArray(value) ? (
+              value.map((item, index) => (
+                <li key={index}>
+                  <Text>{item}</Text>
+                </li>
+              ))
+            ) : (
+              <li>
+                <Text>{value}</Text>
+              </li>
+            )}
           </ul>
         );
-      
+
       default:
         return <Text>{String(value)}</Text>;
     }
   };
 
   const getDescriptionItems = () => {
-    return fields.map(field => ({
+    return fields.map((field) => ({
       key: field.name,
       label: field.label,
       children: renderFieldValue(field, data[field.name]),
@@ -203,42 +214,45 @@ const ViewModal = ({
         />
 
         {/* Additional Sections */}
-        {data.additionalSections && data.additionalSections.map((section, index) => (
-          <div key={index}>
-            <Divider orientation="left">
-              <Space>
-                {section.icon && section.icon}
-                <Title level={5} style={{ margin: 0 }}>
-                  {section.title}
-                </Title>
-              </Space>
-            </Divider>
-            
-            {section.type === 'description' && (
-              <Descriptions
-                bordered
-                column={1}
-                size="small"
-                items={section.items.map(item => ({
-                  key: item.key,
-                  label: item.label,
-                  children: item.value,
-                }))}
-              />
-            )}
-            
-            {section.type === 'content' && (
-              <div style={{ 
-                padding: 16, 
-                background: '#fafafa', 
-                borderRadius: 6,
-                border: '1px solid #f0f0f0'
-              }}>
-                {section.content}
-              </div>
-            )}
-          </div>
-        ))}
+        {data.additionalSections &&
+          data.additionalSections.map((section, index) => (
+            <div key={index}>
+              <Divider orientation="left">
+                <Space>
+                  {section.icon && section.icon}
+                  <Title level={5} style={{ margin: 0 }}>
+                    {section.title}
+                  </Title>
+                </Space>
+              </Divider>
+
+              {section.type === 'description' && (
+                <Descriptions
+                  bordered
+                  column={1}
+                  size="small"
+                  items={section.items.map((item) => ({
+                    key: item.key,
+                    label: item.label,
+                    children: item.value,
+                  }))}
+                />
+              )}
+
+              {section.type === 'content' && (
+                <div
+                  style={{
+                    padding: 16,
+                    background: '#fafafa',
+                    borderRadius: 6,
+                    border: '1px solid #f0f0f0',
+                  }}
+                >
+                  {section.content}
+                </div>
+              )}
+            </div>
+          ))}
 
         {/* Metadata */}
         {(data.createdAt || data.updatedAt || data.id) && (
@@ -246,10 +260,12 @@ const ViewModal = ({
             <Divider orientation="left">
               <Space>
                 <InfoCircleOutlined />
-                <Title level={5} style={{ margin: 0 }}>Metadata</Title>
+                <Title level={5} style={{ margin: 0 }}>
+                  Metadata
+                </Title>
               </Space>
             </Divider>
-            
+
             <Descriptions bordered column={2} size="small">
               {data.id && (
                 <Descriptions.Item label="ID">
@@ -288,7 +304,7 @@ export const viewFieldTypes = {
     type: 'text',
     ...options,
   }),
-  
+
   status: (name, label, colorMap = {}, labelMap = {}) => ({
     name,
     label,
@@ -296,34 +312,34 @@ export const viewFieldTypes = {
     colorMap,
     labelMap,
   }),
-  
+
   date: (name, label, format = 'YYYY-MM-DD HH:mm:ss') => ({
     name,
     label,
     type: 'date',
     format,
   }),
-  
+
   user: (name, label) => ({
     name,
     label,
     type: 'user',
   }),
-  
+
   tags: (name, label, color = 'blue') => ({
     name,
     label,
     type: 'tags',
     tagColor: color,
   }),
-  
+
   number: (name, label, options = {}) => ({
     name,
     label,
     type: 'number',
     ...options,
   }),
-  
+
   boolean: (name, label, trueText = 'Yes', falseText = 'No') => ({
     name,
     label,

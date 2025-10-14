@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Statistic, Progress, message } from 'antd';
+import {
+  Button,
+  Space,
+  Table,
+  Tooltip,
+  Avatar,
+  Typography,
+  Tag,
+  Statistic,
+  Progress,
+  message,
+} from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   DollarOutlined,
   UserOutlined,
   BookOutlined,
@@ -16,14 +27,14 @@ import {
   TransactionOutlined,
   BarChartOutlined,
 } from '@ant-design/icons';
-import { 
-  PageHeader, 
-  SearchBar, 
-  FilterPanel, 
-  StatusBadge, 
-  ActionButtons, 
+import {
+  PageHeader,
+  SearchBar,
+  FilterPanel,
+  StatusBadge,
+  ActionButtons,
   EmptyState,
-  LoadingSpinner 
+  LoadingSpinner,
 } from '../../../components/admin/common';
 import { yuanService } from '../../../services/admin/yuanservice';
 
@@ -43,70 +54,76 @@ const Yuan = () => {
   const [filters, setFilters] = useState({});
 
   // Fetch data from yuanService
-  const fetchData = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      const currentPage = params.current || 1;
-      const currentPageSize = params.pageSize || 10;
-      
-      let response;
-      
-      if (activeTab === 'transactions') {
-        response = await yuanService.getAllTransactions({
-          page: currentPage,
-          pageSize: currentPageSize,
-          search: searchValue,
-          ...filters,
-        });
-      } else if (activeTab === 'balances') {
-        response = await yuanService.getAllBalances({
-          page: currentPage,
-          pageSize: currentPageSize,
-          search: searchValue,
-          ...filters,
-        });
-      } else if (activeTab === 'rewards') {
-        response = await yuanService.getRewardRules();
-        // For rewards, we don't have pagination in the service, so we'll handle it client-side
-        const allRewards = response.data;
-        let filteredRewards = allRewards;
-        
-        if (searchValue) {
-          filteredRewards = allRewards.filter(reward => 
-            reward.actionName.toLowerCase().includes(searchValue.toLowerCase()) ||
-            reward.description.toLowerCase().includes(searchValue.toLowerCase())
-          );
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        const currentPage = params.current || 1;
+        const currentPageSize = params.pageSize || 10;
+
+        let response;
+
+        if (activeTab === 'transactions') {
+          response = await yuanService.getAllTransactions({
+            page: currentPage,
+            pageSize: currentPageSize,
+            search: searchValue,
+            ...filters,
+          });
+        } else if (activeTab === 'balances') {
+          response = await yuanService.getAllBalances({
+            page: currentPage,
+            pageSize: currentPageSize,
+            search: searchValue,
+            ...filters,
+          });
+        } else if (activeTab === 'rewards') {
+          response = await yuanService.getRewardRules();
+          // For rewards, we don't have pagination in the service, so we'll handle it client-side
+          const allRewards = response.data;
+          let filteredRewards = allRewards;
+
+          if (searchValue) {
+            filteredRewards = allRewards.filter(
+              (reward) =>
+                reward.actionName.toLowerCase().includes(searchValue.toLowerCase()) ||
+                reward.description.toLowerCase().includes(searchValue.toLowerCase())
+            );
+          }
+
+          if (filters.isActive !== undefined) {
+            filteredRewards = filteredRewards.filter(
+              (reward) => reward.isActive === filters.isActive
+            );
+          }
+
+          const startIndex = (currentPage - 1) * currentPageSize;
+          const endIndex = startIndex + currentPageSize;
+
+          response = {
+            ...response,
+            data: filteredRewards.slice(startIndex, endIndex),
+            total: filteredRewards.length,
+            page: currentPage,
+            pageSize: currentPageSize,
+          };
         }
-        
-        if (filters.isActive !== undefined) {
-          filteredRewards = filteredRewards.filter(reward => reward.isActive === filters.isActive);
-        }
-        
-        const startIndex = (currentPage - 1) * currentPageSize;
-        const endIndex = startIndex + currentPageSize;
-        
-        response = {
-          ...response,
-          data: filteredRewards.slice(startIndex, endIndex),
-          total: filteredRewards.length,
-          page: currentPage,
-          pageSize: currentPageSize,
-        };
+
+        setData(response.data);
+        setPagination((prev) => ({
+          ...prev,
+          current: response.page,
+          total: response.total,
+          pageSize: response.pageSize || currentPageSize,
+        }));
+      } catch (error) {
+        message.error('Failed to fetch yuan data');
+      } finally {
+        setLoading(false);
       }
-      
-      setData(response.data);
-      setPagination(prev => ({
-        ...prev,
-        current: response.page,
-        total: response.total,
-        pageSize: response.pageSize || currentPageSize,
-      }));
-    } catch (error) {
-      message.error('Failed to fetch yuan data');
-    } finally {
-      setLoading(false);
-    }
-  }, [searchValue, filters, activeTab]);
+    },
+    [searchValue, filters, activeTab]
+  );
 
   useEffect(() => {
     fetchData();
@@ -245,9 +262,7 @@ const Yuan = () => {
                   <Text>{record.username}</Text>
                 </Space>
                 <Space>
-                  <span style={{ color: typeDisplay.color }}>
-                    {typeDisplay.icon}
-                  </span>
+                  <span style={{ color: typeDisplay.color }}>{typeDisplay.icon}</span>
                   <Tag color={typeDisplay.color}>
                     {record.typeName || record.type.replace('_', ' ').toUpperCase()}
                   </Tag>
@@ -263,14 +278,15 @@ const Yuan = () => {
             const isIncome = record.category === 'income';
             return (
               <Space direction="vertical" size={4}>
-                <Text 
-                  strong 
-                  style={{ 
-                    color: isIncome ? '#52c41a' : '#ff4d4f', 
-                    fontSize: '16px' 
+                <Text
+                  strong
+                  style={{
+                    color: isIncome ? '#52c41a' : '#ff4d4f',
+                    fontSize: '16px',
                   }}
                 >
-                  {isIncome ? '+' : '-'}{record.amount.toLocaleString()} 元
+                  {isIncome ? '+' : '-'}
+                  {record.amount.toLocaleString()} 元
                 </Text>
                 <Text type="secondary" style={{ fontSize: '12px' }}>
                   Before: {record.balanceBefore.toLocaleString()} 元
@@ -332,8 +348,8 @@ const Yuan = () => {
           dataIndex: 'currentBalance',
           key: 'currentBalance',
           render: (balance) => (
-            <Statistic 
-              value={balance} 
+            <Statistic
+              value={balance}
               suffix="元"
               valueStyle={{ fontSize: '16px', fontWeight: 'bold' }}
             />
@@ -385,7 +401,9 @@ const Yuan = () => {
           key: 'reward',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Text strong style={{ fontSize: '15px' }}>{record.actionName}</Text>
+              <Text strong style={{ fontSize: '15px' }}>
+                {record.actionName}
+              </Text>
               <Text>{record.description}</Text>
               <Space>
                 <Text strong>{record.yuanReward} 元</Text>
@@ -399,20 +417,20 @@ const Yuan = () => {
           key: 'stats',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Statistic 
-                title="Total Claims" 
-                value={record.totalClaims} 
+              <Statistic
+                title="Total Claims"
+                value={record.totalClaims}
                 valueStyle={{ fontSize: '14px' }}
               />
-              <Statistic 
-                title="Total Awarded" 
-                value={record.totalYuanAwarded} 
+              <Statistic
+                title="Total Awarded"
+                value={record.totalYuanAwarded}
                 suffix="元"
                 valueStyle={{ fontSize: '14px' }}
               />
-              <Progress 
-                percent={Math.min((record.totalClaims / 10000) * 100, 100)} 
-                size="small" 
+              <Progress
+                percent={Math.min((record.totalClaims / 10000) * 100, 100)}
+                size="small"
                 status="active"
               />
             </Space>
@@ -439,7 +457,9 @@ const Yuan = () => {
                 </Text>
               )}
               {record.requiresVerification && (
-                <Tag color="orange" size="small">Verification Required</Tag>
+                <Tag color="orange" size="small">
+                  Verification Required
+                </Tag>
               )}
             </Space>
           ),
@@ -464,18 +484,18 @@ const Yuan = () => {
   // Handlers
   const handleSearch = (value) => {
     setSearchValue(value);
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleFilter = (filterValues) => {
     setFilters(filterValues);
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleClearFilters = () => {
     setFilters({});
     setSearchValue('');
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   const handleView = (record) => {
@@ -533,8 +553,12 @@ const Yuan = () => {
     ...getColumns(),
     {
       title: 'Date',
-      dataIndex: activeTab === 'balances' ? 'lastTransactionAt' : 
-                activeTab === 'rewards' ? 'updatedAt' : 'createdAt',
+      dataIndex:
+        activeTab === 'balances'
+          ? 'lastTransactionAt'
+          : activeTab === 'rewards'
+            ? 'updatedAt'
+            : 'createdAt',
       key: 'date',
       render: (date) => (
         <Tooltip title={new Date(date).toLocaleString()}>
@@ -557,28 +581,32 @@ const Yuan = () => {
           onDelete={handleDelete}
           showMore={true}
           customActions={
-            activeTab === 'transactions' ? [
-              {
-                key: 'refund',
-                icon: <TransactionOutlined />,
-                label: 'Process Refund',
-                onClick: () => handleProcessRefund(record),
-              }
-            ] : activeTab === 'balances' ? [
-              {
-                key: 'adjust',
-                icon: <DollarOutlined />,
-                label: 'Adjust Balance',
-                onClick: () => handleAdjustBalance(record),
-              }
-            ] : [
-              {
-                key: 'toggle',
-                icon: <GiftOutlined />,
-                label: record.isActive ? 'Deactivate' : 'Activate',
-                onClick: () => handleToggleReward(record),
-              }
-            ]
+            activeTab === 'transactions'
+              ? [
+                  {
+                    key: 'refund',
+                    icon: <TransactionOutlined />,
+                    label: 'Process Refund',
+                    onClick: () => handleProcessRefund(record),
+                  },
+                ]
+              : activeTab === 'balances'
+                ? [
+                    {
+                      key: 'adjust',
+                      icon: <DollarOutlined />,
+                      label: 'Adjust Balance',
+                      onClick: () => handleAdjustBalance(record),
+                    },
+                  ]
+                : [
+                    {
+                      key: 'toggle',
+                      icon: <GiftOutlined />,
+                      label: record.isActive ? 'Deactivate' : 'Activate',
+                      onClick: () => handleToggleReward(record),
+                    },
+                  ]
           }
         />
       ),
@@ -590,14 +618,11 @@ const Yuan = () => {
       <PageHeader
         title="Yuan Management"
         subtitle="Manage platform currency, transactions, and rewards"
-        breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Yuan' },
-        ]}
+        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Yuan' }]}
         actions={[
-          <Button 
-            key="statistics" 
-            type="default" 
+          <Button
+            key="statistics"
+            type="default"
             icon={<BarChartOutlined />}
             onClick={() => navigate('/admin/yuan/statistics')}
           >
@@ -608,14 +633,14 @@ const Yuan = () => {
           </Button>,
           <Button key="transactions" type="primary" icon={<DollarOutlined />}>
             Process Transaction
-          </Button>
+          </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         {/* Tab Navigation */}
         <Space>
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <Button
               key={tab.key}
               type={activeTab === tab.key ? 'primary' : 'default'}
@@ -654,7 +679,7 @@ const Yuan = () => {
               {
                 children: 'Clear Filters',
                 onClick: handleClearFilters,
-              }
+              },
             ]}
           />
         ) : (
@@ -665,8 +690,7 @@ const Yuan = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} ${activeTab}`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} ${activeTab}`,
             }}
             onChange={handleTableChange}
             loading={loading}
