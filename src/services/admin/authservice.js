@@ -2,13 +2,19 @@ import axios from 'axios';
 
 // Determine API base URL based on environment
 const getApiBaseUrl = () => {
+  console.log('Environment check:');
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- REACT_APP_API_BASE_URL:', process.env.REACT_APP_API_BASE_URL);
+  
   // If environment variable is set, use it
   if (process.env.REACT_APP_API_BASE_URL) {
+    console.log('Using environment variable for API URL');
     return process.env.REACT_APP_API_BASE_URL;
   }
 
   // For development
   if (process.env.NODE_ENV === 'development') {
+    console.log('Using development default');
     return 'http://localhost:8080/api';
   }
 
@@ -17,6 +23,7 @@ const getApiBaseUrl = () => {
   // return 'https://your-backend-domain.com/api';
 
   // Option 2: Use localhost (for testing with local backend)
+  console.log('Using production default (localhost)');
   return 'http://localhost:8080/api';
 };
 
