@@ -5,7 +5,7 @@ const getApiBaseUrl = () => {
   console.log('Environment check:');
   console.log('- NODE_ENV:', process.env.NODE_ENV);
   console.log('- REACT_APP_API_BASE_URL:', process.env.REACT_APP_API_BASE_URL);
-  
+
   // If environment variable is set, use it
   if (process.env.REACT_APP_API_BASE_URL) {
     console.log('Using environment variable for API URL');
