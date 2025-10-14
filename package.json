@@ -24,10 +24,15 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build -b gh-pages -u \"github-actions <github-actions@github.com>\"",
+    "test": "react-scripts test",
+    "test:ci": "react-scripts test --watch=false --ci --coverage",
+    "lint": "eslint . --ext js,jsx",
+    "lint:fix": "eslint . --ext js,jsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
