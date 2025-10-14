@@ -1,6 +1,29 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+// Determine API base URL based on environment
+const getApiBaseUrl = () => {
+  // If environment variable is set, use it
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+
+  // For development
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:8080/api';
+  }
+
+  // For production - you need to update this with your actual backend URL
+  // Option 1: Use your deployed backend
+  // return 'https://your-backend-domain.com/api';
+
+  // Option 2: Use localhost (for testing with local backend)
+  return 'http://localhost:8080/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Log the API URL for debugging
+console.log('API Base URL:', API_BASE_URL);
 
 // Configure axios defaults
 const apiClient = axios.create({
