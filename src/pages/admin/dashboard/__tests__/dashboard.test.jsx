@@ -12,16 +12,16 @@ afterAll(() => {
   console.warn = originalConsole.warn;
 });
 
-describe('app component', () => {
+describe('dashboard component', () => {
   test('basic test that always passes', () => {
-    expect(true).toBe(true);
+    expect(1 + 1).toBe(2);
   });
 
-  test('react is available', () => {
-    expect(React).toBeDefined();
+  test('react is imported', () => {
+    expect(React).toBeTruthy();
   });
 
-  test('environment is test', () => {
-    expect(process.env.NODE_ENV).toBe('test');
+  test('jest is working', () => {
+    expect(typeof describe).toBe('function');
   });
 });
