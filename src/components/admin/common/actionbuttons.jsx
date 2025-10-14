@@ -93,13 +93,23 @@ const ActionButtons = ({
     <Space size="small" {...props}>
       {showView && onView && (
         <Tooltip title="View">
-          <Button type={type} size={size} icon={<EyeOutlined />} onClick={() => onView(record)} />
+          <Button
+            type={type}
+            size={size}
+            icon={<EyeOutlined />}
+            onClick={() => onView(record)}
+          />
         </Tooltip>
       )}
 
       {showEdit && onEdit && (
         <Tooltip title="Edit">
-          <Button type={type} size={size} icon={<EditOutlined />} onClick={() => onEdit(record)} />
+          <Button
+            type={type}
+            size={size}
+            icon={<EditOutlined />}
+            onClick={() => onEdit(record)}
+          />
         </Tooltip>
       )}
 

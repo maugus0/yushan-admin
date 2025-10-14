@@ -10,11 +10,23 @@ const generateMockRankingData = () => {
     { id: 'most_viewed', name: 'Most Viewed', updateFrequency: 'daily' },
     { id: 'new_releases', name: 'New Releases', updateFrequency: 'daily' },
     { id: 'completed', name: 'Recently Completed', updateFrequency: 'weekly' },
-    { id: 'editors_choice', name: "Editor's Choice", updateFrequency: 'weekly' },
+    {
+      id: 'editors_choice',
+      name: "Editor's Choice",
+      updateFrequency: 'weekly',
+    },
     { id: 'rising_stars', name: 'Rising Stars', updateFrequency: 'daily' },
-    { id: 'most_bookmarked', name: 'Most Bookmarked', updateFrequency: 'daily' },
+    {
+      id: 'most_bookmarked',
+      name: 'Most Bookmarked',
+      updateFrequency: 'daily',
+    },
     { id: 'most_commented', name: 'Most Commented', updateFrequency: 'daily' },
-    { id: 'weekly_favorites', name: 'Weekly Favorites', updateFrequency: 'weekly' },
+    {
+      id: 'weekly_favorites',
+      name: 'Weekly Favorites',
+      updateFrequency: 'weekly',
+    },
     { id: 'monthly_best', name: 'Monthly Best', updateFrequency: 'monthly' },
   ];
 
@@ -85,7 +97,9 @@ const generateMockRankingData = () => {
         chapterCount: Math.floor(Math.random() * 200) + 10,
 
         // Time tracking
-        enteredAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        enteredAt: new Date(
+          Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+        ).toISOString(),
         lastPositionChange: new Date(
           Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
         ).toISOString(),
@@ -140,7 +154,9 @@ const generateMockRankingData = () => {
           genre,
           status: Math.random() > 0.2 ? 'ongoing' : 'completed',
           chapterCount: Math.floor(Math.random() * 200) + 10,
-          enteredAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          enteredAt: new Date(
+            Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+          ).toISOString(),
           lastPositionChange: new Date(
             Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
           ).toISOString(),
@@ -207,7 +223,9 @@ function generateMetricsForRankingType(type) {
     case 'new_releases':
       return {
         ...baseMetrics,
-        releaseDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        releaseDate: new Date(
+          Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+        ).toISOString(),
         initialTraction: Math.floor(Math.random() * 1000) + 100,
         discoveryRate: (Math.random() * 30 + 5).toFixed(1), // 5-35%
       };
@@ -284,11 +302,15 @@ export const rankingService = {
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
-        rankings = rankings.filter((r) => r.typeName.toLowerCase().includes(searchLower));
+        rankings = rankings.filter((r) =>
+          r.typeName.toLowerCase().includes(searchLower)
+        );
       }
 
       // Sort by last updated (newest first)
-      rankings.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+      rankings.sort(
+        (a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)
+      );
 
       // Apply pagination
       const start = (page - 1) * pageSize;
@@ -390,7 +412,9 @@ export const rankingService = {
 
       let trendingRanking;
       if (genre) {
-        trendingRanking = mockRankings.find((r) => r.type === 'trending' && r.genre === genre);
+        trendingRanking = mockRankings.find(
+          (r) => r.type === 'trending' && r.genre === genre
+        );
       } else {
         trendingRanking = mockRankings.find(
           (r) => r.type === 'trending' && r.category === 'global'
@@ -425,11 +449,17 @@ export const rankingService = {
       let popularRanking;
       if (genre) {
         popularRanking = mockRankings.find(
-          (r) => r.type === 'popular' && r.genre === genre && r.timeframe === timeframe
+          (r) =>
+            r.type === 'popular' &&
+            r.genre === genre &&
+            r.timeframe === timeframe
         );
       } else {
         popularRanking = mockRankings.find(
-          (r) => r.type === 'popular' && r.category === 'global' && r.timeframe === timeframe
+          (r) =>
+            r.type === 'popular' &&
+            r.category === 'global' &&
+            r.timeframe === timeframe
         );
       }
 
@@ -494,7 +524,8 @@ export const rankingService = {
         throw new Error('Ranking not found');
       }
 
-      mockRankings[rankingIndex].isVisible = !mockRankings[rankingIndex].isVisible;
+      mockRankings[rankingIndex].isVisible =
+        !mockRankings[rankingIndex].isVisible;
       mockRankings[rankingIndex].updatedAt = new Date().toISOString();
 
       return {
@@ -536,7 +567,9 @@ export const rankingService = {
       });
 
       // Re-sort entries by position
-      mockRankings[rankingIndex].entries.sort((a, b) => a.position - b.position);
+      mockRankings[rankingIndex].entries.sort(
+        (a, b) => a.position - b.position
+      );
 
       mockRankings[rankingIndex].lastUpdated = new Date().toISOString();
       mockRankings[rankingIndex].updatedAt = new Date().toISOString();
@@ -575,7 +608,8 @@ export const rankingService = {
       const newestUpdate = new Date(Math.max(...lastUpdateTimes));
 
       const averageEntries =
-        mockRankings.reduce((sum, r) => sum + r.totalEntries, 0) / totalRankings;
+        mockRankings.reduce((sum, r) => sum + r.totalEntries, 0) /
+        totalRankings;
 
       return {
         success: true,
@@ -590,7 +624,9 @@ export const rankingService = {
           averageEntries: Math.round(averageEntries),
           oldestUpdate: oldestUpdate.toISOString(),
           newestUpdate: newestUpdate.toISOString(),
-          needsUpdate: mockRankings.filter((r) => new Date(r.nextUpdate) <= new Date()).length,
+          needsUpdate: mockRankings.filter(
+            (r) => new Date(r.nextUpdate) <= new Date()
+          ).length,
         },
       };
     } catch (error) {
@@ -599,7 +635,11 @@ export const rankingService = {
   },
 
   // Get novel ranking history (track a novel's position over time)
-  getNovelRankingHistory: async (novelId, rankingType = 'trending', period = '30d') => {
+  getNovelRankingHistory: async (
+    novelId,
+    rankingType = 'trending',
+    period = '30d'
+  ) => {
     try {
       await api.delay(500);
 
@@ -616,7 +656,10 @@ export const rankingService = {
           date: date.toISOString().split('T')[0],
           position,
           score,
-          change: i < days ? position - history[history.length - 1]?.position || 0 : 0,
+          change:
+            i < days
+              ? position - history[history.length - 1]?.position || 0
+              : 0,
         });
       }
 
@@ -646,32 +689,84 @@ export const rankingService = {
       await api.delay(200);
 
       const types = [
-        { id: 'trending', name: 'Trending Now', description: 'Novels gaining popularity rapidly' },
-        { id: 'popular', name: 'Most Popular', description: 'Novels with highest engagement' },
-        { id: 'top_rated', name: 'Top Rated', description: 'Highest rated novels by users' },
-        { id: 'most_viewed', name: 'Most Viewed', description: 'Novels with most page views' },
-        { id: 'new_releases', name: 'New Releases', description: 'Recently published novels' },
+        {
+          id: 'trending',
+          name: 'Trending Now',
+          description: 'Novels gaining popularity rapidly',
+        },
+        {
+          id: 'popular',
+          name: 'Most Popular',
+          description: 'Novels with highest engagement',
+        },
+        {
+          id: 'top_rated',
+          name: 'Top Rated',
+          description: 'Highest rated novels by users',
+        },
+        {
+          id: 'most_viewed',
+          name: 'Most Viewed',
+          description: 'Novels with most page views',
+        },
+        {
+          id: 'new_releases',
+          name: 'New Releases',
+          description: 'Recently published novels',
+        },
         {
           id: 'completed',
           name: 'Recently Completed',
           description: 'Novels that finished recently',
         },
-        { id: 'editors_choice', name: "Editor's Choice", description: 'Curated by editorial team' },
-        { id: 'rising_stars', name: 'Rising Stars', description: 'Up and coming novels' },
-        { id: 'most_bookmarked', name: 'Most Bookmarked', description: 'Most saved by readers' },
+        {
+          id: 'editors_choice',
+          name: "Editor's Choice",
+          description: 'Curated by editorial team',
+        },
+        {
+          id: 'rising_stars',
+          name: 'Rising Stars',
+          description: 'Up and coming novels',
+        },
+        {
+          id: 'most_bookmarked',
+          name: 'Most Bookmarked',
+          description: 'Most saved by readers',
+        },
         {
           id: 'most_commented',
           name: 'Most Commented',
           description: 'Novels with most discussion',
         },
-        { id: 'weekly_favorites', name: 'Weekly Favorites', description: 'Top picks of the week' },
-        { id: 'monthly_best', name: 'Monthly Best', description: 'Best novels of the month' },
+        {
+          id: 'weekly_favorites',
+          name: 'Weekly Favorites',
+          description: 'Top picks of the week',
+        },
+        {
+          id: 'monthly_best',
+          name: 'Monthly Best',
+          description: 'Best novels of the month',
+        },
       ];
 
       const categories = [
-        { id: 'global', name: 'Global', description: 'All novels across all genres' },
-        { id: 'genre', name: 'Genre', description: 'Specific to individual genres' },
-        { id: 'region', name: 'Regional', description: 'Specific to geographical regions' },
+        {
+          id: 'global',
+          name: 'Global',
+          description: 'All novels across all genres',
+        },
+        {
+          id: 'genre',
+          name: 'Genre',
+          description: 'Specific to individual genres',
+        },
+        {
+          id: 'region',
+          name: 'Regional',
+          description: 'Specific to geographical regions',
+        },
       ];
 
       return {

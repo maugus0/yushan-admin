@@ -37,7 +37,9 @@ export const exportToCSV = (data, columns, filename = 'export') => {
 
   // Create and download file
   const csvContent = csvRows.join('\n');
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF' + csvContent], {
+    type: 'text/csv;charset=utf-8;',
+  });
   downloadFile(blob, `${filename}.csv`);
 };
 
@@ -92,7 +94,9 @@ export const exportToJSON = (data, columns = null, filename = 'export') => {
   }
 
   const jsonContent = JSON.stringify(exportData, null, 2);
-  const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+  const blob = new Blob([jsonContent], {
+    type: 'application/json;charset=utf-8;',
+  });
   downloadFile(blob, `${filename}.json`);
 };
 
@@ -103,7 +107,12 @@ export const exportToJSON = (data, columns = null, filename = 'export') => {
  * @param {string} filename - Export filename
  * @param {object} options - PDF options
  */
-export const exportToPDF = (data, columns, filename = 'export', options = {}) => {
+export const exportToPDF = (
+  data,
+  columns,
+  _filename = 'export',
+  options = {}
+) => {
   if (!Array.isArray(data) || data.length === 0) {
     console.warn('No data to export');
     return;
@@ -360,7 +369,9 @@ export const prepareDataForExport = (data, columns, options = {}) => {
   } = options;
 
   // Filter columns
-  const visibleColumns = includeHidden ? columns : columns.filter((col) => !col.hidden);
+  const visibleColumns = includeHidden
+    ? columns
+    : columns.filter((col) => !col.hidden);
 
   return data.map((row) => {
     const exportRow = {};
@@ -430,7 +441,8 @@ const formatValueForExport = (value, options = {}) => {
  * @returns {boolean} - True if string looks like a date
  */
 const isDateString = (str) => {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}|\d{4}\/\d{2}\/\d{2}|\d{2}\/\d{2}\/\d{4}/;
+  const dateRegex =
+    /^\d{4}-\d{2}-\d{2}|\d{4}\/\d{2}\/\d{2}|\d{2}\/\d{2}\/\d{4}/;
   return dateRegex.test(str);
 };
 

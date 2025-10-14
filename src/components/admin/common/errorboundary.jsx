@@ -100,12 +100,19 @@ class ErrorBoundary extends React.Component {
                 <Space direction="vertical" align="center">
                   <Space>
                     {showRetryButton && (
-                      <Button type="primary" icon={<ReloadOutlined />} onClick={this.handleRetry}>
+                      <Button
+                        type="primary"
+                        icon={<ReloadOutlined />}
+                        onClick={this.handleRetry}
+                      >
                         Try Again
                       </Button>
                     )}
                     {showHomeButton && (
-                      <Button icon={<HomeOutlined />} onClick={this.handleGoHome}>
+                      <Button
+                        icon={<HomeOutlined />}
+                        onClick={this.handleGoHome}
+                      >
                         Go Home
                       </Button>
                     )}

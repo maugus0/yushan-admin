@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -223,9 +223,24 @@ const WriterDetail = () => {
       novel: 'Dragon Realm Chronicles',
       time: '2 hours ago',
     },
-    { id: 2, action: 'Updated Chapter 156', novel: 'Mystic Sword Master', time: '1 day ago' },
-    { id: 3, action: 'Created new novel', novel: 'Shadow Hunter', time: '3 days ago' },
-    { id: 4, action: 'Responded to review', novel: 'Dragon Realm Chronicles', time: '1 week ago' },
+    {
+      id: 2,
+      action: 'Updated Chapter 156',
+      novel: 'Mystic Sword Master',
+      time: '1 day ago',
+    },
+    {
+      id: 3,
+      action: 'Created new novel',
+      novel: 'Shadow Hunter',
+      time: '3 days ago',
+    },
+    {
+      id: 4,
+      action: 'Responded to review',
+      novel: 'Dragon Realm Chronicles',
+      time: '1 week ago',
+    },
   ];
 
   const novelColumns = [
@@ -325,10 +340,20 @@ const WriterDetail = () => {
           <Button key="suspend" icon={<StopOutlined />} onClick={handleSuspend}>
             Suspend
           </Button>,
-          <Button key="ban" icon={<UserDeleteOutlined />} danger onClick={handleBan}>
+          <Button
+            key="ban"
+            icon={<UserDeleteOutlined />}
+            danger
+            onClick={handleBan}
+          >
             Ban
           </Button>,
-          <Button key="delete" icon={<DeleteOutlined />} danger onClick={handleDelete}>
+          <Button
+            key="delete"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={handleDelete}
+          >
             Delete
           </Button>,
         ]}
@@ -499,7 +524,9 @@ const WriterDetail = () => {
             <Descriptions column={1}>
               <Descriptions.Item label="Verification Status">
                 <Tag color={user.verification?.verified ? 'green' : 'orange'}>
-                  {user.verification?.verified ? 'Verified' : 'Pending Verification'}
+                  {user.verification?.verified
+                    ? 'Verified'
+                    : 'Pending Verification'}
                 </Tag>
               </Descriptions.Item>
               {user.verification?.verifiedAt && (

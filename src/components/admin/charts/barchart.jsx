@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -70,7 +69,12 @@ const CustomBarChart = ({
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
           {layout === 'vertical' ? (
             <>
-              <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+              <XAxis
+                type="number"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12 }}
+              />
               <YAxis
                 type="category"
                 dataKey="name"
@@ -81,8 +85,17 @@ const CustomBarChart = ({
             </>
           ) : (
             <>
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12 }}
+              />
             </>
           )}
           <Tooltip

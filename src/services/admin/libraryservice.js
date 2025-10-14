@@ -61,7 +61,10 @@ const generateMockLibraryData = () => {
       booksReading: Math.floor(librarySize * 0.2), // ~20% currently reading
       booksWantToRead: Math.floor(librarySize * 0.3), // ~30% want to read
       booksDropped: Math.floor(librarySize * 0.1), // ~10% dropped
-      favoriteGenres: ['fantasy', 'romance', 'mystery'].slice(0, Math.floor(Math.random() * 3) + 1),
+      favoriteGenres: ['fantasy', 'romance', 'mystery'].slice(
+        0,
+        Math.floor(Math.random() * 3) + 1
+      ),
       averageRating: (Math.random() * 2 + 3).toFixed(1), // 3.0-5.0
       createdAt: new Date(
         2023,
@@ -112,7 +115,12 @@ const generateMockLibraryData = () => {
         chapterTitle: `Chapter ${Math.floor(Math.random() * 50) + 1}`,
         progress: Math.floor(Math.random() * 100) + 1, // Percentage
         readingTime: Math.floor(Math.random() * 60) + 5, // Minutes
-        device: Math.random() > 0.5 ? 'mobile' : Math.random() > 0.5 ? 'desktop' : 'tablet',
+        device:
+          Math.random() > 0.5
+            ? 'mobile'
+            : Math.random() > 0.5
+              ? 'desktop'
+              : 'tablet',
         platform: Math.random() > 0.3 ? 'web' : 'app',
         completed: Math.random() > 0.7,
         createdAt: readDate.toISOString(),
@@ -127,8 +135,11 @@ const generateMockLibraryData = () => {
         collections.push({
           id: collections.length + 1,
           userId,
-          name: collectionNames[Math.floor(Math.random() * collectionNames.length)],
-          description: 'A curated collection of my favorite novels and stories.',
+          name: collectionNames[
+            Math.floor(Math.random() * collectionNames.length)
+          ],
+          description:
+            'A curated collection of my favorite novels and stories.',
           isPublic: Math.random() > 0.6,
           bookCount: Math.floor(Math.random() * 30) + 1,
           followerCount: Math.floor(Math.random() * 100),
@@ -182,11 +193,15 @@ export const libraryService = {
 
       // Filter by book count range
       if (minBooks !== null) {
-        libraries = libraries.filter((library) => library.totalBooks >= parseInt(minBooks));
+        libraries = libraries.filter(
+          (library) => library.totalBooks >= parseInt(minBooks)
+        );
       }
 
       if (maxBooks !== null) {
-        libraries = libraries.filter((library) => library.totalBooks <= parseInt(maxBooks));
+        libraries = libraries.filter(
+          (library) => library.totalBooks <= parseInt(maxBooks)
+        );
       }
 
       // Apply sorting
@@ -258,7 +273,9 @@ export const libraryService = {
         .slice(0, 20);
 
       // Get user's collections
-      const userCollections = mockCollections.filter((c) => c.userId === parseInt(userId));
+      const userCollections = mockCollections.filter(
+        (c) => c.userId === parseInt(userId)
+      );
 
       return {
         success: true,
@@ -292,17 +309,23 @@ export const libraryService = {
 
       // Filter by user
       if (userId) {
-        bookmarks = bookmarks.filter((bookmark) => bookmark.userId === parseInt(userId));
+        bookmarks = bookmarks.filter(
+          (bookmark) => bookmark.userId === parseInt(userId)
+        );
       }
 
       // Filter by novel
       if (novelId) {
-        bookmarks = bookmarks.filter((bookmark) => bookmark.novelId === parseInt(novelId));
+        bookmarks = bookmarks.filter(
+          (bookmark) => bookmark.novelId === parseInt(novelId)
+        );
       }
 
       // Filter by privacy
       if (isPrivate !== null) {
-        bookmarks = bookmarks.filter((bookmark) => bookmark.isPrivate === isPrivate);
+        bookmarks = bookmarks.filter(
+          (bookmark) => bookmark.isPrivate === isPrivate
+        );
       }
 
       // Search filter
@@ -376,11 +399,15 @@ export const libraryService = {
 
       // Date range filter
       if (dateFrom) {
-        history = history.filter((h) => new Date(h.createdAt) >= new Date(dateFrom));
+        history = history.filter(
+          (h) => new Date(h.createdAt) >= new Date(dateFrom)
+        );
       }
 
       if (dateTo) {
-        history = history.filter((h) => new Date(h.createdAt) <= new Date(dateTo));
+        history = history.filter(
+          (h) => new Date(h.createdAt) <= new Date(dateTo)
+        );
       }
 
       // Sort by reading date (newest first)
@@ -508,7 +535,9 @@ export const libraryService = {
     try {
       await api.delay(300);
 
-      const bookmarkIndex = mockBookmarks.findIndex((b) => b.id === parseInt(id));
+      const bookmarkIndex = mockBookmarks.findIndex(
+        (b) => b.id === parseInt(id)
+      );
 
       if (bookmarkIndex === -1) {
         throw new Error('Bookmark not found');
@@ -535,7 +564,9 @@ export const libraryService = {
     try {
       await api.delay(300);
 
-      const bookmarkIndex = mockBookmarks.findIndex((b) => b.id === parseInt(id));
+      const bookmarkIndex = mockBookmarks.findIndex(
+        (b) => b.id === parseInt(id)
+      );
 
       if (bookmarkIndex === -1) {
         throw new Error('Bookmark not found');
@@ -585,7 +616,9 @@ export const libraryService = {
     try {
       await api.delay(400);
 
-      const collectionIndex = mockCollections.findIndex((c) => c.id === parseInt(id));
+      const collectionIndex = mockCollections.findIndex(
+        (c) => c.id === parseInt(id)
+      );
 
       if (collectionIndex === -1) {
         throw new Error('Collection not found');
@@ -612,7 +645,9 @@ export const libraryService = {
     try {
       await api.delay(400);
 
-      const collectionIndex = mockCollections.findIndex((c) => c.id === parseInt(id));
+      const collectionIndex = mockCollections.findIndex(
+        (c) => c.id === parseInt(id)
+      );
 
       if (collectionIndex === -1) {
         throw new Error('Collection not found');
@@ -638,14 +673,26 @@ export const libraryService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
 
-      const periodHistory = mockReadingHistory.filter((h) => new Date(h.createdAt) >= startDate);
-      const periodBookmarks = mockBookmarks.filter((b) => new Date(b.createdAt) >= startDate);
-      const periodCollections = mockCollections.filter((c) => new Date(c.createdAt) >= startDate);
+      const periodHistory = mockReadingHistory.filter(
+        (h) => new Date(h.createdAt) >= startDate
+      );
+      const periodBookmarks = mockBookmarks.filter(
+        (b) => new Date(b.createdAt) >= startDate
+      );
+      const periodCollections = mockCollections.filter(
+        (c) => new Date(c.createdAt) >= startDate
+      );
 
-      const totalReadingTime = mockReadingHistory.reduce((sum, h) => sum + h.readingTime, 0);
-      const averageSessionTime = totalReadingTime / mockReadingHistory.length || 0;
+      const totalReadingTime = mockReadingHistory.reduce(
+        (sum, h) => sum + h.readingTime,
+        0
+      );
+      const averageSessionTime =
+        totalReadingTime / mockReadingHistory.length || 0;
 
       const deviceStats = mockReadingHistory.reduce((acc, h) => {
         acc[h.device] = (acc[h.device] || 0) + 1;
@@ -653,7 +700,9 @@ export const libraryService = {
       }, {});
 
       const completionRate =
-        (mockReadingHistory.filter((h) => h.completed).length / mockReadingHistory.length) * 100;
+        (mockReadingHistory.filter((h) => h.completed).length /
+          mockReadingHistory.length) *
+        100;
 
       return {
         success: true,
@@ -670,10 +719,12 @@ export const libraryService = {
           deviceStats,
           completionRate: Math.round(completionRate),
           averageBooksPerUser: Math.round(
-            mockLibraries.reduce((sum, l) => sum + l.totalBooks, 0) / mockLibraries.length
+            mockLibraries.reduce((sum, l) => sum + l.totalBooks, 0) /
+              mockLibraries.length
           ),
           averageReadingTimePerUser: Math.round(
-            mockLibraries.reduce((sum, l) => sum + l.totalReadingTime, 0) / mockLibraries.length
+            mockLibraries.reduce((sum, l) => sum + l.totalReadingTime, 0) /
+              mockLibraries.length
           ),
           publicCollections: mockCollections.filter((c) => c.isPublic).length,
           privateBookmarks: mockBookmarks.filter((b) => b.isPrivate).length,
@@ -691,16 +742,26 @@ export const libraryService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
-
-      const userHistory = mockReadingHistory.filter(
-        (h) => h.userId === parseInt(userId) && new Date(h.createdAt) >= startDate
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
       );
 
-      const userBookmarks = mockBookmarks.filter((b) => b.userId === parseInt(userId));
-      const userCollections = mockCollections.filter((c) => c.userId === parseInt(userId));
+      const userHistory = mockReadingHistory.filter(
+        (h) =>
+          h.userId === parseInt(userId) && new Date(h.createdAt) >= startDate
+      );
 
-      const totalReadingTime = userHistory.reduce((sum, h) => sum + h.readingTime, 0);
+      const userBookmarks = mockBookmarks.filter(
+        (b) => b.userId === parseInt(userId)
+      );
+      const userCollections = mockCollections.filter(
+        (c) => c.userId === parseInt(userId)
+      );
+
+      const totalReadingTime = userHistory.reduce(
+        (sum, h) => sum + h.readingTime,
+        0
+      );
       const averageSessionTime = totalReadingTime / userHistory.length || 0;
       const completedSessions = userHistory.filter((h) => h.completed).length;
 
@@ -725,7 +786,8 @@ export const libraryService = {
           totalReadingTime: Math.round(totalReadingTime / 60), // Hours
           averageSessionTime: Math.round(averageSessionTime), // Minutes
           completedSessions,
-          completionRate: Math.round((completedSessions / userHistory.length) * 100) || 0,
+          completionRate:
+            Math.round((completedSessions / userHistory.length) * 100) || 0,
           totalBookmarks: userBookmarks.length,
           totalCollections: userCollections.length,
           dailyActivity,
@@ -766,7 +828,9 @@ function getMostActiveHour(history) {
     return acc;
   }, {});
 
-  const mostActiveHour = Object.entries(hourCounts).sort(([, a], [, b]) => b - a)[0];
+  const mostActiveHour = Object.entries(hourCounts).sort(
+    ([, a], [, b]) => b - a
+  )[0];
 
   return mostActiveHour ? parseInt(mostActiveHour[0]) : null;
 }
@@ -777,7 +841,9 @@ function getMostUsedDevice(history) {
     return acc;
   }, {});
 
-  const mostUsedDevice = Object.entries(deviceCounts).sort(([, a], [, b]) => b - a)[0];
+  const mostUsedDevice = Object.entries(deviceCounts).sort(
+    ([, a], [, b]) => b - a
+  )[0];
 
   return mostUsedDevice ? mostUsedDevice[0] : null;
 }

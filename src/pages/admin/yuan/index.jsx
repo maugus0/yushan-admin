@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Button,
   Space,
@@ -86,8 +86,12 @@ const Yuan = () => {
           if (searchValue) {
             filteredRewards = allRewards.filter(
               (reward) =>
-                reward.actionName.toLowerCase().includes(searchValue.toLowerCase()) ||
-                reward.description.toLowerCase().includes(searchValue.toLowerCase())
+                reward.actionName
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase()) ||
+                reward.description
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase())
             );
           }
 
@@ -132,21 +136,39 @@ const Yuan = () => {
   // Get transaction type display
   const getTransactionTypeDisplay = (type) => {
     const config = {
-      purchase: { color: 'purple', icon: <ShoppingCartOutlined />, prefix: '+' },
+      purchase: {
+        color: 'purple',
+        icon: <ShoppingCartOutlined />,
+        prefix: '+',
+      },
       reading_reward: { color: 'green', icon: <GiftOutlined />, prefix: '+' },
       daily_login: { color: 'blue', icon: <CalendarOutlined />, prefix: '+' },
       chapter_unlock: { color: 'red', icon: <BookOutlined />, prefix: '-' },
       gift_author: { color: 'orange', icon: <TrophyOutlined />, prefix: '-' },
-      premium_feature: { color: 'purple', icon: <CrownOutlined />, prefix: '-' },
+      premium_feature: {
+        color: 'purple',
+        icon: <CrownOutlined />,
+        prefix: '-',
+      },
       refund: { color: 'cyan', icon: <TransactionOutlined />, prefix: '+' },
       bonus: { color: 'green', icon: <GiftOutlined />, prefix: '+' },
       withdrawal: { color: 'red', icon: <WalletOutlined />, prefix: '-' },
       subscription: { color: 'blue', icon: <CrownOutlined />, prefix: '-' },
-      tournament_prize: { color: 'gold', icon: <TrophyOutlined />, prefix: '+' },
+      tournament_prize: {
+        color: 'gold',
+        icon: <TrophyOutlined />,
+        prefix: '+',
+      },
       referral_bonus: { color: 'green', icon: <UserOutlined />, prefix: '+' },
-      balance_adjustment: { color: 'gray', icon: <DollarOutlined />, prefix: '±' },
+      balance_adjustment: {
+        color: 'gray',
+        icon: <DollarOutlined />,
+        prefix: '±',
+      },
     };
-    return config[type] || { color: 'default', icon: <DollarOutlined />, prefix: '' };
+    return (
+      config[type] || { color: 'default', icon: <DollarOutlined />, prefix: '' }
+    );
   };
 
   // Filter configurations for different tabs
@@ -262,9 +284,12 @@ const Yuan = () => {
                   <Text>{record.username}</Text>
                 </Space>
                 <Space>
-                  <span style={{ color: typeDisplay.color }}>{typeDisplay.icon}</span>
+                  <span style={{ color: typeDisplay.color }}>
+                    {typeDisplay.icon}
+                  </span>
                   <Tag color={typeDisplay.color}>
-                    {record.typeName || record.type.replace('_', ' ').toUpperCase()}
+                    {record.typeName ||
+                      record.type.replace('_', ' ').toUpperCase()}
                   </Tag>
                 </Space>
               </Space>
@@ -337,7 +362,9 @@ const Yuan = () => {
                 <Text strong>{record.username}</Text>
               </Space>
               <Tag color={record.isSubscriber ? 'gold' : 'default'}>
-                {record.isSubscriber ? `${record.subscriptionTier} Subscriber` : 'Free User'}
+                {record.isSubscriber
+                  ? `${record.subscriptionTier} Subscriber`
+                  : 'Free User'}
               </Tag>
               <StatusBadge status={record.accountStatus} />
             </Space>
@@ -379,7 +406,11 @@ const Yuan = () => {
           key: 'verification',
           render: (_, record) => (
             <Space direction="vertical" size={4}>
-              <Tag color={record.verificationLevel === 'verified' ? 'green' : 'orange'}>
+              <Tag
+                color={
+                  record.verificationLevel === 'verified' ? 'green' : 'orange'
+                }
+              >
                 {record.verificationLevel}
               </Tag>
               <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -407,7 +438,9 @@ const Yuan = () => {
               <Text>{record.description}</Text>
               <Space>
                 <Text strong>{record.yuanReward} 元</Text>
-                <Tag color="blue">{record.actionType.replace('_', ' ').toUpperCase()}</Tag>
+                <Tag color="blue">
+                  {record.actionType.replace('_', ' ').toUpperCase()}
+                </Tag>
               </Space>
             </Space>
           ),
@@ -468,7 +501,9 @@ const Yuan = () => {
           title: 'Status',
           dataIndex: 'isActive',
           key: 'status',
-          render: (isActive) => <StatusBadge status={isActive ? 'active' : 'inactive'} />,
+          render: (isActive) => (
+            <StatusBadge status={isActive ? 'active' : 'inactive'} />
+          ),
         },
       ];
     }
@@ -476,7 +511,11 @@ const Yuan = () => {
 
   // Tab configuration
   const tabs = [
-    { key: 'transactions', label: 'Transactions', icon: <TransactionOutlined /> },
+    {
+      key: 'transactions',
+      label: 'Transactions',
+      icon: <TransactionOutlined />,
+    },
     { key: 'balances', label: 'User Balances', icon: <WalletOutlined /> },
     { key: 'rewards', label: 'Reward Programs', icon: <GiftOutlined /> },
   ];
@@ -510,12 +549,12 @@ const Yuan = () => {
     }
   };
 
-  const handleEdit = (record) => {
+  const handleEdit = (_record) => {
     // Handle edit functionality based on activeTab
     message.info('Edit functionality coming soon');
   };
 
-  const handleDelete = async (record) => {
+  const handleDelete = async (_record) => {
     try {
       // Handle delete functionality based on activeTab
       message.info('Delete functionality coming soon');
@@ -525,20 +564,24 @@ const Yuan = () => {
     }
   };
 
-  const handleAdjustBalance = (record) => {
+  const handleAdjustBalance = (_record) => {
     // TODO: Open modal for balance adjustment
     message.info('Balance adjustment modal coming soon');
   };
 
-  const handleProcessRefund = (record) => {
+  const handleProcessRefund = (_record) => {
     // TODO: Handle refund processing
     message.info('Refund processing coming soon');
   };
 
   const handleToggleReward = async (record) => {
     try {
-      await yuanService.updateRewardRule(record.id, { isActive: !record.isActive });
-      message.success(`Reward ${record.isActive ? 'deactivated' : 'activated'} successfully`);
+      await yuanService.updateRewardRule(record.id, {
+        isActive: !record.isActive,
+      });
+      message.success(
+        `Reward ${record.isActive ? 'deactivated' : 'activated'} successfully`
+      );
       fetchData();
     } catch (error) {
       message.error('Failed to update reward status');
@@ -618,7 +661,10 @@ const Yuan = () => {
       <PageHeader
         title="Yuan Management"
         subtitle="Manage platform currency, transactions, and rewards"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Yuan' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Yuan' },
+        ]}
         actions={[
           <Button
             key="statistics"
@@ -690,7 +736,8 @@ const Yuan = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} ${activeTab}`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} ${activeTab}`,
             }}
             onChange={handleTableChange}
             loading={loading}

@@ -416,7 +416,7 @@ export const formatSocialHandle = (handle, platform = 'general') => {
  * @param {string} type - Message type
  * @returns {string} - Formatted message
  */
-export const formatMessage = (message, type = 'info') => {
+export const formatMessage = (message, _type = 'info') => {
   if (!message) return '';
 
   // Capitalize first letter

@@ -47,7 +47,11 @@ const AdminSidebar = ({
         <span>
           Users
           {notifications.users > 0 && (
-            <Badge count={notifications.users} size="small" style={{ marginLeft: 8 }} />
+            <Badge
+              count={notifications.users}
+              size="small"
+              style={{ marginLeft: 8 }}
+            />
           )}
         </span>
       ),
@@ -76,7 +80,11 @@ const AdminSidebar = ({
         <span>
           Novels
           {notifications.novels > 0 && (
-            <Badge count={notifications.novels} size="small" style={{ marginLeft: 8 }} />
+            <Badge
+              count={notifications.novels}
+              size="small"
+              style={{ marginLeft: 8 }}
+            />
           )}
         </span>
       ),
@@ -98,7 +106,11 @@ const AdminSidebar = ({
         <span>
           Comments
           {notifications.comments > 0 && (
-            <Badge count={notifications.comments} size="small" style={{ marginLeft: 8 }} />
+            <Badge
+              count={notifications.comments}
+              size="small"
+              style={{ marginLeft: 8 }}
+            />
           )}
         </span>
       ),
@@ -110,7 +122,11 @@ const AdminSidebar = ({
         <span>
           Reviews
           {notifications.reviews > 0 && (
-            <Badge count={notifications.reviews} size="small" style={{ marginLeft: 8 }} />
+            <Badge
+              count={notifications.reviews}
+              size="small"
+              style={{ marginLeft: 8 }}
+            />
           )}
         </span>
       ),
@@ -137,7 +153,11 @@ const AdminSidebar = ({
         <span>
           Reports
           {notifications.reports > 0 && (
-            <Badge count={notifications.reports} size="small" style={{ marginLeft: 8 }} />
+            <Badge
+              count={notifications.reports}
+              size="small"
+              style={{ marginLeft: 8 }}
+            />
           )}
         </span>
       ),
@@ -211,7 +231,8 @@ const AdminSidebar = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderBottom: theme === 'light' ? '1px solid #f0f0f0' : '1px solid #303030',
+          borderBottom:
+            theme === 'light' ? '1px solid #f0f0f0' : '1px solid #303030',
           background: theme === 'light' ? '#1890ff' : '#001529',
         }}
       >

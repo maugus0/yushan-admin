@@ -61,7 +61,9 @@ export const validateUsername = (username) => {
   }
 
   if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-    errors.push('Username can only contain letters, numbers, underscores, and hyphens');
+    errors.push(
+      'Username can only contain letters, numbers, underscores, and hyphens'
+    );
   }
 
   return {
@@ -336,7 +338,12 @@ export const validateRequired = (value, fieldName = 'Field') => {
  * @param {string} fieldName - Name of the field
  * @returns {object} - Validation result
  */
-export const validateStringLength = (value, min = 0, max = Infinity, fieldName = 'Field') => {
+export const validateStringLength = (
+  value,
+  min = 0,
+  max = Infinity,
+  fieldName = 'Field'
+) => {
   const errors = [];
 
   if (typeof value !== 'string') {

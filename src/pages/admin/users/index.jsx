@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Statistic, Button, Space, Typography, List, Avatar, Tag } from 'antd';
+import {
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Button,
+  Space,
+  Typography,
+  List,
+  Avatar,
+  Tag,
+} from 'antd';
 import {
   UserOutlined,
   TeamOutlined,
@@ -43,14 +54,24 @@ const UsersOverview = () => {
         userService.getWriters({ page: 1, pageSize: 5 }),
       ]);
 
-      const allReaders = await userService.getReaders({ page: 1, pageSize: 100 });
-      const allWriters = await userService.getWriters({ page: 1, pageSize: 100 });
+      const allReaders = await userService.getReaders({
+        page: 1,
+        pageSize: 100,
+      });
+      const allWriters = await userService.getWriters({
+        page: 1,
+        pageSize: 100,
+      });
 
       // Calculate statistics
       const totalReaders = allReaders.total;
       const totalWriters = allWriters.total;
-      const activeReaders = allReaders.data.filter((user) => user.status === 'active').length;
-      const activeWriters = allWriters.data.filter((user) => user.status === 'active').length;
+      const activeReaders = allReaders.data.filter(
+        (user) => user.status === 'active'
+      ).length;
+      const activeWriters = allWriters.data.filter(
+        (user) => user.status === 'active'
+      ).length;
 
       setStats({
         totalUsers: totalReaders + totalWriters,
@@ -61,8 +82,14 @@ const UsersOverview = () => {
 
       // Combine recent users
       const combinedUsers = [
-        ...readersResponse.data.map((user) => ({ ...user, userType: 'reader' })),
-        ...writersResponse.data.map((user) => ({ ...user, userType: 'writer' })),
+        ...readersResponse.data.map((user) => ({
+          ...user,
+          userType: 'reader',
+        })),
+        ...writersResponse.data.map((user) => ({
+          ...user,
+          userType: 'writer',
+        })),
       ]
         .sort((a, b) => new Date(b.joinDate) - new Date(a.joinDate))
         .slice(0, 6);
@@ -125,7 +152,11 @@ const UsersOverview = () => {
     },
   ];
 
-  const breadcrumbItems = [{ title: 'Admin' }, { title: 'User Management' }, { title: 'Overview' }];
+  const breadcrumbItems = [
+    { title: 'Admin' },
+    { title: 'User Management' },
+    { title: 'Overview' },
+  ];
 
   return (
     <div>
@@ -202,7 +233,10 @@ const UsersOverview = () => {
           <Card
             title="Recent Users"
             extra={
-              <Button type="link" onClick={() => navigate('/admin/users/readers')}>
+              <Button
+                type="link"
+                onClick={() => navigate('/admin/users/readers')}
+              >
                 View All
               </Button>
             }
@@ -213,11 +247,15 @@ const UsersOverview = () => {
               renderItem={(user) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar src={user.avatar} icon={<UserOutlined />} />}
+                    avatar={
+                      <Avatar src={user.avatar} icon={<UserOutlined />} />
+                    }
                     title={
                       <Space>
                         {user.username}
-                        <Tag color={user.userType === 'reader' ? 'blue' : 'purple'}>
+                        <Tag
+                          color={user.userType === 'reader' ? 'blue' : 'purple'}
+                        >
                           {user.userType}
                         </Tag>
                       </Space>
@@ -225,7 +263,9 @@ const UsersOverview = () => {
                     description={
                       <Space>
                         <StatusBadge status={user.status} />
-                        <Text type="secondary">{new Date(user.joinDate).toLocaleDateString()}</Text>
+                        <Text type="secondary">
+                          {new Date(user.joinDate).toLocaleDateString()}
+                        </Text>
                       </Space>
                     }
                   />
@@ -237,7 +277,10 @@ const UsersOverview = () => {
 
         {/* Top Readers */}
         <Col span={8}>
-          <Card title="Top Readers" extra={<TrophyOutlined style={{ color: '#faad14' }} />}>
+          <Card
+            title="Top Readers"
+            extra={<TrophyOutlined style={{ color: '#faad14' }} />}
+          >
             <List
               dataSource={topReaders}
               renderItem={(reader, index) => (
@@ -267,7 +310,10 @@ const UsersOverview = () => {
 
         {/* Top Writers */}
         <Col span={8}>
-          <Card title="Top Writers" extra={<TrophyOutlined style={{ color: '#faad14' }} />}>
+          <Card
+            title="Top Writers"
+            extra={<TrophyOutlined style={{ color: '#faad14' }} />}
+          >
             <List
               dataSource={topWriters}
               renderItem={(writer, index) => (

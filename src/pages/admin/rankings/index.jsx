@@ -1,5 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress, Statistic } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  Button,
+  Space,
+  Table,
+  Tooltip,
+  Avatar,
+  Typography,
+  Tag,
+  Progress,
+  Statistic,
+} from 'antd';
 import {
   TrophyOutlined,
   UserOutlined,
@@ -233,24 +243,34 @@ const Rankings = () => {
                 item.author.toLowerCase().includes(searchValue.toLowerCase())
               );
             } else if (activeTab === 'authors') {
-              return item.name.toLowerCase().includes(searchValue.toLowerCase());
+              return item.name
+                .toLowerCase()
+                .includes(searchValue.toLowerCase());
             } else {
-              return item.username.toLowerCase().includes(searchValue.toLowerCase());
+              return item.username
+                .toLowerCase()
+                .includes(searchValue.toLowerCase());
             }
           });
         }
 
         // Apply filters
         if (filters.category && activeTab === 'novels') {
-          filteredData = filteredData.filter((item) => item.category === filters.category);
+          filteredData = filteredData.filter(
+            (item) => item.category === filters.category
+          );
         }
 
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         if (filters.trend) {
-          filteredData = filteredData.filter((item) => item.trend === filters.trend);
+          filteredData = filteredData.filter(
+            (item) => item.trend === filters.trend
+          );
         }
 
         const pageSize = params.pageSize || pagination.pageSize;
@@ -270,11 +290,13 @@ const Rankings = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current, activeTab]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters, activeTab]);
 
   // Filter configurations for different tabs
@@ -337,15 +359,20 @@ const Rankings = () => {
             {rank <= 3 && (
               <CrownOutlined
                 style={{
-                  color: rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : '#cd7f32',
+                  color:
+                    rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : '#cd7f32',
                 }}
               />
             )}
             <Text strong style={{ fontSize: '16px' }}>
               #{rank}
             </Text>
-            {record.trend === 'rising' && <RiseOutlined style={{ color: '#52c41a' }} />}
-            {record.trend === 'falling' && <FallOutlined style={{ color: '#ff4d4f' }} />}
+            {record.trend === 'rising' && (
+              <RiseOutlined style={{ color: '#52c41a' }} />
+            )}
+            {record.trend === 'falling' && (
+              <FallOutlined style={{ color: '#ff4d4f' }} />
+            )}
           </Space>
         ),
       },
@@ -418,7 +445,9 @@ const Rankings = () => {
                 <BookOutlined />
                 <Text type="secondary">{record.novels} novels</Text>
                 <TeamOutlined />
-                <Text type="secondary">{record.followers.toLocaleString()} followers</Text>
+                <Text type="secondary">
+                  {record.followers.toLocaleString()} followers
+                </Text>
               </Space>
               <StatusBadge status={record.status} />
             </Space>
@@ -438,7 +467,9 @@ const Rankings = () => {
                 <Text>{record.avgRating}/5 avg rating</Text>
               </Space>
               <Space>
-                <Text type="secondary">{record.totalVotes.toLocaleString()} total votes</Text>
+                <Text type="secondary">
+                  {record.totalVotes.toLocaleString()} total votes
+                </Text>
               </Space>
             </Space>
           ),
@@ -577,7 +608,10 @@ const Rankings = () => {
       <PageHeader
         title="Rankings Management"
         subtitle="Manage and moderate platform rankings"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Rankings' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Rankings' },
+        ]}
         actions={[
           <Button key="refresh" type="default" icon={<TrophyOutlined />}>
             Update Rankings
@@ -641,7 +675,8 @@ const Rankings = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} ${activeTab}`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} ${activeTab}`,
             }}
             onChange={handleTableChange}
             loading={loading}

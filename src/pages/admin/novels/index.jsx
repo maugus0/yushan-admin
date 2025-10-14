@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Table, Tooltip, Badge, Rate, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -146,7 +146,8 @@ const Novels = () => {
               by {record.author}
             </div>
             <div style={{ fontSize: '11px', color: '#999' }}>
-              {record.language} • {record.isOriginal ? 'Original' : 'Translation'}
+              {record.language} •{' '}
+              {record.isOriginal ? 'Original' : 'Translation'}
             </div>
           </div>
         </Space>
@@ -177,13 +178,25 @@ const Novels = () => {
       width: 200,
       render: (_, record) => (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 4,
+            }}
+          >
             <span style={{ fontSize: '12px' }}>
               <FileTextOutlined style={{ marginRight: 4 }} />
               {record.chaptersCount} chapters
             </span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 4,
+            }}
+          >
             <span style={{ fontSize: '12px' }}>
               <EyeOutlined style={{ marginRight: 4 }} />
               {record.views.toLocaleString()} views
@@ -205,13 +218,22 @@ const Novels = () => {
       render: (_, record) => (
         <div>
           <div style={{ fontSize: '12px', marginBottom: 2 }}>
-            <span style={{ color: '#1890ff' }}>{record.likes.toLocaleString()}</span> likes
+            <span style={{ color: '#1890ff' }}>
+              {record.likes.toLocaleString()}
+            </span>{' '}
+            likes
           </div>
           <div style={{ fontSize: '12px', marginBottom: 2 }}>
-            <span style={{ color: '#52c41a' }}>{record.bookmarks.toLocaleString()}</span> bookmarks
+            <span style={{ color: '#52c41a' }}>
+              {record.bookmarks.toLocaleString()}
+            </span>{' '}
+            bookmarks
           </div>
           <div style={{ fontSize: '12px' }}>
-            <span style={{ color: '#fa8c16' }}>{record.comments.toLocaleString()}</span> comments
+            <span style={{ color: '#fa8c16' }}>
+              {record.comments.toLocaleString()}
+            </span>{' '}
+            comments
           </div>
         </div>
       ),
@@ -223,9 +245,13 @@ const Novels = () => {
       width: 100,
       render: (revenue, record) => (
         <div>
-          {record.isPremium && <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />}
+          {record.isPremium && (
+            <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />
+          )}
           {revenue > 0 ? (
-            <div style={{ fontSize: '12px', fontWeight: 500, color: '#52c41a' }}>
+            <div
+              style={{ fontSize: '12px', fontWeight: 500, color: '#52c41a' }}
+            >
               ${revenue.toLocaleString()}
             </div>
           ) : (
@@ -343,9 +369,17 @@ const Novels = () => {
       <PageHeader
         title="Novels Management"
         subtitle="Manage and monitor novels on the platform"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Novels' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Novels' },
+        ]}
         actions={[
-          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
+          <Button
+            key="add"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddNew}
+          >
             Add Novel
           </Button>,
         ]}
@@ -402,7 +436,8 @@ const Novels = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} novels`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} novels`,
             }}
             onChange={handleTableChange}
             loading={loading}

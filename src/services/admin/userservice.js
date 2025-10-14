@@ -1,5 +1,3 @@
-import api from './api';
-
 // Mock data for development
 const generateMockReaders = () => {
   const readers = [];
@@ -72,7 +70,13 @@ const generateMockReaders = () => {
 const generateMockWriters = () => {
   const writers = [];
   const statuses = ['active', 'inactive', 'suspended', 'pending'];
-  const names = ['Sarah Connor', 'Michael Scott', 'Elena Vasquez', 'James Park', 'Luna Rivera'];
+  const names = [
+    'Sarah Connor',
+    'Michael Scott',
+    'Elena Vasquez',
+    'James Park',
+    'Luna Rivera',
+  ];
 
   for (let i = 0; i < 5; i++) {
     const joinDate = new Date(
@@ -100,7 +104,10 @@ const generateMockWriters = () => {
         location: ['Seattle', 'Austin', 'Denver', 'Portland', 'San Francisco'][
           Math.floor(Math.random() * 5)
         ],
-        genres: ['Fantasy', 'Romance', 'Sci-Fi'].slice(0, Math.floor(Math.random() * 3) + 1),
+        genres: ['Fantasy', 'Romance', 'Sci-Fi'].slice(
+          0,
+          Math.floor(Math.random() * 3) + 1
+        ),
         writingStats: {
           novelsPublished: Math.floor(Math.random() * 10) + 1,
           chaptersWritten: Math.floor(Math.random() * 200) + 50,
@@ -147,11 +154,15 @@ export const userService = {
       }
 
       if (params.status) {
-        filteredUsers = filteredUsers.filter((user) => user.status === params.status);
+        filteredUsers = filteredUsers.filter(
+          (user) => user.status === params.status
+        );
       }
 
       if (params.userType) {
-        filteredUsers = filteredUsers.filter((user) => user.userType === params.userType);
+        filteredUsers = filteredUsers.filter(
+          (user) => user.userType === params.userType
+        );
       }
 
       // Apply pagination

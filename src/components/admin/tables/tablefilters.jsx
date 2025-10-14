@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   Form,
@@ -84,7 +84,18 @@ const TableFilters = ({
 
   // Render filter component based on type
   const renderFilter = (filter) => {
-    const { key, label, type, options = [], placeholder, width, rules = [], ...props } = filter;
+    const {
+      // eslint-disable-next-line no-unused-vars
+      key,
+      label,
+      type,
+      options = [],
+      placeholder,
+      width,
+      // eslint-disable-next-line no-unused-vars
+      rules = [],
+      ...props
+    } = filter;
 
     const commonProps = {
       placeholder: placeholder || `Select ${label}`,
@@ -96,11 +107,19 @@ const TableFilters = ({
     switch (type) {
       case 'text':
       case 'search':
-        return <Input {...commonProps} prefix={type === 'search' ? <SearchOutlined /> : null} />;
+        return (
+          <Input
+            {...commonProps}
+            prefix={type === 'search' ? <SearchOutlined /> : null}
+          />
+        );
 
       case 'select':
         return (
-          <Select {...commonProps} mode={props.multiple ? 'multiple' : undefined}>
+          <Select
+            {...commonProps}
+            mode={props.multiple ? 'multiple' : undefined}
+          >
             {options.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
@@ -132,8 +151,16 @@ const TableFilters = ({
       case 'numberrange':
         return (
           <Input.Group compact>
-            <InputNumber placeholder="Min" style={{ width: '50%' }} {...props.minProps} />
-            <InputNumber placeholder="Max" style={{ width: '50%' }} {...props.maxProps} />
+            <InputNumber
+              placeholder="Min"
+              style={{ width: '50%' }}
+              {...props.minProps}
+            />
+            <InputNumber
+              placeholder="Max"
+              style={{ width: '50%' }}
+              {...props.maxProps}
+            />
           </Input.Group>
         );
 
@@ -199,7 +226,12 @@ const TableFilters = ({
         <Space wrap>
           {tags}
           {tags.length > 0 && (
-            <Button type="link" size="small" onClick={handleReset} icon={<ClearOutlined />}>
+            <Button
+              type="link"
+              size="small"
+              onClick={handleReset}
+              icon={<ClearOutlined />}
+            >
               Clear All
             </Button>
           )}
@@ -229,7 +261,11 @@ const TableFilters = ({
             <Row gutter={[16, 16]}>
               {quickFilters.map((filter) => (
                 <Col key={filter.key} span={filter.span || 6}>
-                  <Form.Item name={filter.key} label={filter.label} rules={filter.rules}>
+                  <Form.Item
+                    name={filter.key}
+                    label={filter.label}
+                    rules={filter.rules}
+                  >
                     {renderFilter(filter)}
                   </Form.Item>
                 </Col>
@@ -263,7 +299,11 @@ const TableFilters = ({
               <Row gutter={[16, 16]}>
                 {advancedFilters.map((filter) => (
                   <Col key={filter.key} span={filter.span || 8}>
-                    <Form.Item name={filter.key} label={filter.label} rules={filter.rules}>
+                    <Form.Item
+                      name={filter.key}
+                      label={filter.label}
+                      rules={filter.rules}
+                    >
                       {renderFilter(filter)}
                     </Form.Item>
                   </Col>
@@ -276,7 +316,10 @@ const TableFilters = ({
         {/* Action Buttons */}
         <Row justify="end" style={{ marginTop: 16 }}>
           <Space>
-            <Button onClick={handleReset} disabled={getActiveFilterCount() === 0}>
+            <Button
+              onClick={handleReset}
+              disabled={getActiveFilterCount() === 0}
+            >
               Reset
             </Button>
             <Button

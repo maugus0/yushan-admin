@@ -65,7 +65,10 @@ const CustomAreaChart = ({
       {...props}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <AreaChart
+          data={data}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
           <defs>
             {areaConfig.map((area, index) => (
               <linearGradient
@@ -82,7 +85,12 @@ const CustomAreaChart = ({
             ))}
           </defs>
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
-          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+          <XAxis
+            dataKey="name"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12 }}
+          />
           <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
           <Tooltip
             formatter={formatTooltip}

@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Badge, Tag } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Button, Space, Table, Tooltip, Badge } from 'antd';
 import {
   PlusOutlined,
   TagsOutlined,
   BookOutlined,
   CalendarOutlined,
-  EditOutlined,
-  DeleteOutlined,
   FolderOutlined,
 } from '@ant-design/icons';
 import {
@@ -35,7 +33,8 @@ const Categories = () => {
     {
       id: 1,
       name: 'Fantasy',
-      description: 'Stories with magical elements, mythical creatures, and supernatural powers',
+      description:
+        'Stories with magical elements, mythical creatures, and supernatural powers',
       novelCount: 450,
       status: 'active',
       color: '#722ed1',
@@ -115,14 +114,18 @@ const Categories = () => {
 
         // Apply status filter
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         // Apply novel count filter
         if (filters.novelCountRange) {
           const [min, max] = filters.novelCountRange;
           filteredData = filteredData.filter(
-            (item) => item.novelCount >= (min || 0) && item.novelCount <= (max || Infinity)
+            (item) =>
+              item.novelCount >= (min || 0) &&
+              item.novelCount <= (max || Infinity)
           );
         }
 
@@ -143,11 +146,13 @@ const Categories = () => {
         setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchValue, filters, pagination.pageSize, pagination.current]
   );
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters]);
 
   // Filter configuration
@@ -326,9 +331,17 @@ const Categories = () => {
       <PageHeader
         title="Categories Management"
         subtitle="Manage novel categories and genres"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Categories' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Categories' },
+        ]}
         actions={[
-          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
+          <Button
+            key="add"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddNew}
+          >
             Add Category
           </Button>,
         ]}
@@ -375,7 +388,8 @@ const Categories = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} categories`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} categories`,
             }}
             onChange={handleTableChange}
             loading={loading}

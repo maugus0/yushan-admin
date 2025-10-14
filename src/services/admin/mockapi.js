@@ -3,13 +3,17 @@
 
 class MockAPI {
   constructor() {
-    this.delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
+    this.delay = (ms = 500) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // Auth endpoints
   async login(credentials) {
     await this.delay();
-    if (credentials.username === 'admin' && credentials.password === 'admin123') {
+    if (
+      credentials.username === 'admin' &&
+      credentials.password === 'admin123'
+    ) {
       return {
         success: true,
         data: {
@@ -17,7 +21,13 @@ class MockAPI {
           username: 'admin',
           email: 'admin@yushan.com',
           role: 'super_admin',
-          permissions: ['read', 'write', 'delete', 'manage_users', 'manage_content'],
+          permissions: [
+            'read',
+            'write',
+            'delete',
+            'manage_users',
+            'manage_content',
+          ],
           token: 'mock-jwt-token',
         },
       };
@@ -99,15 +109,20 @@ class MockAPI {
       email: `user${i + 1}@example.com`,
       type: i % 3 === 0 ? 'writer' : 'reader',
       status: i % 10 === 0 ? 'suspended' : 'active',
-      joinDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-      lastActive: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      joinDate: new Date(
+        Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
+      ).toISOString(),
+      lastActive: new Date(
+        Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+      ).toISOString(),
       novelsCount: i % 3 === 0 ? Math.floor(Math.random() * 10) : 0,
       chaptersCount: i % 3 === 0 ? Math.floor(Math.random() * 100) : 0,
     }));
 
     const filteredUsers = users.filter((user) => {
       if (type !== 'all' && user.type !== type) return false;
-      if (search && !user.username.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search && !user.username.toLowerCase().includes(search.toLowerCase()))
+        return false;
       return true;
     });
 
@@ -137,13 +152,16 @@ class MockAPI {
       chaptersCount: Math.floor(Math.random() * 100) + 1,
       views: Math.floor(Math.random() * 100000),
       rating: (Math.random() * 5).toFixed(1),
-      createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+      createdAt: new Date(
+        Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
+      ).toISOString(),
       updatedAt: new Date().toISOString(),
     }));
 
     const filteredNovels = novels.filter((novel) => {
       if (status !== 'all' && novel.status !== status) return false;
-      if (search && !novel.title.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search && !novel.title.toLowerCase().includes(search.toLowerCase()))
+        return false;
       return true;
     });
 

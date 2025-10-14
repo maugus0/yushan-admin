@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Space,
@@ -8,12 +8,9 @@ import {
   Select,
   Switch,
   InputNumber,
-  Typography,
-  Divider,
   message,
   Row,
   Col,
-  Upload,
   ColorPicker,
   Slider,
 } from 'antd';
@@ -21,19 +18,15 @@ import {
   SettingOutlined,
   SaveOutlined,
   ReloadOutlined,
-  UploadOutlined,
   GlobalOutlined,
   SecurityScanOutlined,
   DollarOutlined,
-  MailOutlined,
   BellOutlined,
-  DatabaseOutlined,
   ThunderboltOutlined,
   PictureOutlined,
 } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner } from '../../../components/admin/common';
 
-const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -119,6 +112,7 @@ const Settings = () => {
   // Load settings on mount
   useEffect(() => {
     loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load settings from API
@@ -189,7 +183,11 @@ const Settings = () => {
           <>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="siteName" label="Site Name" rules={[{ required: true }]}>
+                <Form.Item
+                  name="siteName"
+                  label="Site Name"
+                  rules={[{ required: true }]}
+                >
                   <Input placeholder="Enter site name" />
                 </Form.Item>
               </Col>
@@ -205,7 +203,10 @@ const Settings = () => {
             </Row>
 
             <Form.Item name="siteDescription" label="Site Description">
-              <TextArea rows={3} placeholder="Brief description of your platform" />
+              <TextArea
+                rows={3}
+                placeholder="Brief description of your platform"
+              />
             </Form.Item>
 
             <Row gutter={16}>
@@ -243,13 +244,21 @@ const Settings = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="maintenanceMode" label="Maintenance Mode" valuePropName="checked">
+                <Form.Item
+                  name="maintenanceMode"
+                  label="Maintenance Mode"
+                  valuePropName="checked"
+                >
                   <Switch checkedChildren="ON" unCheckedChildren="OFF" />
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item name="registrationEnabled" label="User Registration" valuePropName="checked">
+            <Form.Item
+              name="registrationEnabled"
+              label="User Registration"
+              valuePropName="checked"
+            >
               <Switch checkedChildren="Enabled" unCheckedChildren="Disabled" />
             </Form.Item>
           </>
@@ -316,8 +325,15 @@ const Settings = () => {
           <>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="maxChapterLength" label="Max Chapter Length (words)">
-                  <InputNumber min={1000} max={50000} style={{ width: '100%' }} />
+                <Form.Item
+                  name="maxChapterLength"
+                  label="Max Chapter Length (words)"
+                >
+                  <InputNumber
+                    min={1000}
+                    max={50000}
+                    style={{ width: '100%' }}
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -339,7 +355,10 @@ const Settings = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="defaultNovelStatus" label="Default Novel Status">
+                <Form.Item
+                  name="defaultNovelStatus"
+                  label="Default Novel Status"
+                >
                   <Select placeholder="Select status">
                     <Option value="pending">Pending Review</Option>
                     <Option value="approved">Auto-Approved</Option>
@@ -389,7 +408,10 @@ const Settings = () => {
           <>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="yuanExchangeRate" label="Yuan Exchange Rate (USD)">
+                <Form.Item
+                  name="yuanExchangeRate"
+                  label="Yuan Exchange Rate (USD)"
+                >
                   <InputNumber
                     min={0.001}
                     max={1}
@@ -408,13 +430,24 @@ const Settings = () => {
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="authorCommission" label="Author Commission (%)">
-                  <Slider min={50} max={90} marks={{ 50: '50%', 70: '70%', 90: '90%' }} />
+                <Form.Item
+                  name="authorCommission"
+                  label="Author Commission (%)"
+                >
+                  <Slider
+                    min={50}
+                    max={90}
+                    marks={{ 50: '50%', 70: '70%', 90: '90%' }}
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item name="platformFee" label="Platform Fee (%)">
-                  <Slider min={10} max={50} marks={{ 10: '10%', 30: '30%', 50: '50%' }} />
+                  <Slider
+                    min={10}
+                    max={50}
+                    marks={{ 10: '10%', 30: '30%', 50: '50%' }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -429,7 +462,11 @@ const Settings = () => {
             </Form.Item>
 
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Form.Item name="enableTipping" label="Enable Tipping" valuePropName="checked">
+              <Form.Item
+                name="enableTipping"
+                label="Enable Tipping"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item
@@ -488,7 +525,11 @@ const Settings = () => {
                   >
                     <Switch />
                   </Form.Item>
-                  <Form.Item name="systemAlerts" label="System Alerts" valuePropName="checked">
+                  <Form.Item
+                    name="systemAlerts"
+                    label="System Alerts"
+                    valuePropName="checked"
+                  >
                     <Switch />
                   </Form.Item>
                   <Form.Item
@@ -502,7 +543,10 @@ const Settings = () => {
               </Col>
             </Row>
 
-            <Form.Item name="notificationBatchSize" label="Notification Batch Size">
+            <Form.Item
+              name="notificationBatchSize"
+              label="Notification Batch Size"
+            >
               <InputNumber min={10} max={1000} style={{ width: '100%' }} />
             </Form.Item>
           </>
@@ -518,7 +562,10 @@ const Settings = () => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="sessionTimeout" label="Session Timeout (hours)">
+                <Form.Item
+                  name="sessionTimeout"
+                  label="Session Timeout (hours)"
+                >
                   <InputNumber min={1} max={168} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
@@ -529,7 +576,10 @@ const Settings = () => {
             </Form.Item>
 
             <Form.Item name="ipWhitelist" label="IP Whitelist">
-              <TextArea rows={3} placeholder="Enter IP addresses separated by commas" />
+              <TextArea
+                rows={3}
+                placeholder="Enter IP addresses separated by commas"
+              />
             </Form.Item>
 
             <Space direction="vertical" style={{ width: '100%' }}>
@@ -547,7 +597,11 @@ const Settings = () => {
               >
                 <Switch />
               </Form.Item>
-              <Form.Item name="enableCaptcha" label="Enable CAPTCHA" valuePropName="checked">
+              <Form.Item
+                name="enableCaptcha"
+                label="Enable CAPTCHA"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item
@@ -567,12 +621,23 @@ const Settings = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="cacheExpiry" label="Cache Expiry (seconds)">
-                  <InputNumber min={300} max={86400} style={{ width: '100%' }} />
+                  <InputNumber
+                    min={300}
+                    max={86400}
+                    style={{ width: '100%' }}
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="maxConcurrentUsers" label="Max Concurrent Users">
-                  <InputNumber min={1000} max={100000} style={{ width: '100%' }} />
+                <Form.Item
+                  name="maxConcurrentUsers"
+                  label="Max Concurrent Users"
+                >
+                  <InputNumber
+                    min={1000}
+                    max={100000}
+                    style={{ width: '100%' }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -582,7 +647,11 @@ const Settings = () => {
             </Form.Item>
 
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Form.Item name="enableCaching" label="Enable Caching" valuePropName="checked">
+              <Form.Item
+                name="enableCaching"
+                label="Enable Caching"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item
@@ -592,7 +661,11 @@ const Settings = () => {
               >
                 <Switch />
               </Form.Item>
-              <Form.Item name="enableCDN" label="Enable CDN" valuePropName="checked">
+              <Form.Item
+                name="enableCDN"
+                label="Enable CDN"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
               <Form.Item
@@ -602,7 +675,11 @@ const Settings = () => {
               >
                 <Switch />
               </Form.Item>
-              <Form.Item name="enableBackups" label="Enable Backups" valuePropName="checked">
+              <Form.Item
+                name="enableBackups"
+                label="Enable Backups"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
             </Space>
@@ -619,7 +696,10 @@ const Settings = () => {
       <PageHeader
         title="Platform Settings"
         subtitle="Configure and manage platform settings"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Settings' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Settings' },
+        ]}
         actions={[
           <Button
             key="reset"
@@ -673,7 +753,10 @@ const Settings = () => {
             title={
               <Space>
                 {sections.find((s) => s.key === activeSection)?.icon}
-                <span>{sections.find((s) => s.key === activeSection)?.label} Settings</span>
+                <span>
+                  {sections.find((s) => s.key === activeSection)?.label}{' '}
+                  Settings
+                </span>
               </Space>
             }
             loading={loading}

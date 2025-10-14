@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Layout, Button, Dropdown, Avatar, Space, Typography, Badge, Tooltip } from 'antd';
+import {
+  Layout,
+  Button,
+  Dropdown,
+  Avatar,
+  Space,
+  Typography,
+  Badge,
+  Tooltip,
+} from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -75,17 +84,25 @@ const AdminHeader = ({
     },
   ];
 
-  const notificationMenuItems = notifications.slice(0, 5).map((notification, index) => ({
-    key: `notification-${index}`,
-    label: (
-      <div style={{ maxWidth: 250 }}>
-        <div style={{ fontWeight: 500, marginBottom: 4 }}>{notification.title}</div>
-        <div style={{ fontSize: 12, color: '#666' }}>{notification.description}</div>
-        <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>{notification.time}</div>
-      </div>
-    ),
-    onClick: () => onNotificationClick && onNotificationClick(notification),
-  }));
+  const notificationMenuItems = notifications
+    .slice(0, 5)
+    .map((notification, index) => ({
+      key: `notification-${index}`,
+      label: (
+        <div style={{ maxWidth: 250 }}>
+          <div style={{ fontWeight: 500, marginBottom: 4 }}>
+            {notification.title}
+          </div>
+          <div style={{ fontSize: 12, color: '#666' }}>
+            {notification.description}
+          </div>
+          <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+            {notification.time}
+          </div>
+        </div>
+      ),
+      onClick: () => onNotificationClick && onNotificationClick(notification),
+    }));
 
   if (notifications.length > 5) {
     notificationMenuItems.push(
@@ -152,7 +169,13 @@ const AdminHeader = ({
           <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}>
             <Button
               type="text"
-              icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+              icon={
+                isFullscreen ? (
+                  <FullscreenExitOutlined />
+                ) : (
+                  <FullscreenOutlined />
+                )
+              }
               onClick={handleFullscreen}
               style={{ fontSize: '16px' }}
             />
@@ -167,7 +190,11 @@ const AdminHeader = ({
             trigger={['click']}
           >
             <Badge count={unreadCount} size="small">
-              <Button type="text" icon={<BellOutlined />} style={{ fontSize: '16px' }} />
+              <Button
+                type="text"
+                icon={<BellOutlined />}
+                style={{ fontSize: '16px' }}
+              />
             </Badge>
           </Dropdown>
         )}
@@ -179,18 +206,33 @@ const AdminHeader = ({
             arrow
             trigger={['click']}
           >
-            <Space style={{ cursor: 'pointer', padding: '8px 12px', borderRadius: '6px' }}>
+            <Space
+              style={{
+                cursor: 'pointer',
+                padding: '8px 12px',
+                borderRadius: '6px',
+              }}
+            >
               <Avatar
                 size="small"
                 src={admin.avatar}
                 icon={!admin.avatar && <UserOutlined />}
                 style={{ backgroundColor: '#1890ff' }}
               />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                }}
+              >
                 <Text strong style={{ fontSize: '14px', lineHeight: 1.2 }}>
                   {admin.username}
                 </Text>
-                <Text type="secondary" style={{ fontSize: '12px', lineHeight: 1.2 }}>
+                <Text
+                  type="secondary"
+                  style={{ fontSize: '12px', lineHeight: 1.2 }}
+                >
                   {admin.role?.replace('_', ' ') || 'Admin'}
                 </Text>
               </div>

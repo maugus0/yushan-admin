@@ -1,5 +1,9 @@
 import { Card, Typography, Space, Button, Dropdown } from 'antd';
-import { MoreOutlined, DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
+import {
+  MoreOutlined,
+  DownloadOutlined,
+  FullscreenOutlined,
+} from '@ant-design/icons';
 
 const { Title } = Typography;
 

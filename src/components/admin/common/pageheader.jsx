@@ -19,7 +19,7 @@ const PageHeader = ({
   style = {},
   className = '',
   children,
-  ...props
+  ..._props
 }) => {
   const backIcon = showBackButton ? <ArrowLeftOutlined /> : null;
 
@@ -77,7 +77,11 @@ const PageHeader = ({
               {subtitle && (
                 <Text
                   type="secondary"
-                  style={{ fontSize: '14px', display: 'block', marginTop: '4px' }}
+                  style={{
+                    fontSize: '14px',
+                    display: 'block',
+                    marginTop: '4px',
+                  }}
                 >
                   {subtitle}
                 </Text>
@@ -87,7 +91,9 @@ const PageHeader = ({
           </Space>
         </div>
 
-        {(actions.length > 0 || extra) && <div style={{ marginLeft: '16px' }}>{headerExtra}</div>}
+        {(actions.length > 0 || extra) && (
+          <div style={{ marginLeft: '16px' }}>{headerExtra}</div>
+        )}
       </div>
 
       {/* Footer */}

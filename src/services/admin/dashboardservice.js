@@ -1,7 +1,11 @@
 import api from './api';
 
 // Generate realistic time-series data
-const generateTimeSeriesData = (days = 30, baseValue = 1000, variance = 0.2) => {
+const generateTimeSeriesData = (
+  days = 30,
+  baseValue = 1000,
+  variance = 0.2
+) => {
   const data = [];
   let currentValue = baseValue;
 
@@ -29,6 +33,7 @@ export const dashboardService = {
       await api.delay(400);
 
       const now = new Date();
+      // eslint-disable-next-line no-unused-vars
       const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
       return {
@@ -377,7 +382,9 @@ export const dashboardService = {
               id: 2,
               type: 'info',
               message: 'Backup completed successfully',
-              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              timestamp: new Date(
+                Date.now() - 2 * 60 * 60 * 1000
+              ).toISOString(),
             },
           ],
         },
@@ -388,7 +395,7 @@ export const dashboardService = {
   },
 
   // Get top content
-  getTopContent: async (type = 'novels', period = '7d', limit = 10) => {
+  getTopContent: async (_type = 'novels', _period = '7d', limit = 10) => {
     try {
       await api.delay(400);
 

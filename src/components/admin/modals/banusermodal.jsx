@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
-import { Modal, Form, Input, Select, DatePicker, Checkbox, Space, message } from 'antd';
-import { ExclamationCircleOutlined, UserDeleteOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Checkbox,
+  Space,
+  message,
+} from 'antd';
+import {
+  ExclamationCircleOutlined,
+  UserDeleteOutlined,
+} from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = false }) => {
+const BanUserModal = ({
+  visible,
+  onCancel,
+  onConfirm,
+  user = null,
+  loading = false,
+}) => {
   const [form] = Form.useForm();
   const [banType, setBanType] = useState('temporary');
 
@@ -28,7 +46,10 @@ const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = fal
         publicReason: values.publicReason,
         adminNotes: values.adminNotes,
         banDate: new Date().toISOString(),
-        expiresAt: values.banType === 'permanent' ? null : values.expiresAt?.toISOString(),
+        expiresAt:
+          values.banType === 'permanent'
+            ? null
+            : values.expiresAt?.toISOString(),
       };
 
       await onConfirm(banData);
@@ -63,10 +84,12 @@ const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = fal
       destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
-        <ExclamationCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />
+        <ExclamationCircleOutlined
+          style={{ color: '#faad14', marginRight: 8 }}
+        />
         <span style={{ color: '#666' }}>
-          This action will restrict the user's access to the platform. Please provide a clear
-          reason.
+          This action will restrict the user's access to the platform. Please
+          provide a clear reason.
         </span>
       </div>
 
@@ -94,7 +117,9 @@ const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = fal
           <Form.Item
             name="expiresAt"
             label="Ban Expires At"
-            rules={[{ required: true, message: 'Please select expiration date' }]}
+            rules={[
+              { required: true, message: 'Please select expiration date' },
+            ]}
           >
             <DatePicker
               showTime
@@ -118,7 +143,9 @@ const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = fal
             <Option value="harassment">Harassment/Bullying</Option>
             <Option value="inappropriate_content">Inappropriate Content</Option>
             <Option value="copyright_violation">Copyright Violation</Option>
-            <Option value="multiple_violations">Multiple Policy Violations</Option>
+            <Option value="multiple_violations">
+              Multiple Policy Violations
+            </Option>
             <Option value="fraud">Fraudulent Activity</Option>
             <Option value="other">Other (specify below)</Option>
           </Select>
@@ -127,7 +154,9 @@ const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = fal
         <Form.Item
           name="publicReason"
           label="Public Reason (shown to user)"
-          rules={[{ required: true, message: 'Please provide a public reason' }]}
+          rules={[
+            { required: true, message: 'Please provide a public reason' },
+          ]}
         >
           <TextArea
             rows={3}
@@ -148,7 +177,9 @@ const BanUserModal = ({ visible, onCancel, onConfirm, user = null, loading = fal
 
         <Space direction="vertical" style={{ width: '100%' }}>
           <Form.Item name="deleteContent" valuePropName="checked">
-            <Checkbox>Delete all user's content (novels, comments, reviews)</Checkbox>
+            <Checkbox>
+              Delete all user's content (novels, comments, reviews)
+            </Checkbox>
           </Form.Item>
 
           <Form.Item name="notifyUser" valuePropName="checked">

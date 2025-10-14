@@ -230,7 +230,8 @@ const generateMockSettings = () => {
     seo: {
       // Meta settings
       defaultMetaTitle: 'Yushan - Premium Novel Reading Platform',
-      defaultMetaDescription: 'Discover, read, and share amazing novels on Yushan platform.',
+      defaultMetaDescription:
+        'Discover, read, and share amazing novels on Yushan platform.',
       defaultMetaKeywords: 'novels, reading, books, stories, fiction',
 
       // Social media
@@ -409,6 +410,7 @@ export const settingsService = {
     try {
       await api.delay(1000); // Simulate email sending delay
 
+      // eslint-disable-next-line no-unused-vars
       const { recipient, subject, message } = emailData;
 
       // Simulate email test
@@ -425,7 +427,9 @@ export const settingsService = {
           },
         };
       } else {
-        throw new Error('Failed to send test email. Please check SMTP configuration.');
+        throw new Error(
+          'Failed to send test email. Please check SMTP configuration.'
+        );
       }
     } catch (error) {
       throw new Error(error.message || 'Failed to test email settings');
@@ -446,20 +450,38 @@ export const settingsService = {
           if (!settingsData.siteName || settingsData.siteName.length < 3) {
             errors.push('Site name must be at least 3 characters long');
           }
-          if (!settingsData.adminEmail || !isValidEmail(settingsData.adminEmail)) {
+          if (
+            !settingsData.adminEmail ||
+            !isValidEmail(settingsData.adminEmail)
+          ) {
             errors.push('Valid admin email is required');
           }
-          if (settingsData.passwordMinLength && settingsData.passwordMinLength < 6) {
-            warnings.push('Password minimum length less than 6 is not recommended');
+          if (
+            settingsData.passwordMinLength &&
+            settingsData.passwordMinLength < 6
+          ) {
+            warnings.push(
+              'Password minimum length less than 6 is not recommended'
+            );
           }
           break;
 
         case 'content':
-          if (settingsData.maxChapterLength && settingsData.maxChapterLength < 100) {
-            errors.push('Maximum chapter length must be at least 100 characters');
+          if (
+            settingsData.maxChapterLength &&
+            settingsData.maxChapterLength < 100
+          ) {
+            errors.push(
+              'Maximum chapter length must be at least 100 characters'
+            );
           }
-          if (settingsData.maxCommentLength && settingsData.maxCommentLength < 50) {
-            warnings.push('Very short comment length may limit user expression');
+          if (
+            settingsData.maxCommentLength &&
+            settingsData.maxCommentLength < 50
+          ) {
+            warnings.push(
+              'Very short comment length may limit user expression'
+            );
           }
           break;
 
@@ -468,18 +490,24 @@ export const settingsService = {
             errors.push('SMTP host and username are required');
           }
           if (settingsData.emailRateLimit && settingsData.emailRateLimit < 10) {
-            warnings.push('Very low email rate limit may cause delivery delays');
+            warnings.push(
+              'Very low email rate limit may cause delivery delays'
+            );
           }
           break;
 
         case 'payment':
           if (
             settingsData.authorCommissionRate &&
-            (settingsData.authorCommissionRate < 0 || settingsData.authorCommissionRate > 100)
+            (settingsData.authorCommissionRate < 0 ||
+              settingsData.authorCommissionRate > 100)
           ) {
             errors.push('Author commission rate must be between 0 and 100');
           }
-          if (settingsData.minimumPayoutAmount && settingsData.minimumPayoutAmount < 1) {
+          if (
+            settingsData.minimumPayoutAmount &&
+            settingsData.minimumPayoutAmount < 1
+          ) {
             errors.push('Minimum payout amount must be at least $1');
           }
           break;
@@ -569,10 +597,14 @@ export const settingsService = {
 
       // Validate import data
       const requiredCategories = ['system', 'content', 'user', 'moderation'];
-      const missingCategories = requiredCategories.filter((cat) => !settings[cat]);
+      const missingCategories = requiredCategories.filter(
+        (cat) => !settings[cat]
+      );
 
       if (missingCategories.length > 0) {
-        throw new Error(`Missing required categories: ${missingCategories.join(', ')}`);
+        throw new Error(
+          `Missing required categories: ${missingCategories.join(', ')}`
+        );
       }
 
       // Import settings
@@ -615,7 +647,8 @@ export const settingsService = {
       for (let i = 0; i < limit; i++) {
         const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000); // Past days
         const categories = category ? [category] : Object.keys(mockSettings);
-        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const randomCategory =
+          categories[Math.floor(Math.random() * categories.length)];
 
         history.push({
           id: i + 1,
@@ -648,15 +681,51 @@ export const settingsService = {
       await api.delay(200);
 
       const categories = [
-        { id: 'system', name: 'System', description: 'Core system configuration' },
-        { id: 'content', name: 'Content', description: 'Content management settings' },
-        { id: 'user', name: 'User', description: 'User management and preferences' },
-        { id: 'moderation', name: 'Moderation', description: 'Content moderation settings' },
-        { id: 'analytics', name: 'Analytics', description: 'Analytics and tracking settings' },
-        { id: 'email', name: 'Email', description: 'Email configuration and templates' },
-        { id: 'seo', name: 'SEO', description: 'Search engine optimization settings' },
-        { id: 'payment', name: 'Payment', description: 'Payment gateway and billing settings' },
-        { id: 'storage', name: 'Storage', description: 'File storage and CDN settings' },
+        {
+          id: 'system',
+          name: 'System',
+          description: 'Core system configuration',
+        },
+        {
+          id: 'content',
+          name: 'Content',
+          description: 'Content management settings',
+        },
+        {
+          id: 'user',
+          name: 'User',
+          description: 'User management and preferences',
+        },
+        {
+          id: 'moderation',
+          name: 'Moderation',
+          description: 'Content moderation settings',
+        },
+        {
+          id: 'analytics',
+          name: 'Analytics',
+          description: 'Analytics and tracking settings',
+        },
+        {
+          id: 'email',
+          name: 'Email',
+          description: 'Email configuration and templates',
+        },
+        {
+          id: 'seo',
+          name: 'SEO',
+          description: 'Search engine optimization settings',
+        },
+        {
+          id: 'payment',
+          name: 'Payment',
+          description: 'Payment gateway and billing settings',
+        },
+        {
+          id: 'storage',
+          name: 'Storage',
+          description: 'File storage and CDN settings',
+        },
       ];
 
       return {

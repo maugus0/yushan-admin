@@ -19,11 +19,19 @@ const LoadingSpinner = ({
   fullScreen = false,
   ...props
 }) => {
-  const customIndicator = indicator || <LoadingOutlined style={{ fontSize: 24 }} spin />;
+  const customIndicator = indicator || (
+    <LoadingOutlined style={{ fontSize: 24 }} spin />
+  );
 
   const spinnerContent = (
     <Space direction="vertical" align="center" style={{ width: '100%' }}>
-      <Spin spinning={spinning} size={size} indicator={customIndicator} delay={delay} {...props}>
+      <Spin
+        spinning={spinning}
+        size={size}
+        indicator={customIndicator}
+        delay={delay}
+        {...props}
+      >
         {children}
       </Spin>
       {showText && tip && (
@@ -105,11 +113,21 @@ const LoadingSpinner = ({
 
 // Pre-configured spinner variations
 export const PageLoader = (props) => (
-  <LoadingSpinner size="large" tip="Loading page..." centered fullScreen {...props} />
+  <LoadingSpinner
+    size="large"
+    tip="Loading page..."
+    centered
+    fullScreen
+    {...props}
+  />
 );
 
 export const TableLoader = (props) => (
-  <LoadingSpinner tip="Loading data..." style={{ minHeight: '300px' }} {...props} />
+  <LoadingSpinner
+    tip="Loading data..."
+    style={{ minHeight: '300px' }}
+    {...props}
+  />
 );
 
 export const ButtonLoader = (props) => (

@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layout } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../contexts/admin/adminauthcontext';
-import { AdminHeader, AdminSidebar, ErrorBoundary } from '../../components/admin/common';
+import {
+  AdminHeader,
+  AdminSidebar,
+  ErrorBoundary,
+} from '../../components/admin/common';
 
 const { Content } = Layout;
 
@@ -86,14 +90,19 @@ const AdminLayout = () => {
   return (
     <ErrorBoundary>
       <Layout style={{ minHeight: '100vh' }}>
-        <AdminSidebar collapsed={collapsed} notifications={sidebarNotifications} />
+        <AdminSidebar
+          collapsed={collapsed}
+          notifications={sidebarNotifications}
+        />
 
         <Layout>
           <AdminHeader
             collapsed={collapsed}
             onToggleCollapsed={handleToggleCollapsed}
             notifications={mockNotifications}
-            unreadCount={sidebarNotifications.users + sidebarNotifications.reports}
+            unreadCount={
+              sidebarNotifications.users + sidebarNotifications.reports
+            }
             onUserMenuClick={handleUserMenuClick}
             onNotificationClick={handleNotificationClick}
             showSearch={true}

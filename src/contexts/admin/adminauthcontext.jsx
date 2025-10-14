@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { message } from 'antd';
 
 const AdminAuthContext = createContext();
@@ -34,13 +34,22 @@ export const AdminAuthProvider = ({ children }) => {
       // Mock login - in real app, this would call your API
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
-      if (credentials.username === 'admin' && credentials.password === 'admin123') {
+      if (
+        credentials.username === 'admin' &&
+        credentials.password === 'admin123'
+      ) {
         const mockAdmin = {
           id: 1,
           username: 'admin',
           email: 'admin@yushan.com',
           role: 'super_admin',
-          permissions: ['read', 'write', 'delete', 'manage_users', 'manage_content'],
+          permissions: [
+            'read',
+            'write',
+            'delete',
+            'manage_users',
+            'manage_content',
+          ],
           avatar: null,
           lastLogin: new Date().toISOString(),
         };
@@ -74,5 +83,9 @@ export const AdminAuthProvider = ({ children }) => {
     isAuthenticated: !!admin,
   };
 
-  return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
+  return (
+    <AdminAuthContext.Provider value={value}>
+      {children}
+    </AdminAuthContext.Provider>
+  );
 };
