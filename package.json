@@ -1,7 +1,12 @@
 {
   "name": "yushan-admin",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maugus0/yushan-admin.git"
+  },
   "homepage": "https://maugus0.github.io/yushan-admin",
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
@@ -14,7 +19,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.4",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "recharts": "^3.2.1",
     "web-vitals": "^2.1.4",
     "zustand": "^5.0.8"
@@ -49,6 +54,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "nth-check": "^2.0.1",
+    "webpack-dev-server": "^5.2.1",
+    "postcss": "^8.4.31"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

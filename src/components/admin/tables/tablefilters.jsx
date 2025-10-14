@@ -84,14 +84,15 @@ const TableFilters = ({
 
   // Render filter component based on type
   const renderFilter = (filter) => {
-    // eslint-disable-next-line no-unused-vars
     const {
+      // eslint-disable-next-line no-unused-vars
       key,
       label,
       type,
       options = [],
       placeholder,
       width,
+      // eslint-disable-next-line no-unused-vars
       rules = [],
       ...props
     } = filter;
