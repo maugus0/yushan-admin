@@ -44,7 +44,9 @@ const Breadcrumbs = ({
       if (segment === 'admin') return;
 
       const isLast = index === pathSegments.length - 1;
-      const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/[-_]/g, ' ');
+      const title =
+        segment.charAt(0).toUpperCase() +
+        segment.slice(1).replace(/[-_]/g, ' ');
 
       if (isLast) {
         // Last item should not be a link
@@ -60,7 +62,8 @@ const Breadcrumbs = ({
   };
 
   // Use provided items or auto-generate
-  const breadcrumbItems = items.length > 0 ? items : autoGenerate ? generateBreadcrumbs() : [];
+  const breadcrumbItems =
+    items.length > 0 ? items : autoGenerate ? generateBreadcrumbs() : [];
 
   // If no items and not auto-generating, don't render
   if (breadcrumbItems.length === 0) {

@@ -80,7 +80,12 @@ const generateMockComments = () => {
         originalContent: null, // For edited comments
 
         // Status and moderation
-        status: Math.random() > 0.05 ? 'approved' : Math.random() > 0.5 ? 'pending' : 'rejected',
+        status:
+          Math.random() > 0.05
+            ? 'approved'
+            : Math.random() > 0.5
+              ? 'pending'
+              : 'rejected',
         isEdited: Math.random() > 0.9,
         isReported: Math.random() > 0.98,
         isSpam: Math.random() > 0.995,
@@ -93,7 +98,8 @@ const generateMockComments = () => {
         replyCount: hasReplies ? Math.floor(Math.random() * 5) + 1 : 0,
 
         // Moderation info
-        reportCount: Math.random() > 0.98 ? Math.floor(Math.random() * 5) + 1 : 0,
+        reportCount:
+          Math.random() > 0.98 ? Math.floor(Math.random() * 5) + 1 : 0,
         moderatedBy: Math.random() > 0.95 ? 'moderator_alex' : null,
         moderatedAt: Math.random() > 0.95 ? new Date().toISOString() : null,
         moderationReason: null,
@@ -148,17 +154,23 @@ export const commentService = {
 
       // Filter by novel
       if (novelId) {
-        comments = comments.filter((comment) => comment.novelId === parseInt(novelId));
+        comments = comments.filter(
+          (comment) => comment.novelId === parseInt(novelId)
+        );
       }
 
       // Filter by chapter
       if (chapterId) {
-        comments = comments.filter((comment) => comment.chapterId === parseInt(chapterId));
+        comments = comments.filter(
+          (comment) => comment.chapterId === parseInt(chapterId)
+        );
       }
 
       // Filter by user
       if (userId) {
-        comments = comments.filter((comment) => comment.userId === parseInt(userId));
+        comments = comments.filter(
+          (comment) => comment.userId === parseInt(userId)
+        );
       }
 
       // Filter by status
@@ -168,7 +180,9 @@ export const commentService = {
 
       // Filter by reported status
       if (isReported !== null) {
-        comments = comments.filter((comment) => comment.isReported === isReported);
+        comments = comments.filter(
+          (comment) => comment.isReported === isReported
+        );
       }
 
       // Search filter
@@ -226,7 +240,12 @@ export const commentService = {
     try {
       await api.delay(400);
 
-      const { page = 1, pageSize = 50, includeReplies = true, status = 'approved' } = params;
+      const {
+        page = 1,
+        pageSize = 50,
+        includeReplies = true,
+        status = 'approved',
+      } = params;
 
       let comments = mockComments.filter((comment) => {
         if (targetType === 'novel') {
@@ -348,7 +367,9 @@ export const commentService = {
 
       // Update reply count for parent comment
       if (commentData.parentId) {
-        const parentComment = mockComments.find((c) => c.id === commentData.parentId);
+        const parentComment = mockComments.find(
+          (c) => c.id === commentData.parentId
+        );
         if (parentComment) {
           parentComment.replyCount += 1;
         }
@@ -383,7 +404,10 @@ export const commentService = {
       };
 
       // Mark as edited if content changed
-      if (updateData.content && updateData.content !== originalComment.content) {
+      if (
+        updateData.content &&
+        updateData.content !== originalComment.content
+      ) {
         updatedComment.isEdited = true;
         updatedComment.editedAt = new Date().toISOString();
         updatedComment.originalContent = originalComment.content;
@@ -414,7 +438,9 @@ export const commentService = {
       const deletedComment = mockComments[commentIndex];
 
       // Also delete all replies
-      const repliesToDelete = mockComments.filter((c) => c.parentId === parseInt(id));
+      const repliesToDelete = mockComments.filter(
+        (c) => c.parentId === parseInt(id)
+      );
       repliesToDelete.forEach((reply) => {
         const replyIndex = mockComments.findIndex((c) => c.id === reply.id);
         if (replyIndex !== -1) {
@@ -427,7 +453,9 @@ export const commentService = {
 
       // Update parent reply count if this was a reply
       if (deletedComment.parentId) {
-        const parentComment = mockComments.find((c) => c.id === deletedComment.parentId);
+        const parentComment = mockComments.find(
+          (c) => c.id === deletedComment.parentId
+        );
         if (parentComment) {
           parentComment.replyCount = Math.max(0, parentComment.replyCount - 1);
         }
@@ -484,7 +512,9 @@ export const commentService = {
       const moderatedComments = [];
 
       ids.forEach((id) => {
-        const commentIndex = mockComments.findIndex((c) => c.id === parseInt(id));
+        const commentIndex = mockComments.findIndex(
+          (c) => c.id === parseInt(id)
+        );
         if (commentIndex !== -1) {
           mockComments[commentIndex] = {
             ...mockComments[commentIndex],
@@ -521,9 +551,13 @@ export const commentService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
 
-      const periodComments = comments.filter((c) => new Date(c.createdAt) >= startDate);
+      const periodComments = comments.filter(
+        (c) => new Date(c.createdAt) >= startDate
+      );
 
       return {
         success: true,
@@ -541,7 +575,8 @@ export const commentService = {
             return acc;
           }, {}),
           engagementRate: (
-            periodComments.reduce((sum, c) => sum + c.likes, 0) / periodComments.length || 0
+            periodComments.reduce((sum, c) => sum + c.likes, 0) /
+              periodComments.length || 0
           ).toFixed(1),
         },
       };
@@ -561,7 +596,8 @@ export const commentService = {
         throw new Error('Comment not found');
       }
 
-      mockComments[commentIndex].isPinned = !mockComments[commentIndex].isPinned;
+      mockComments[commentIndex].isPinned =
+        !mockComments[commentIndex].isPinned;
       mockComments[commentIndex].updatedAt = new Date().toISOString();
 
       return {

@@ -22,7 +22,9 @@ const CustomLineChart = ({
   ...props
 }) => {
   // Default line configuration
-  const defaultLines = [{ dataKey: 'value', stroke: '#1890ff', strokeWidth: 2, name: 'Value' }];
+  const defaultLines = [
+    { dataKey: 'value', stroke: '#1890ff', strokeWidth: 2, name: 'Value' },
+  ];
 
   const lineConfig = lines.length > 0 ? lines : defaultLines;
 
@@ -56,9 +58,17 @@ const CustomLineChart = ({
       {...props}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <LineChart
+          data={data}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
-          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+          <XAxis
+            dataKey="name"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12 }}
+          />
           <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
           <Tooltip
             formatter={formatTooltip}

@@ -121,13 +121,17 @@ const Chapters = () => {
 
         // Apply filters
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         if (filters.wordCountRange) {
           const [min, max] = filters.wordCountRange;
           filteredData = filteredData.filter(
-            (item) => item.wordCount >= (min || 0) && item.wordCount <= (max || Infinity)
+            (item) =>
+              item.wordCount >= (min || 0) &&
+              item.wordCount <= (max || Infinity)
           );
         }
 
@@ -224,7 +228,9 @@ const Chapters = () => {
             percent={Math.min((count / 3000) * 100, 100)}
             showInfo={false}
             size="small"
-            strokeColor={count >= 3000 ? '#52c41a' : count >= 2000 ? '#faad14' : '#ff4d4f'}
+            strokeColor={
+              count >= 3000 ? '#52c41a' : count >= 2000 ? '#faad14' : '#ff4d4f'
+            }
           />
         </Space>
       ),
@@ -334,9 +340,17 @@ const Chapters = () => {
       <PageHeader
         title="Chapters Management"
         subtitle="Manage and monitor novel chapters"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Chapters' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Chapters' },
+        ]}
         actions={[
-          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
+          <Button
+            key="add"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddNew}
+          >
             Add Chapter
           </Button>,
         ]}
@@ -383,7 +397,8 @@ const Chapters = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} chapters`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} chapters`,
             }}
             onChange={handleTableChange}
             loading={loading}

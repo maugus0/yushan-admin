@@ -1,5 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Avatar, Typography, Tag, Progress } from 'antd';
+import {
+  Button,
+  Space,
+  Table,
+  Tooltip,
+  Avatar,
+  Typography,
+  Tag,
+  Progress,
+} from 'antd';
 import {
   BookOutlined,
   UserOutlined,
@@ -195,7 +204,9 @@ const Library = () => {
             if (activeTab === 'collections') {
               return (
                 item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-                item.description.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.description
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase()) ||
                 item.owner.toLowerCase().includes(searchValue.toLowerCase())
               );
             } else if (activeTab === 'bookmarks') {
@@ -215,15 +226,21 @@ const Library = () => {
 
         // Apply filters
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         if (filters.isPublic !== undefined && activeTab === 'collections') {
-          filteredData = filteredData.filter((item) => item.isPublic === filters.isPublic);
+          filteredData = filteredData.filter(
+            (item) => item.isPublic === filters.isPublic
+          );
         }
 
         if (filters.bookmarkType && activeTab === 'bookmarks') {
-          filteredData = filteredData.filter((item) => item.bookmarkType === filters.bookmarkType);
+          filteredData = filteredData.filter(
+            (item) => item.bookmarkType === filters.bookmarkType
+          );
         }
 
         const pageSize = params.pageSize || pagination.pageSize;
@@ -404,7 +421,9 @@ const Library = () => {
                 </Space>
                 <Text strong>{record.novel}</Text>
                 <Space>
-                  <span style={{ color: typeDisplay.color }}>{typeDisplay.icon}</span>
+                  <span style={{ color: typeDisplay.color }}>
+                    {typeDisplay.icon}
+                  </span>
                   <Tag color={typeDisplay.color}>
                     {record.bookmarkType.replace('_', ' ').toUpperCase()}
                   </Tag>
@@ -442,7 +461,9 @@ const Library = () => {
               <Text strong style={{ fontSize: '15px' }}>
                 {record.novel}
               </Text>
-              <Tag color={getReadingStatusColor(record.status)}>{record.status.toUpperCase()}</Tag>
+              <Tag color={getReadingStatusColor(record.status)}>
+                {record.status.toUpperCase()}
+              </Tag>
             </Space>
           ),
         },
@@ -460,8 +481,8 @@ const Library = () => {
                 status={record.status === 'completed' ? 'success' : 'active'}
               />
               <Text type="secondary" style={{ fontSize: '12px' }}>
-                <ClockCircleOutlined /> {Math.round(record.timeSpent / 60)}h {record.timeSpent % 60}
-                m
+                <ClockCircleOutlined /> {Math.round(record.timeSpent / 60)}h{' '}
+                {record.timeSpent % 60}m
               </Text>
             </Space>
           ),
@@ -499,7 +520,11 @@ const Library = () => {
   const tabs = [
     { key: 'collections', label: 'Collections', icon: <FolderOutlined /> },
     { key: 'bookmarks', label: 'Bookmarks', icon: <BookOutlined /> },
-    { key: 'reading_history', label: 'Reading History', icon: <BarsOutlined /> },
+    {
+      key: 'reading_history',
+      label: 'Reading History',
+      icon: <BarsOutlined />,
+    },
   ];
 
   // Handlers
@@ -603,7 +628,10 @@ const Library = () => {
       <PageHeader
         title="Library Management"
         subtitle="Manage user collections, bookmarks, and reading history"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Library' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Library' },
+        ]}
         actions={[
           <Button key="export" type="default" icon={<DownloadOutlined />}>
             Export Data

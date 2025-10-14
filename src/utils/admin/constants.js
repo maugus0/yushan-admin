@@ -524,7 +524,11 @@ export const validationRules = {
   url: { type: 'url', message: '请输入有效的URL地址' },
   maxLength: (length) => ({ max: length, message: `最多${length}个字符` }),
   minLength: (length) => ({ min: length, message: `至少${length}个字符` }),
-  range: (min, max) => ({ min, max, message: `长度应在${min}-${max}个字符之间` }),
+  range: (min, max) => ({
+    min,
+    max,
+    message: `长度应在${min}-${max}个字符之间`,
+  }),
 };
 
 /**

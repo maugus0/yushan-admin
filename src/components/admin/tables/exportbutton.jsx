@@ -36,7 +36,10 @@ const ExportButton = ({
         .map((header) => {
           const value = row[header];
           // Handle values that might contain commas or quotes
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          if (
+            typeof value === 'string' &&
+            (value.includes(',') || value.includes('"'))
+          ) {
             return `"${value.replace(/"/g, '""')}"`;
           }
           return value || '';
@@ -82,8 +85,12 @@ const ExportButton = ({
 
     try {
       let content, mimeType, extension;
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
-      const selectionSuffix = hasSelection && dataToExport === selectedData ? '_selected' : '';
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/[:.]/g, '-');
+      const selectionSuffix =
+        hasSelection && dataToExport === selectedData ? '_selected' : '';
       const finalFilename = `${filename}${selectionSuffix}_${timestamp}`;
 
       switch (format) {
@@ -94,7 +101,8 @@ const ExportButton = ({
           break;
         case 'excel':
           content = convertToExcel(dataToExport);
-          mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+          mimeType =
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
           extension = 'xlsx';
           break;
         case 'json':
@@ -118,7 +126,9 @@ const ExportButton = ({
         downloadFile(content, `${finalFilename}.${extension}`, mimeType);
       }
 
-      message.success(`Exported ${dataToExport.length} items as ${format.toUpperCase()}`);
+      message.success(
+        `Exported ${dataToExport.length} items as ${format.toUpperCase()}`
+      );
     } catch (error) {
       message.error(`Export failed: ${error.message}`);
       console.error('Export error:', error);
@@ -204,7 +214,12 @@ const ExportButton = ({
       disabled={disabled || (data.length === 0 && selectedData.length === 0)}
       trigger={['click']}
     >
-      <Button icon={<DownloadOutlined />} loading={loading} type={type} size={size}>
+      <Button
+        icon={<DownloadOutlined />}
+        loading={loading}
+        type={type}
+        size={size}
+      >
         Export <DownOutlined />
       </Button>
     </Dropdown>

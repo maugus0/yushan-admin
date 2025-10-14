@@ -81,7 +81,8 @@ const Reports = () => {
       id: 3,
       type: 'copyright_violation',
       reportedContentType: 'novel',
-      reportedContent: 'This novel appears to be plagiarized from an existing published work.',
+      reportedContent:
+        'This novel appears to be plagiarized from an existing published work.',
       reportedItem: 'Novel: Stolen Dreams',
       reportedBy: 'original_author',
       reportedUser: 'plagiarist_writer',
@@ -100,7 +101,8 @@ const Reports = () => {
       id: 4,
       type: 'inappropriate_content',
       reportedContentType: 'chapter',
-      reportedContent: 'Chapter contains explicit content not marked with appropriate warnings.',
+      reportedContent:
+        'Chapter contains explicit content not marked with appropriate warnings.',
       reportedItem: 'Chapter 15: The Forbidden Ritual',
       reportedBy: 'parent_user',
       reportedUser: 'edge_writer',
@@ -151,33 +153,51 @@ const Reports = () => {
         if (searchValue) {
           filteredData = filteredData.filter(
             (item) =>
-              item.reportedContent.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.reportedBy.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.reportedUser.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.reportedItem.toLowerCase().includes(searchValue.toLowerCase()) ||
+              item.reportedContent
+                .toLowerCase()
+                .includes(searchValue.toLowerCase()) ||
+              item.reportedBy
+                .toLowerCase()
+                .includes(searchValue.toLowerCase()) ||
+              item.reportedUser
+                .toLowerCase()
+                .includes(searchValue.toLowerCase()) ||
+              item.reportedItem
+                .toLowerCase()
+                .includes(searchValue.toLowerCase()) ||
               item.reason.toLowerCase().includes(searchValue.toLowerCase())
           );
         }
 
         // Apply filters
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         if (filters.type) {
-          filteredData = filteredData.filter((item) => item.type === filters.type);
+          filteredData = filteredData.filter(
+            (item) => item.type === filters.type
+          );
         }
 
         if (filters.priority) {
-          filteredData = filteredData.filter((item) => item.priority === filters.priority);
+          filteredData = filteredData.filter(
+            (item) => item.priority === filters.priority
+          );
         }
 
         if (filters.category) {
-          filteredData = filteredData.filter((item) => item.category === filters.category);
+          filteredData = filteredData.filter(
+            (item) => item.category === filters.category
+          );
         }
 
         if (filters.assignedTo) {
-          filteredData = filteredData.filter((item) => item.assignedTo === filters.assignedTo);
+          filteredData = filteredData.filter(
+            (item) => item.assignedTo === filters.assignedTo
+          );
         }
 
         const pageSize = params.pageSize || pagination.pageSize;
@@ -298,7 +318,9 @@ const Reports = () => {
               <Text strong>{record.reportedUser}</Text>
             </Space>
             <Space>
-              <span style={{ color: priorityDisplay.color }}>{priorityDisplay.icon}</span>
+              <span style={{ color: priorityDisplay.color }}>
+                {priorityDisplay.icon}
+              </span>
               <Text strong style={{ color: priorityDisplay.color }}>
                 {record.priority.toUpperCase()}
               </Text>
@@ -446,8 +468,12 @@ const Reports = () => {
   // Calculate statistics
   const getStats = () => {
     const pending = mockReports.filter((r) => r.status === 'pending').length;
-    const investigating = mockReports.filter((r) => r.status === 'investigating').length;
-    const critical = mockReports.filter((r) => r.priority === 'critical').length;
+    const investigating = mockReports.filter(
+      (r) => r.status === 'investigating'
+    ).length;
+    const critical = mockReports.filter(
+      (r) => r.priority === 'critical'
+    ).length;
     return { pending, investigating, critical };
   };
 
@@ -458,9 +484,17 @@ const Reports = () => {
       <PageHeader
         title="Reports Management"
         subtitle="Review and resolve user reports and violations"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Reports' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Reports' },
+        ]}
         actions={[
-          <Button key="critical" type="default" danger icon={<ExclamationCircleOutlined />}>
+          <Button
+            key="critical"
+            type="default"
+            danger
+            icon={<ExclamationCircleOutlined />}
+          >
             Critical ({stats.critical})
           </Button>,
           <Button key="investigating" type="default" icon={<EyeOutlined />}>
@@ -511,7 +545,8 @@ const Reports = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} reports`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} reports`,
             }}
             onChange={handleTableChange}
             loading={loading}

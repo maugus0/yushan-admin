@@ -1,12 +1,31 @@
 import { useState } from 'react';
-import { Modal, Form, Input, Select, DatePicker, Checkbox, Space, Typography, message } from 'antd';
-import { ExclamationCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Checkbox,
+  Space,
+  Typography,
+  message,
+} from 'antd';
+import {
+  ExclamationCircleOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Option } = Select;
 const { Text } = Typography;
 
-const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading = false }) => {
+const SuspendUserModal = ({
+  visible,
+  onCancel,
+  onConfirm,
+  user = null,
+  loading = false,
+}) => {
   const [form] = Form.useForm();
   const [suspensionType, setSuspensionType] = useState('temporary');
 
@@ -29,7 +48,10 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
         publicReason: values.publicReason,
         adminNotes: values.adminNotes,
         suspendedAt: new Date().toISOString(),
-        expiresAt: values.suspensionType === 'indefinite' ? null : values.expiresAt?.toISOString(),
+        expiresAt:
+          values.suspensionType === 'indefinite'
+            ? null
+            : values.expiresAt?.toISOString(),
       };
 
       await onConfirm(suspensionData);
@@ -58,15 +80,20 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
       onCancel={handleCancel}
       confirmLoading={loading}
       okText="Suspend User"
-      okButtonProps={{ style: { backgroundColor: '#fa8c16', borderColor: '#fa8c16' } }}
+      okButtonProps={{
+        style: { backgroundColor: '#fa8c16', borderColor: '#fa8c16' },
+      }}
       cancelText="Cancel"
       width={600}
       destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
-        <ExclamationCircleOutlined style={{ color: '#faad14', marginRight: 8 }} />
+        <ExclamationCircleOutlined
+          style={{ color: '#faad14', marginRight: 8 }}
+        />
         <span style={{ color: '#666' }}>
-          This action will temporarily restrict the user's access and activities on the platform.
+          This action will temporarily restrict the user's access and activities
+          on the platform.
         </span>
       </div>
 
@@ -94,7 +121,9 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
           <Form.Item
             name="expiresAt"
             label="Suspension Expires At"
-            rules={[{ required: true, message: 'Please select expiration date' }]}
+            rules={[
+              { required: true, message: 'Please select expiration date' },
+            ]}
           >
             <DatePicker
               showTime
@@ -112,12 +141,16 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
         >
           <Select placeholder="Select a reason for suspension">
             <Option value="spam_content">Posting Spam Content</Option>
-            <Option value="inappropriate_behavior">Inappropriate Behavior</Option>
+            <Option value="inappropriate_behavior">
+              Inappropriate Behavior
+            </Option>
             <Option value="policy_violation">Platform Policy Violation</Option>
             <Option value="harassment">Harassment of Other Users</Option>
             <Option value="fake_accounts">Creating Fake Accounts</Option>
             <Option value="copyright_issues">Copyright-related Issues</Option>
-            <Option value="repeated_warnings">Repeated Warning Violations</Option>
+            <Option value="repeated_warnings">
+              Repeated Warning Violations
+            </Option>
             <Option value="other">Other (specify below)</Option>
           </Select>
         </Form.Item>
@@ -125,7 +158,12 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
         <Form.Item
           name="restrictions"
           label="Specific Restrictions"
-          rules={[{ required: true, message: 'Please select at least one restriction' }]}
+          rules={[
+            {
+              required: true,
+              message: 'Please select at least one restriction',
+            },
+          ]}
         >
           <Select mode="multiple" placeholder="Select restrictions to apply">
             <Option value="posting">Cannot post new content</Option>
@@ -142,7 +180,9 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
         <Form.Item
           name="publicReason"
           label="Public Reason (shown to user)"
-          rules={[{ required: true, message: 'Please provide a public reason' }]}
+          rules={[
+            { required: true, message: 'Please provide a public reason' },
+          ]}
         >
           <TextArea
             rows={3}
@@ -188,7 +228,8 @@ const SuspendUserModal = ({ visible, onCancel, onConfirm, user = null, loading =
           </li>
           <li>
             <Text type="secondary">
-              User will see suspension notice when trying to access restricted features
+              User will see suspension notice when trying to access restricted
+              features
             </Text>
           </li>
           <li>

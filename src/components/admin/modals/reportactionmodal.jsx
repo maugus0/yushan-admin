@@ -1,5 +1,16 @@
 import { useState } from 'react';
-import { Modal, Form, Input, Select, Space, Typography, Card, Tag, Divider, message } from 'antd';
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  Typography,
+  Card,
+  Tag,
+  Divider,
+  message,
+} from 'antd';
 import {
   FlagOutlined,
   UserOutlined,
@@ -12,7 +23,13 @@ const { TextArea } = Input;
 const { Option } = Select;
 const { Text, Paragraph } = Typography;
 
-const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading = false }) => {
+const ReportActionModal = ({
+  visible,
+  onCancel,
+  onResolve,
+  report = {},
+  loading = false,
+}) => {
   const [form] = Form.useForm();
   const [actionType, setActionType] = useState('');
 
@@ -77,9 +94,13 @@ const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading 
         <Space direction="vertical" style={{ width: '100%' }}>
           <Space>
             <Text strong>Report Type:</Text>
-            <Tag color="orange">{report.type?.replace('_', ' ').toUpperCase()}</Tag>
+            <Tag color="orange">
+              {report.type?.replace('_', ' ').toUpperCase()}
+            </Tag>
             <Text strong>Priority:</Text>
-            <Tag color={getPriorityColor(report.priority)}>{report.priority?.toUpperCase()}</Tag>
+            <Tag color={getPriorityColor(report.priority)}>
+              {report.priority?.toUpperCase()}
+            </Tag>
           </Space>
 
           <Space>
@@ -94,7 +115,14 @@ const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading 
 
           <div>
             <Text strong>Reason:</Text>
-            <Paragraph style={{ margin: '4px 0', padding: 8, background: '#fff', borderRadius: 4 }}>
+            <Paragraph
+              style={{
+                margin: '4px 0',
+                padding: 8,
+                background: '#fff',
+                borderRadius: 4,
+              }}
+            >
               {report.reason}
             </Paragraph>
           </div>
@@ -126,7 +154,10 @@ const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading 
           label="Resolution Action"
           rules={[{ required: true, message: 'Please select an action' }]}
         >
-          <Select placeholder="Select resolution action" onChange={setActionType}>
+          <Select
+            placeholder="Select resolution action"
+            onChange={setActionType}
+          >
             <Option value="dismiss">
               <Space>
                 <EyeOutlined style={{ color: '#1890ff' }} />
@@ -178,17 +209,22 @@ const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading 
           </Form.Item>
         )}
 
-        {actionType && ['user_suspension', 'user_ban', 'warning'].includes(actionType) && (
-          <Form.Item name="userAction" label="User Account Action">
-            <Select placeholder="Additional user account actions">
-              <Option value="no_action">No additional action</Option>
-              <Option value="restrict_posting">Restrict posting privileges</Option>
-              <Option value="restrict_comments">Restrict commenting</Option>
-              <Option value="probation">Place on probation</Option>
-              <Option value="require_approval">Require content approval</Option>
-            </Select>
-          </Form.Item>
-        )}
+        {actionType &&
+          ['user_suspension', 'user_ban', 'warning'].includes(actionType) && (
+            <Form.Item name="userAction" label="User Account Action">
+              <Select placeholder="Additional user account actions">
+                <Option value="no_action">No additional action</Option>
+                <Option value="restrict_posting">
+                  Restrict posting privileges
+                </Option>
+                <Option value="restrict_comments">Restrict commenting</Option>
+                <Option value="probation">Place on probation</Option>
+                <Option value="require_approval">
+                  Require content approval
+                </Option>
+              </Select>
+            </Form.Item>
+          )}
 
         <Form.Item
           name="resolution"
@@ -216,7 +252,11 @@ const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading 
         </Form.Item>
 
         <Space direction="vertical" style={{ width: '100%' }}>
-          <Form.Item name="notifyReporter" valuePropName="checked" initialValue={true}>
+          <Form.Item
+            name="notifyReporter"
+            valuePropName="checked"
+            initialValue={true}
+          >
             <Select defaultValue={true} style={{ width: '100%' }}>
               <Option value={true}>Notify reporter of resolution</Option>
               <Option value={false}>Do not notify reporter</Option>
@@ -228,7 +268,10 @@ const ReportActionModal = ({ visible, onCancel, onResolve, report = {}, loading 
             valuePropName="checked"
             initialValue={actionType !== 'dismiss'}
           >
-            <Select defaultValue={actionType !== 'dismiss'} style={{ width: '100%' }}>
+            <Select
+              defaultValue={actionType !== 'dismiss'}
+              style={{ width: '100%' }}
+            >
               <Option value={true}>Notify reported user of action</Option>
               <Option value={false}>Do not notify reported user</Option>
             </Select>

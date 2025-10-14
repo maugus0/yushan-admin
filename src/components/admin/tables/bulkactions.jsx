@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { Space, Button, Dropdown, Typography, Popconfirm, Modal, message } from 'antd';
+import {
+  Space,
+  Button,
+  Dropdown,
+  Typography,
+  Popconfirm,
+  Modal,
+  message,
+} from 'antd';
 import {
   CheckOutlined,
   DeleteOutlined,
@@ -32,7 +40,9 @@ const BulkActions = ({
       setActionLoading((prev) => ({ ...prev, [actionKey]: true }));
       try {
         await onAction(actionKey, selectedRowKeys, selectedRows);
-        message.success(`${actionConfig.label} completed for ${selectedRowKeys.length} items`);
+        message.success(
+          `${actionConfig.label} completed for ${selectedRowKeys.length} items`
+        );
       } catch (error) {
         message.error(`Failed to ${actionConfig.label.toLowerCase()}`);
         console.error('Bulk action error:', error);
@@ -143,7 +153,8 @@ const BulkActions = ({
   return (
     <Space>
       <Text strong>
-        {selectedRowKeys.length} item{selectedRowKeys.length !== 1 ? 's' : ''} selected
+        {selectedRowKeys.length} item{selectedRowKeys.length !== 1 ? 's' : ''}{' '}
+        selected
       </Text>
 
       <Dropdown

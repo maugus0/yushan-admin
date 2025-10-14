@@ -92,15 +92,22 @@ const generateMockReviews = () => {
         novelId,
         rating,
         title: reviewTitles[Math.floor(Math.random() * reviewTitles.length)],
-        content: reviewContents[Math.floor(Math.random() * reviewContents.length)],
+        content:
+          reviewContents[Math.floor(Math.random() * reviewContents.length)],
         wordCount: Math.floor(Math.random() * 200) + 50, // 50-250 words
 
         // Reviewer information
         reviewerId: Math.floor(Math.random() * reviewerNames.length) + 1,
-        reviewerName: reviewerNames[Math.floor(Math.random() * reviewerNames.length)],
+        reviewerName:
+          reviewerNames[Math.floor(Math.random() * reviewerNames.length)],
         reviewerAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${reviewerNames[Math.floor(Math.random() * reviewerNames.length)]}`,
         reviewerLevel: Math.floor(Math.random() * 50) + 1,
-        reviewerBadge: Math.random() > 0.8 ? 'verified' : Math.random() > 0.9 ? 'premium' : null,
+        reviewerBadge:
+          Math.random() > 0.8
+            ? 'verified'
+            : Math.random() > 0.9
+              ? 'premium'
+              : null,
         isVerifiedPurchase: Math.random() > 0.3, // 70% are verified
 
         // Review metadata
@@ -117,7 +124,12 @@ const generateMockReviews = () => {
         replyCount: Math.floor(Math.random() * 10),
 
         // Status and moderation
-        status: Math.random() > 0.02 ? 'approved' : Math.random() > 0.5 ? 'pending' : 'rejected',
+        status:
+          Math.random() > 0.02
+            ? 'approved'
+            : Math.random() > 0.5
+              ? 'pending'
+              : 'rejected',
         isEdited: Math.random() > 0.85,
         isReported: Math.random() > 0.99,
         isFeatured: Math.random() > 0.98,
@@ -148,7 +160,12 @@ const generateMockReviews = () => {
         },
 
         // Reading context
-        platform: Math.random() > 0.3 ? 'web' : Math.random() > 0.5 ? 'mobile' : 'tablet',
+        platform:
+          Math.random() > 0.3
+            ? 'web'
+            : Math.random() > 0.5
+              ? 'mobile'
+              : 'tablet',
         location:
           Math.random() > 0.4
             ? 'US'
@@ -161,7 +178,8 @@ const generateMockReviews = () => {
         // Spoiler and content warnings
         containsSpoilers: Math.random() > 0.9,
         spoilerWarned: Math.random() > 0.95,
-        contentWarnings: Math.random() > 0.98 ? ['violence', 'adult_content'] : [],
+        contentWarnings:
+          Math.random() > 0.98 ? ['violence', 'adult_content'] : [],
 
         // Moderation info
         moderatedBy: Math.random() > 0.98 ? 'moderator_jane' : null,
@@ -224,21 +242,29 @@ export const reviewService = {
 
       // Filter by novel
       if (novelId) {
-        reviews = reviews.filter((review) => review.novelId === parseInt(novelId));
+        reviews = reviews.filter(
+          (review) => review.novelId === parseInt(novelId)
+        );
       }
 
       // Filter by rating
       if (rating) {
-        reviews = reviews.filter((review) => review.rating === parseInt(rating));
+        reviews = reviews.filter(
+          (review) => review.rating === parseInt(rating)
+        );
       }
 
       // Filter by rating range
       if (minRating !== null) {
-        reviews = reviews.filter((review) => review.rating >= parseInt(minRating));
+        reviews = reviews.filter(
+          (review) => review.rating >= parseInt(minRating)
+        );
       }
 
       if (maxRating !== null) {
-        reviews = reviews.filter((review) => review.rating <= parseInt(maxRating));
+        reviews = reviews.filter(
+          (review) => review.rating <= parseInt(maxRating)
+        );
       }
 
       // Filter by status
@@ -272,7 +298,11 @@ export const reviewService = {
         let aValue = a[sortBy];
         let bValue = b[sortBy];
 
-        if (sortBy === 'rating' || sortBy === 'likes' || sortBy === 'helpfulVotes') {
+        if (
+          sortBy === 'rating' ||
+          sortBy === 'likes' ||
+          sortBy === 'helpfulVotes'
+        ) {
           aValue = parseInt(aValue);
           bValue = parseInt(bValue);
         } else if (sortBy === 'createdAt' || sortBy === 'updatedAt') {
@@ -319,17 +349,22 @@ export const reviewService = {
       } = params;
 
       let reviews = mockReviews.filter(
-        (review) => review.novelId === parseInt(novelId) && review.status === 'approved'
+        (review) =>
+          review.novelId === parseInt(novelId) && review.status === 'approved'
       );
 
       // Filter by rating
       if (rating) {
-        reviews = reviews.filter((review) => review.rating === parseInt(rating));
+        reviews = reviews.filter(
+          (review) => review.rating === parseInt(rating)
+        );
       }
 
       // Filter by verified status
       if (verified !== null) {
-        reviews = reviews.filter((review) => review.isVerifiedPurchase === verified);
+        reviews = reviews.filter(
+          (review) => review.isVerifiedPurchase === verified
+        );
       }
 
       // Apply sorting
@@ -531,7 +566,8 @@ export const reviewService = {
         throw new Error('Review not found');
       }
 
-      mockReviews[reviewIndex].isFeatured = !mockReviews[reviewIndex].isFeatured;
+      mockReviews[reviewIndex].isFeatured =
+        !mockReviews[reviewIndex].isFeatured;
       mockReviews[reviewIndex].updatedAt = new Date().toISOString();
 
       return {
@@ -557,9 +593,13 @@ export const reviewService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
 
-      const periodReviews = reviews.filter((r) => new Date(r.createdAt) >= startDate);
+      const periodReviews = reviews.filter(
+        (r) => new Date(r.createdAt) >= startDate
+      );
 
       const ratingDistribution = reviews.reduce((acc, review) => {
         acc[review.rating] = (acc[review.rating] || 0) + 1;
@@ -568,26 +608,33 @@ export const reviewService = {
 
       const averageRating =
         reviews.length > 0
-          ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+          ? (
+              reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            ).toFixed(1)
           : 0;
 
       const averageAspectScores =
         reviews.length > 0
           ? {
-              plot: (reviews.reduce((sum, r) => sum + r.aspects.plot, 0) / reviews.length).toFixed(
-                1
-              ),
+              plot: (
+                reviews.reduce((sum, r) => sum + r.aspects.plot, 0) /
+                reviews.length
+              ).toFixed(1),
               characters: (
-                reviews.reduce((sum, r) => sum + r.aspects.characters, 0) / reviews.length
+                reviews.reduce((sum, r) => sum + r.aspects.characters, 0) /
+                reviews.length
               ).toFixed(1),
               worldBuilding: (
-                reviews.reduce((sum, r) => sum + r.aspects.worldBuilding, 0) / reviews.length
+                reviews.reduce((sum, r) => sum + r.aspects.worldBuilding, 0) /
+                reviews.length
               ).toFixed(1),
               writing: (
-                reviews.reduce((sum, r) => sum + r.aspects.writing, 0) / reviews.length
+                reviews.reduce((sum, r) => sum + r.aspects.writing, 0) /
+                reviews.length
               ).toFixed(1),
               pacing: (
-                reviews.reduce((sum, r) => sum + r.aspects.pacing, 0) / reviews.length
+                reviews.reduce((sum, r) => sum + r.aspects.pacing, 0) /
+                reviews.length
               ).toFixed(1),
             }
           : {};
@@ -606,10 +653,16 @@ export const reviewService = {
           featured: reviews.filter((r) => r.isFeatured).length,
           verified: reviews.filter((r) => r.isVerifiedPurchase).length,
           averagePerDay: Math.round(periodReviews.length / periodDays),
-          totalHelpfulVotes: reviews.reduce((sum, r) => sum + r.helpfulVotes, 0),
+          totalHelpfulVotes: reviews.reduce(
+            (sum, r) => sum + r.helpfulVotes,
+            0
+          ),
           averageQualityScore:
             reviews.length > 0
-              ? Math.round(reviews.reduce((sum, r) => sum + r.qualityScore, 0) / reviews.length)
+              ? Math.round(
+                  reviews.reduce((sum, r) => sum + r.qualityScore, 0) /
+                    reviews.length
+                )
               : 0,
         },
       };
@@ -625,9 +678,13 @@ export const reviewService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
 
-      const periodReviews = mockReviews.filter((r) => new Date(r.createdAt) >= startDate);
+      const periodReviews = mockReviews.filter(
+        (r) => new Date(r.createdAt) >= startDate
+      );
 
       const reviewerStats = periodReviews.reduce((acc, review) => {
         if (!acc[review.reviewerId]) {
@@ -654,8 +711,12 @@ export const reviewService = {
       const topReviewers = Object.values(reviewerStats)
         .map((reviewer) => ({
           ...reviewer,
-          averageRating: (reviewer.totalRating / reviewer.reviewCount).toFixed(1),
-          averageQualityScore: Math.round(reviewer.qualityScore / reviewer.reviewCount),
+          averageRating: (reviewer.totalRating / reviewer.reviewCount).toFixed(
+            1
+          ),
+          averageQualityScore: Math.round(
+            reviewer.qualityScore / reviewer.reviewCount
+          ),
         }))
         .sort((a, b) => b.totalHelpfulVotes - a.totalHelpfulVotes)
         .slice(0, limit);

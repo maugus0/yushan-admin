@@ -181,17 +181,50 @@ const ReaderDetail = () => {
 
   // Mock reading activity data
   const recentActivity = [
-    { id: 1, action: 'Read Chapter 45', novel: 'Dragon Realm Chronicles', time: '2 hours ago' },
-    { id: 2, action: 'Added to Library', novel: 'Mystic Sword Master', time: '1 day ago' },
-    { id: 3, action: 'Left Review', novel: 'Eternal Love Story', time: '3 days ago' },
+    {
+      id: 1,
+      action: 'Read Chapter 45',
+      novel: 'Dragon Realm Chronicles',
+      time: '2 hours ago',
+    },
+    {
+      id: 2,
+      action: 'Added to Library',
+      novel: 'Mystic Sword Master',
+      time: '1 day ago',
+    },
+    {
+      id: 3,
+      action: 'Left Review',
+      novel: 'Eternal Love Story',
+      time: '3 days ago',
+    },
     { id: 4, action: 'Bookmarked', novel: 'Shadow Hunter', time: '1 week ago' },
   ];
 
   // Mock favorite novels data
   const favoriteNovels = [
-    { id: 1, title: 'Dragon Realm Chronicles', author: 'Liu Wei', rating: 5, progress: 85 },
-    { id: 2, title: 'Mystic Sword Master', author: 'Zhang Ming', rating: 4, progress: 60 },
-    { id: 3, title: 'Eternal Love Story', author: 'Chen Li', rating: 5, progress: 100 },
+    {
+      id: 1,
+      title: 'Dragon Realm Chronicles',
+      author: 'Liu Wei',
+      rating: 5,
+      progress: 85,
+    },
+    {
+      id: 2,
+      title: 'Mystic Sword Master',
+      author: 'Zhang Ming',
+      rating: 4,
+      progress: 60,
+    },
+    {
+      id: 3,
+      title: 'Eternal Love Story',
+      author: 'Chen Li',
+      rating: 5,
+      progress: 100,
+    },
   ];
 
   const breadcrumbItems = [
@@ -224,10 +257,20 @@ const ReaderDetail = () => {
           <Button key="suspend" icon={<StopOutlined />} onClick={handleSuspend}>
             Suspend
           </Button>,
-          <Button key="ban" icon={<UserDeleteOutlined />} danger onClick={handleBan}>
+          <Button
+            key="ban"
+            icon={<UserDeleteOutlined />}
+            danger
+            onClick={handleBan}
+          >
             Ban
           </Button>,
-          <Button key="delete" icon={<DeleteOutlined />} danger onClick={handleDelete}>
+          <Button
+            key="delete"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={handleDelete}
+          >
             Delete
           </Button>,
         ]}
@@ -365,7 +408,11 @@ const ReaderDetail = () => {
                         <Space>
                           <StarOutlined style={{ color: '#faad14' }} />
                           <Text>{item.rating}/5</Text>
-                          <Progress percent={item.progress} size="small" style={{ width: 100 }} />
+                          <Progress
+                            percent={item.progress}
+                            size="small"
+                            style={{ width: 100 }}
+                          />
                         </Space>
                       </div>
                     }

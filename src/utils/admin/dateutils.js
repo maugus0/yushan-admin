@@ -123,7 +123,10 @@ export const getDateRange = (period) => {
 
     case 'yesterday': {
       const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-      return [yesterday, new Date(yesterday.getTime() + 24 * 60 * 60 * 1000 - 1)];
+      return [
+        yesterday,
+        new Date(yesterday.getTime() + 24 * 60 * 60 * 1000 - 1),
+      ];
     }
 
     case 'week': {
@@ -155,8 +158,16 @@ export const getDateRange = (period) => {
     }
 
     case 'quarter': {
-      const quarterStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
-      const quarterEnd = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 + 3, 0);
+      const quarterStart = new Date(
+        now.getFullYear(),
+        Math.floor(now.getMonth() / 3) * 3,
+        1
+      );
+      const quarterEnd = new Date(
+        now.getFullYear(),
+        Math.floor(now.getMonth() / 3) * 3 + 3,
+        0
+      );
       return [quarterStart, quarterEnd];
     }
 
@@ -166,7 +177,11 @@ export const getDateRange = (period) => {
         Math.floor(now.getMonth() / 3) * 3 - 3,
         1
       );
-      const lastQuarterEnd = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 0);
+      const lastQuarterEnd = new Date(
+        now.getFullYear(),
+        Math.floor(now.getMonth() / 3) * 3,
+        0
+      );
       return [lastQuarterStart, lastQuarterEnd];
     }
 
@@ -264,7 +279,10 @@ export const isThisMonth = (date) => {
   const dateObj = new Date(date);
   const now = new Date();
 
-  return dateObj.getMonth() === now.getMonth() && dateObj.getFullYear() === now.getFullYear();
+  return (
+    dateObj.getMonth() === now.getMonth() &&
+    dateObj.getFullYear() === now.getFullYear()
+  );
 };
 
 /**
@@ -345,7 +363,10 @@ export const getAge = (birthdate) => {
   let age = today.getFullYear() - birthdateObj.getFullYear();
   const monthDiff = today.getMonth() - birthdateObj.getMonth();
 
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthdateObj.getDate())
+  ) {
     age--;
   }
 
@@ -360,7 +381,11 @@ export const getAge = (birthdate) => {
 export const getStartEndOfDay = (date) => {
   const dateObj = new Date(date);
 
-  const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  const startOfDay = new Date(
+    dateObj.getFullYear(),
+    dateObj.getMonth(),
+    dateObj.getDate()
+  );
   const endOfDay = new Date(
     dateObj.getFullYear(),
     dateObj.getMonth(),
@@ -402,7 +427,20 @@ export const getMonthName = (date, short = false) => {
 
   const dateObj = new Date(date);
   const months = short
-    ? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+    ? [
+        '1月',
+        '2月',
+        '3月',
+        '4月',
+        '5月',
+        '6月',
+        '7月',
+        '8月',
+        '9月',
+        '10月',
+        '11月',
+        '12月',
+      ]
     : [
         '一月',
         '二月',

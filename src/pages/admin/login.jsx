@@ -51,17 +51,30 @@ const AdminLogin = () => {
             <Text type="secondary">Web Novel Platform Administration</Text>
           </div>
 
-          <Form form={form} onFinish={handleLogin} layout="vertical" size="large">
+          <Form
+            form={form}
+            onFinish={handleLogin}
+            layout="vertical"
+            size="large"
+          >
             <Form.Item
               name="username"
-              rules={[{ required: true, message: 'Please enter your username' }]}
+              rules={[
+                { required: true, message: 'Please enter your username' },
+              ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Username" autoComplete="username" />
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Username"
+                autoComplete="username"
+              />
             </Form.Item>
 
             <Form.Item
               name="password"
-              rules={[{ required: true, message: 'Please enter your password' }]}
+              rules={[
+                { required: true, message: 'Please enter your password' },
+              ]}
             >
               <Input.Password
                 prefix={<LockOutlined />}

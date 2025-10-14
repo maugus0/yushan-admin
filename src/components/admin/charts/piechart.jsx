@@ -1,4 +1,11 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import ChartWrapper from './chartwrapper';
 
 const COLORS = [
@@ -88,7 +95,10 @@ const CustomPieChart = ({
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              <Cell
+                key={`cell-${index}`}
+                fill={colors[index % colors.length]}
+              />
             ))}
           </Pie>
           <Tooltip
@@ -104,7 +114,9 @@ const CustomPieChart = ({
             <Legend
               verticalAlign="bottom"
               height={36}
-              formatter={(value, entry) => <span style={{ color: entry.color }}>{value}</span>}
+              formatter={(value, entry) => (
+                <span style={{ color: entry.color }}>{value}</span>
+              )}
             />
           )}
         </PieChart>

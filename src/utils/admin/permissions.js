@@ -318,7 +318,12 @@ export const canManageUser = (user, targetUser) => {
   if (user.id === targetUser.id) return false;
 
   // Must have user management permission
-  if (!hasPermission(user, `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.UPDATE}`)) {
+  if (
+    !hasPermission(
+      user,
+      `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.UPDATE}`
+    )
+  ) {
     return false;
   }
 

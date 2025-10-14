@@ -29,7 +29,11 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { novelService } from '../../../services/admin/novelservice';
-import { PageHeader, LoadingSpinner, StatusBadge } from '../../../components/admin/common';
+import {
+  PageHeader,
+  LoadingSpinner,
+  StatusBadge,
+} from '../../../components/admin/common';
 import { LineChart, AreaChart } from '../../../components/admin/charts';
 
 const { Title, Text, Paragraph } = Typography;
@@ -119,12 +123,22 @@ const NovelDetail = () => {
   // Demographics data for tables
   const ageGroupColumns = [
     { title: 'Age Group', dataIndex: 'range', key: 'range' },
-    { title: 'Percentage', dataIndex: 'percentage', key: 'percentage', render: (val) => `${val}%` },
+    {
+      title: 'Percentage',
+      dataIndex: 'percentage',
+      key: 'percentage',
+      render: (val) => `${val}%`,
+    },
   ];
 
   const regionColumns = [
     { title: 'Region', dataIndex: 'region', key: 'region' },
-    { title: 'Percentage', dataIndex: 'percentage', key: 'percentage', render: (val) => `${val}%` },
+    {
+      title: 'Percentage',
+      dataIndex: 'percentage',
+      key: 'percentage',
+      render: (val) => `${val}%`,
+    },
   ];
 
   return (
@@ -139,7 +153,12 @@ const NovelDetail = () => {
           { title: novel.title },
         ]}
         actions={[
-          <Button key="edit" type="primary" icon={<EditOutlined />} onClick={handleEdit}>
+          <Button
+            key="edit"
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={handleEdit}
+          >
             Edit Novel
           </Button>,
           <Button
@@ -171,7 +190,11 @@ const NovelDetail = () => {
               {/* Basic Info */}
               <div>
                 <Title level={4}>{novel.title}</Title>
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <Space
+                  direction="vertical"
+                  size="small"
+                  style={{ width: '100%' }}
+                >
                   <Text>
                     <UserOutlined /> by <strong>{novel.author}</strong>
                   </Text>
@@ -250,7 +273,11 @@ const NovelDetail = () => {
         <Col xs={24} lg={16}>
           <Tabs activeKey={activeTab} onChange={setActiveTab}>
             <TabPane tab="Overview" key="overview">
-              <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="large"
+              >
                 {/* Description */}
                 <Card title="Description">
                   <Paragraph>{novel.description}</Paragraph>
@@ -267,7 +294,9 @@ const NovelDetail = () => {
                     <Descriptions.Item label="Type">
                       {novel.isOriginal ? 'Original' : 'Translation'}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Age Rating">{novel.ageRating}</Descriptions.Item>
+                    <Descriptions.Item label="Age Rating">
+                      {novel.ageRating}
+                    </Descriptions.Item>
                     <Descriptions.Item label="Total Words">
                       {novel.totalWords.toLocaleString()}
                     </Descriptions.Item>
@@ -275,10 +304,12 @@ const NovelDetail = () => {
                       {novel.averageWordsPerChapter.toLocaleString()}
                     </Descriptions.Item>
                     <Descriptions.Item label="Created">
-                      <CalendarOutlined /> {new Date(novel.createdAt).toLocaleDateString()}
+                      <CalendarOutlined />{' '}
+                      {new Date(novel.createdAt).toLocaleDateString()}
                     </Descriptions.Item>
                     <Descriptions.Item label="Last Updated">
-                      <CalendarOutlined /> {new Date(novel.updatedAt).toLocaleDateString()}
+                      <CalendarOutlined />{' '}
+                      {new Date(novel.updatedAt).toLocaleDateString()}
                     </Descriptions.Item>
                   </Descriptions>
 
@@ -302,21 +333,45 @@ const NovelDetail = () => {
                   <Col span={12}>
                     <Card title="Engagement Overview">
                       <Space direction="vertical" style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Text>Comments</Text>
                           <Text strong>{novel.comments.toLocaleString()}</Text>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Text>Reviews</Text>
                           <Text strong>{novel.reviews.toLocaleString()}</Text>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Text>Weekly Views</Text>
-                          <Text strong>{novel.weeklyViews.toLocaleString()}</Text>
+                          <Text strong>
+                            {novel.weeklyViews.toLocaleString()}
+                          </Text>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Text>Monthly Views</Text>
-                          <Text strong>{novel.monthlyViews.toLocaleString()}</Text>
+                          <Text strong>
+                            {novel.monthlyViews.toLocaleString()}
+                          </Text>
                         </div>
                       </Space>
                     </Card>
@@ -324,29 +379,58 @@ const NovelDetail = () => {
                   <Col span={12}>
                     <Card title="Status Info">
                       <Space direction="vertical" style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Text>Completion</Text>
-                          <Text strong>{novel.isCompleted ? 'Completed' : 'Ongoing'}</Text>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Text>Trending</Text>
                           <Text strong>
-                            {novel.trending ? `Rank #${novel.trendingRank}` : 'No'}
+                            {novel.isCompleted ? 'Completed' : 'Ongoing'}
                           </Text>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Text>Trending</Text>
+                          <Text strong>
+                            {novel.trending
+                              ? `Rank #${novel.trendingRank}`
+                              : 'No'}
+                          </Text>
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Text>Reports</Text>
                           <Text
                             strong
-                            style={{ color: novel.reportCount > 0 ? '#ff4d4f' : 'inherit' }}
+                            style={{
+                              color:
+                                novel.reportCount > 0 ? '#ff4d4f' : 'inherit',
+                            }}
                           >
                             {novel.reportCount}
                           </Text>
                         </div>
                         {novel.publishedAt && (
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
                             <Text>Published</Text>
-                            <Text strong>{new Date(novel.publishedAt).toLocaleDateString()}</Text>
+                            <Text strong>
+                              {new Date(novel.publishedAt).toLocaleDateString()}
+                            </Text>
                           </div>
                         )}
                       </Space>
@@ -357,15 +441,27 @@ const NovelDetail = () => {
             </TabPane>
 
             <TabPane tab="Analytics" key="analytics">
-              <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="large"
+              >
                 {/* Views Chart */}
                 <Card title="Views Analytics">
                   <LineChart
                     title="Daily Views"
                     data={viewsChartData}
                     lines={[
-                      { dataKey: 'views', stroke: '#1890ff', name: 'Total Views' },
-                      { dataKey: 'uniqueViews', stroke: '#52c41a', name: 'Unique Views' },
+                      {
+                        dataKey: 'views',
+                        stroke: '#1890ff',
+                        name: 'Total Views',
+                      },
+                      {
+                        dataKey: 'uniqueViews',
+                        stroke: '#52c41a',
+                        name: 'Unique Views',
+                      },
                     ]}
                     height={300}
                   />
@@ -378,8 +474,16 @@ const NovelDetail = () => {
                     data={engagementChartData}
                     areas={[
                       { dataKey: 'likes', fill: '#ff7875', name: 'Likes' },
-                      { dataKey: 'comments', fill: '#40a9ff', name: 'Comments' },
-                      { dataKey: 'bookmarks', fill: '#73d13d', name: 'Bookmarks' },
+                      {
+                        dataKey: 'comments',
+                        fill: '#40a9ff',
+                        name: 'Comments',
+                      },
+                      {
+                        dataKey: 'bookmarks',
+                        fill: '#73d13d',
+                        name: 'Bookmarks',
+                      },
                     ]}
                     height={300}
                   />
@@ -428,10 +532,16 @@ const NovelDetail = () => {
                         />
                       </Col>
                       <Col span={6}>
-                        <Statistic title="Retention Rate" value={stats.engagement.retentionRate} />
+                        <Statistic
+                          title="Retention Rate"
+                          value={stats.engagement.retentionRate}
+                        />
                       </Col>
                       <Col span={6}>
-                        <Statistic title="Share Rate" value={stats.engagement.shareRate} />
+                        <Statistic
+                          title="Share Rate"
+                          value={stats.engagement.shareRate}
+                        />
                       </Col>
                     </Row>
                   </Card>

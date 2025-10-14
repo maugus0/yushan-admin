@@ -140,11 +140,15 @@ const Writers = () => {
         <Space direction="vertical" size="small">
           <Space>
             <BookOutlined />
-            <span>{record.profile?.writingStats?.novelsPublished || 0} novels</span>
+            <span>
+              {record.profile?.writingStats?.novelsPublished || 0} novels
+            </span>
           </Space>
           <Space>
             <FileTextOutlined />
-            <span>{record.profile?.writingStats?.chaptersWritten || 0} chapters</span>
+            <span>
+              {record.profile?.writingStats?.chaptersWritten || 0} chapters
+            </span>
           </Space>
         </Space>
       ),
@@ -342,11 +346,17 @@ const Writers = () => {
         await userService.bulkDeleteUsers(selectedKeys);
         message.success(`${selectedKeys.length} writers deleted successfully`);
       } else if (actionKey === 'suspend') {
-        await userService.bulkUpdateUsers(selectedKeys, { status: 'suspended' });
-        message.success(`${selectedKeys.length} writers suspended successfully`);
+        await userService.bulkUpdateUsers(selectedKeys, {
+          status: 'suspended',
+        });
+        message.success(
+          `${selectedKeys.length} writers suspended successfully`
+        );
       } else if (actionKey === 'activate') {
         await userService.bulkUpdateUsers(selectedKeys, { status: 'active' });
-        message.success(`${selectedKeys.length} writers activated successfully`);
+        message.success(
+          `${selectedKeys.length} writers activated successfully`
+        );
       }
       fetchData();
     } catch (error) {
@@ -386,7 +396,11 @@ const Writers = () => {
     fieldTypes.text('profile.location', 'Location', { span: 12 }),
   ];
 
-  const breadcrumbItems = [{ title: 'Admin' }, { title: 'User Management' }, { title: 'Writers' }];
+  const breadcrumbItems = [
+    { title: 'Admin' },
+    { title: 'User Management' },
+    { title: 'Writers' },
+  ];
 
   return (
     <div>
@@ -396,7 +410,12 @@ const Writers = () => {
         title="Writers"
         subtitle="Manage writer accounts and their publications"
         extra={[
-          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
+          <Button
+            key="add"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddNew}
+          >
             Add Writer
           </Button>,
         ]}
@@ -418,7 +437,8 @@ const Writers = () => {
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} writers`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} writers`,
         }}
         onChange={handleTableChange}
         enableSelection={true}

@@ -15,7 +15,12 @@ import {
   Col,
   message,
 } from 'antd';
-import { EditOutlined, UploadOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  UploadOutlined,
+  SaveOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
@@ -64,7 +69,8 @@ const EditModal = ({
       // Convert dayjs objects back to ISO strings
       fields.forEach((field) => {
         if (field.type === 'date' && processedValues[field.name]) {
-          processedValues[field.name] = processedValues[field.name].toISOString();
+          processedValues[field.name] =
+            processedValues[field.name].toISOString();
         }
       });
 
@@ -168,7 +174,9 @@ const EditModal = ({
       case 'upload':
         return (
           <Upload {...field.uploadProps} fileList={field.fileList || []}>
-            <Button icon={<UploadOutlined />}>{field.uploadText || 'Upload File'}</Button>
+            <Button icon={<UploadOutlined />}>
+              {field.uploadText || 'Upload File'}
+            </Button>
           </Upload>
         );
 
@@ -229,11 +237,20 @@ const EditModal = ({
       width={width}
       destroyOnClose
     >
-      <Form form={form} layout={layout} onValuesChange={() => setHasChanges(true)}>
+      <Form
+        form={form}
+        layout={layout}
+        onValuesChange={() => setHasChanges(true)}
+      >
         <Row gutter={16}>
           {fields.map((field) => (
-            <Col key={field.name} span={field.span || (layout === 'horizontal' ? 24 : 12)}>
-              <Form.Item {...getFormItemProps(field)}>{renderField(field)}</Form.Item>
+            <Col
+              key={field.name}
+              span={field.span || (layout === 'horizontal' ? 24 : 12)}
+            >
+              <Form.Item {...getFormItemProps(field)}>
+                {renderField(field)}
+              </Form.Item>
             </Col>
           ))}
         </Row>

@@ -292,7 +292,8 @@ export const getStatusTransitions = (category, currentStatus) => {
   const categoryTransitions = transitions[category?.toUpperCase()];
   if (!categoryTransitions) return [];
 
-  const availableTransitions = categoryTransitions[currentStatus?.toLowerCase()];
+  const availableTransitions =
+    categoryTransitions[currentStatus?.toLowerCase()];
   if (!availableTransitions) return [];
 
   return availableTransitions.map((status) => ({
@@ -310,7 +311,9 @@ export const getStatusTransitions = (category, currentStatus) => {
  */
 export const isValidStatusTransition = (category, fromStatus, toStatus) => {
   const availableTransitions = getStatusTransitions(category, fromStatus);
-  return availableTransitions.some((transition) => transition.value === toStatus);
+  return availableTransitions.some(
+    (transition) => transition.value === toStatus
+  );
 };
 
 /**
@@ -320,7 +323,11 @@ export const isValidStatusTransition = (category, fromStatus, toStatus) => {
  * @param {string} statusField - Field name containing status
  * @returns {object} - Status statistics
  */
-export const getStatusStatistics = (items, category, statusField = 'status') => {
+export const getStatusStatistics = (
+  items,
+  category,
+  statusField = 'status'
+) => {
   if (!Array.isArray(items)) return {};
 
   const stats = {};
@@ -340,7 +347,8 @@ export const getStatusStatistics = (items, category, statusField = 'status') => 
 
   // Calculate percentages
   Object.keys(stats).forEach((status) => {
-    stats[status].percentage = total > 0 ? (stats[status].count / total) * 100 : 0;
+    stats[status].percentage =
+      total > 0 ? (stats[status].count / total) * 100 : 0;
   });
 
   return stats;
@@ -459,9 +467,13 @@ export const formatStatusHistory = (statusHistory, category) => {
 
   return statusHistory.map((entry) => ({
     ...entry,
-    fromStatusLabel: entry.fromStatus ? getStatusConfig(category, entry.fromStatus).label : '',
+    fromStatusLabel: entry.fromStatus
+      ? getStatusConfig(category, entry.fromStatus).label
+      : '',
     toStatusLabel: getStatusConfig(category, entry.toStatus).label,
-    fromStatusColor: entry.fromStatus ? getStatusColor(category, entry.fromStatus) : '',
+    fromStatusColor: entry.fromStatus
+      ? getStatusColor(category, entry.fromStatus)
+      : '',
     toStatusColor: getStatusColor(category, entry.toStatus),
   }));
 };

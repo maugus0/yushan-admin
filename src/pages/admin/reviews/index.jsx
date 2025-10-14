@@ -1,5 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Avatar, Typography, Rate, Progress } from 'antd';
+import {
+  Button,
+  Space,
+  Table,
+  Tooltip,
+  Avatar,
+  Typography,
+  Rate,
+  Progress,
+} from 'antd';
 import {
   StarOutlined,
   UserOutlined,
@@ -150,15 +159,21 @@ const Reviews = () => {
 
         // Apply filters
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         if (filters.rating) {
-          filteredData = filteredData.filter((item) => item.rating === filters.rating);
+          filteredData = filteredData.filter(
+            (item) => item.rating === filters.rating
+          );
         }
 
         if (filters.spoilerFree !== undefined) {
-          filteredData = filteredData.filter((item) => item.spoilerFree === filters.spoilerFree);
+          filteredData = filteredData.filter(
+            (item) => item.spoilerFree === filters.spoilerFree
+          );
         }
 
         if (filters.hasReports) {
@@ -253,7 +268,11 @@ const Reviews = () => {
             {!record.spoilerFree && (
               <Text
                 type="warning"
-                style={{ fontSize: '11px', background: '#fff1b8', padding: '0 4px' }}
+                style={{
+                  fontSize: '11px',
+                  background: '#fff1b8',
+                  padding: '0 4px',
+                }}
               >
                 SPOILERS
               </Text>
@@ -303,7 +322,9 @@ const Reviews = () => {
             </Space>
           )}
           <Progress
-            percent={Math.round((record.helpful / (record.likes + record.dislikes)) * 100)}
+            percent={Math.round(
+              (record.helpful / (record.likes + record.dislikes)) * 100
+            )}
             size="small"
             format={() => 'Helpful'}
             strokeColor="#52c41a"
@@ -350,7 +371,9 @@ const Reviews = () => {
             {
               key: 'spoiler',
               icon: <StarOutlined />,
-              label: record.spoilerFree ? 'Mark as Spoiler' : 'Mark as Spoiler-Free',
+              label: record.spoilerFree
+                ? 'Mark as Spoiler'
+                : 'Mark as Spoiler-Free',
             },
           ]}
         />
@@ -395,7 +418,10 @@ const Reviews = () => {
       <PageHeader
         title="Reviews Management"
         subtitle="Moderate and manage user reviews"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Reviews' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Reviews' },
+        ]}
         actions={[
           <Button key="flagged" type="default" icon={<FlagOutlined />}>
             Flagged ({data.filter((item) => item.status === 'flagged').length})
@@ -445,7 +471,8 @@ const Reviews = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} reviews`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} reviews`,
             }}
             onChange={handleTableChange}
             loading={loading}

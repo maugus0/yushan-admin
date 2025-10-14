@@ -26,7 +26,12 @@ import {
   BarChartOutlined,
 } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner } from '../../../components/admin/common';
-import { LineChart, AreaChart, BarChart, PieChart } from '../../../components/admin/charts';
+import {
+  LineChart,
+  AreaChart,
+  BarChart,
+  PieChart,
+} from '../../../components/admin/charts';
 import { yuanService } from '../../../services/admin/yuanservice';
 
 const { Title, Text } = Typography;
@@ -75,12 +80,12 @@ const YuanStatistics = () => {
   }
 
   // Prepare chart data
-  const transactionTypeData = Object.entries(stats.transactionsByType || {}).map(
-    ([type, count]) => ({
-      name: type.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-      value: count,
-    })
-  );
+  const transactionTypeData = Object.entries(
+    stats.transactionsByType || {}
+  ).map(([type, count]) => ({
+    name: type.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+    value: count,
+  }));
 
   const flowData = [
     { name: 'Income', value: stats.periodIncome, fill: '#52c41a' },
@@ -110,12 +115,15 @@ const YuanStatistics = () => {
           {index < 3 ? (
             <TrophyOutlined
               style={{
-                color: index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : '#cd7f32',
+                color:
+                  index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : '#cd7f32',
                 marginRight: 8,
               }}
             />
           ) : (
-            <span style={{ marginRight: 8, fontWeight: 'bold' }}>{index + 1}</span>
+            <span style={{ marginRight: 8, fontWeight: 'bold' }}>
+              {index + 1}
+            </span>
           )}
         </div>
       ),
@@ -146,7 +154,9 @@ const YuanStatistics = () => {
       title: 'Current Balance',
       dataIndex: 'currentBalance',
       key: 'currentBalance',
-      render: (balance) => <Text style={{ color: '#52c41a' }}>{balance.toLocaleString()} 元</Text>,
+      render: (balance) => (
+        <Text style={{ color: '#52c41a' }}>{balance.toLocaleString()} 元</Text>
+      ),
     },
   ];
 
@@ -162,7 +172,12 @@ const YuanStatistics = () => {
           { title: 'Statistics' },
         ]}
         actions={[
-          <Select key="period" value={period} onChange={setPeriod} style={{ width: 120 }}>
+          <Select
+            key="period"
+            value={period}
+            onChange={setPeriod}
+            style={{ width: 120 }}
+          >
             <Option value="7d">Last 7 days</Option>
             <Option value="30d">Last 30 days</Option>
             <Option value="90d">Last 90 days</Option>
@@ -214,8 +229,12 @@ const YuanStatistics = () => {
                     title="Net Flow"
                     value={stats.netFlow}
                     suffix="元"
-                    valueStyle={{ color: stats.netFlow >= 0 ? '#52c41a' : '#ff4d4f' }}
-                    prefix={stats.netFlow >= 0 ? <RiseOutlined /> : <FallOutlined />}
+                    valueStyle={{
+                      color: stats.netFlow >= 0 ? '#52c41a' : '#ff4d4f',
+                    }}
+                    prefix={
+                      stats.netFlow >= 0 ? <RiseOutlined /> : <FallOutlined />
+                    }
                   />
                 </Card>
               </Col>
@@ -272,7 +291,11 @@ const YuanStatistics = () => {
                     data={dailyData}
                     areas={[
                       { dataKey: 'income', fill: '#52c41a', name: 'Income' },
-                      { dataKey: 'expenses', fill: '#ff4d4f', name: 'Expenses' },
+                      {
+                        dataKey: 'expenses',
+                        fill: '#ff4d4f',
+                        name: 'Expenses',
+                      },
                     ]}
                     height={300}
                   />
@@ -291,7 +314,9 @@ const YuanStatistics = () => {
                 <Card title="Income vs Expenses">
                   <BarChart
                     data={flowData}
-                    bars={[{ dataKey: 'value', fill: '#8884d8', name: 'Amount' }]}
+                    bars={[
+                      { dataKey: 'value', fill: '#8884d8', name: 'Amount' },
+                    ]}
                     height={250}
                   />
                 </Card>
@@ -301,8 +326,16 @@ const YuanStatistics = () => {
                   <LineChart
                     data={dailyData}
                     lines={[
-                      { dataKey: 'activeUsers', stroke: '#1890ff', name: 'Active Users' },
-                      { dataKey: 'transactions', stroke: '#52c41a', name: 'Transactions' },
+                      {
+                        dataKey: 'activeUsers',
+                        stroke: '#1890ff',
+                        name: 'Active Users',
+                      },
+                      {
+                        dataKey: 'transactions',
+                        stroke: '#52c41a',
+                        name: 'Transactions',
+                      },
                     ]}
                     height={250}
                   />
@@ -393,8 +426,9 @@ const YuanStatistics = () => {
 
             <Card title="Package Performance">
               <Text type="secondary">
-                Yuan packages have generated ${stats.packageRevenue.toLocaleString()} in revenue
-                from {stats.packageSales.toLocaleString()} total sales.
+                Yuan packages have generated $
+                {stats.packageRevenue.toLocaleString()} in revenue from{' '}
+                {stats.packageSales.toLocaleString()} total sales.
               </Text>
               <div style={{ marginTop: 16 }}>
                 <Progress

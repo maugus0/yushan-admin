@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Dropdown, Button, Checkbox, Space, Typography, Divider, Input, Tooltip } from 'antd';
+import {
+  Dropdown,
+  Button,
+  Checkbox,
+  Space,
+  Typography,
+  Divider,
+  Input,
+  Tooltip,
+} from 'antd';
 import {
   SettingOutlined,
   EyeOutlined,
@@ -20,7 +29,8 @@ const ColumnSelector = ({
   showReset = true,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [localVisibleColumns, setLocalVisibleColumns] = useState(visibleColumns);
+  const [localVisibleColumns, setLocalVisibleColumns] =
+    useState(visibleColumns);
 
   useEffect(() => {
     setLocalVisibleColumns(visibleColumns);
@@ -60,7 +70,9 @@ const ColumnSelector = ({
   };
 
   const handleSelectAll = (checked) => {
-    const newVisibleColumns = checked ? columns.map((col) => col.key || col.dataIndex) : [];
+    const newVisibleColumns = checked
+      ? columns.map((col) => col.key || col.dataIndex)
+      : [];
 
     setLocalVisibleColumns(newVisibleColumns);
     saveToStorage(newVisibleColumns);
@@ -124,7 +136,13 @@ const ColumnSelector = ({
               checked={allVisible}
               onChange={(e) => handleSelectAll(e.target.checked)}
             >
-              <Text strong>{allVisible ? 'Hide All' : someVisible ? 'Show All' : 'Show All'}</Text>
+              <Text strong>
+                {allVisible
+                  ? 'Hide All'
+                  : someVisible
+                    ? 'Show All'
+                    : 'Show All'}
+              </Text>
             </Checkbox>
           </div>
           <Divider style={{ margin: '8px 0' }} />
@@ -139,13 +157,20 @@ const ColumnSelector = ({
             const isVisible = localVisibleColumns.includes(columnKey);
 
             return (
-              <div key={columnKey} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              <div
+                key={columnKey}
+                style={{ display: 'flex', alignItems: 'center', width: '100%' }}
+              >
                 <Checkbox
                   checked={isVisible}
-                  onChange={(e) => handleColumnToggle(columnKey, e.target.checked)}
+                  onChange={(e) =>
+                    handleColumnToggle(columnKey, e.target.checked)
+                  }
                   style={{ marginRight: 8 }}
                 />
-                <span style={{ color: isVisible ? undefined : '#999', flex: 1 }}>
+                <span
+                  style={{ color: isVisible ? undefined : '#999', flex: 1 }}
+                >
                   {isVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
                 </span>
                 <Text
@@ -158,7 +183,10 @@ const ColumnSelector = ({
                   {column.title}
                 </Text>
                 {column.required && (
-                  <Text type="secondary" style={{ fontSize: '12px', marginLeft: 8 }}>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: '12px', marginLeft: 8 }}
+                  >
                     Required
                   </Text>
                 )}
@@ -173,7 +201,11 @@ const ColumnSelector = ({
         <>
           <Divider style={{ margin: '8px 0' }} />
           <div style={{ textAlign: 'center' }}>
-            <Button size="small" icon={<ReloadOutlined />} onClick={handleReset}>
+            <Button
+              size="small"
+              icon={<ReloadOutlined />}
+              onClick={handleReset}
+            >
               Reset to Default
             </Button>
           </div>
@@ -183,16 +215,26 @@ const ColumnSelector = ({
   );
 
   return (
-    <Dropdown overlay={dropdownContent} trigger={['click']} placement="bottomRight">
+    <Dropdown
+      overlay={dropdownContent}
+      trigger={['click']}
+      placement="bottomRight"
+    >
       <Tooltip title="Customize columns">
-        <Button icon={<SettingOutlined />}>Columns ({localVisibleColumns.length})</Button>
+        <Button icon={<SettingOutlined />}>
+          Columns ({localVisibleColumns.length})
+        </Button>
       </Tooltip>
     </Dropdown>
   );
 };
 
 // Hook for managing column visibility
-export const useColumnSelector = (columns, defaultVisible = null, storageKey = null) => {
+export const useColumnSelector = (
+  columns,
+  defaultVisible = null,
+  storageKey = null
+) => {
   const getDefaultVisibleColumns = () => {
     if (defaultVisible) return defaultVisible;
     return columns
@@ -200,7 +242,9 @@ export const useColumnSelector = (columns, defaultVisible = null, storageKey = n
       .map((col) => col.key || col.dataIndex);
   };
 
-  const [visibleColumns, setVisibleColumns] = useState(getDefaultVisibleColumns());
+  const [visibleColumns, setVisibleColumns] = useState(
+    getDefaultVisibleColumns()
+  );
 
   // Filter columns based on visibility
   const getVisibleColumns = () => {

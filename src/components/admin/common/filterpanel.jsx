@@ -70,7 +70,11 @@ const FilterPanel = ({
     switch (type) {
       case 'select':
         return (
-          <Select placeholder={placeholder || `Select ${label}`} allowClear {...fieldProps}>
+          <Select
+            placeholder={placeholder || `Select ${label}`}
+            allowClear
+            {...fieldProps}
+          >
             {options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
@@ -125,8 +129,16 @@ const FilterPanel = ({
       case 'numberrange':
         return (
           <Space.Compact style={{ width: '100%' }}>
-            <InputNumber placeholder="Min" style={{ width: '50%' }} {...fieldProps.min} />
-            <InputNumber placeholder="Max" style={{ width: '50%' }} {...fieldProps.max} />
+            <InputNumber
+              placeholder="Min"
+              style={{ width: '50%' }}
+              {...fieldProps.min}
+            />
+            <InputNumber
+              placeholder="Max"
+              style={{ width: '50%' }}
+              {...fieldProps.max}
+            />
           </Space.Compact>
         );
 
@@ -157,7 +169,12 @@ const FilterPanel = ({
         );
 
       default:
-        return <Input placeholder={placeholder || `Enter ${label}`} {...fieldProps} />;
+        return (
+          <Input
+            placeholder={placeholder || `Enter ${label}`}
+            {...fieldProps}
+          />
+        );
     }
   };
 
@@ -188,7 +205,11 @@ const FilterPanel = ({
             </Button>
           )}
           {showApplyButton && (
-            <Button type="primary" icon={<FilterOutlined />} onClick={() => form.submit()}>
+            <Button
+              type="primary"
+              icon={<FilterOutlined />}
+              onClick={() => form.submit()}
+            >
               Apply Filters
             </Button>
           )}

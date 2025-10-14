@@ -53,15 +53,27 @@
 }
 
 .stat-card-icon.primary {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-hover)
+  );
 }
 
 .stat-card-icon.success {
-  background: linear-gradient(135deg, var(--success-color), var(--success-hover));
+  background: linear-gradient(
+    135deg,
+    var(--success-color),
+    var(--success-hover)
+  );
 }
 
 .stat-card-icon.warning {
-  background: linear-gradient(135deg, var(--warning-color), var(--warning-hover));
+  background: linear-gradient(
+    135deg,
+    var(--warning-color),
+    var(--warning-hover)
+  );
 }
 
 .stat-card-icon.error {

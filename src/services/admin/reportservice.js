@@ -61,7 +61,12 @@ const generateMockReports = () => {
       'Threatening language',
       'Targeted harassment',
     ],
-    violence: ['Graphic violence', 'Detailed gore', 'Disturbing scenes', 'Excessive brutality'],
+    violence: [
+      'Graphic violence',
+      'Detailed gore',
+      'Disturbing scenes',
+      'Excessive brutality',
+    ],
     copyright: [
       'Unauthorized use of content',
       'Stolen intellectual property',
@@ -86,8 +91,18 @@ const generateMockReports = () => {
       'Gender-based attacks',
       'Discriminatory language',
     ],
-    scam: ['Fraudulent links', 'Phishing attempts', 'Fake promotions', 'Deceptive schemes'],
-    off_topic: ['Unrelated discussion', 'Spam comments', 'Random content', 'Topic derailment'],
+    scam: [
+      'Fraudulent links',
+      'Phishing attempts',
+      'Fake promotions',
+      'Deceptive schemes',
+    ],
+    off_topic: [
+      'Unrelated discussion',
+      'Spam comments',
+      'Random content',
+      'Topic derailment',
+    ],
     duplicate: [
       'Repeated submission',
       'Multiple same posts',
@@ -98,13 +113,19 @@ const generateMockReports = () => {
 
   // Generate reports for various content types
   for (let i = 1; i <= 500; i++) {
-    const reportType = reportTypes[Math.floor(Math.random() * reportTypes.length)];
+    const reportType =
+      reportTypes[Math.floor(Math.random() * reportTypes.length)];
     const reportDate = new Date(
       2024,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     );
-    const contentType = Math.random() > 0.3 ? 'comment' : Math.random() > 0.5 ? 'novel' : 'chapter';
+    const contentType =
+      Math.random() > 0.3
+        ? 'comment'
+        : Math.random() > 0.5
+          ? 'novel'
+          : 'chapter';
 
     const report = {
       id: i,
@@ -114,7 +135,11 @@ const generateMockReports = () => {
       typeName: reportType.name,
       priority: reportType.priority,
       category:
-        Math.random() > 0.7 ? 'content' : Math.random() > 0.5 ? 'user_behavior' : 'platform_abuse',
+        Math.random() > 0.7
+          ? 'content'
+          : Math.random() > 0.5
+            ? 'user_behavior'
+            : 'platform_abuse',
 
       // Content being reported
       contentType,
@@ -130,7 +155,8 @@ const generateMockReports = () => {
 
       // Reporter information
       reporterId: Math.floor(Math.random() * reporterUsernames.length) + 1,
-      reporterUsername: reporterUsernames[Math.floor(Math.random() * reporterUsernames.length)],
+      reporterUsername:
+        reporterUsernames[Math.floor(Math.random() * reporterUsernames.length)],
       reporterEmail: `${reporterUsernames[Math.floor(Math.random() * reporterUsernames.length)]}@example.com`,
       reporterType: Math.random() > 0.8 ? 'verified' : 'regular',
 
@@ -157,8 +183,13 @@ const generateMockReports = () => {
 
       // Assignment and moderation
       assignedTo:
-        Math.random() > 0.7 ? 'moderator_alex' : Math.random() > 0.8 ? 'admin_sarah' : null,
-      moderatorId: Math.random() > 0.7 ? Math.floor(Math.random() * 5) + 1 : null,
+        Math.random() > 0.7
+          ? 'moderator_alex'
+          : Math.random() > 0.8
+            ? 'admin_sarah'
+            : null,
+      moderatorId:
+        Math.random() > 0.7 ? Math.floor(Math.random() * 5) + 1 : null,
       escalatedTo: Math.random() > 0.95 ? 'senior_moderator' : null,
       escalationReason: null,
 
@@ -175,7 +206,8 @@ const generateMockReports = () => {
                 ? 'medium'
                 : 'low'
               : 'low',
-      impact: Math.random() > 0.7 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low',
+      impact:
+        Math.random() > 0.7 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low',
       urgency:
         reportType.priority === 'critical'
           ? 'urgent'
@@ -187,8 +219,10 @@ const generateMockReports = () => {
       viewCount: Math.floor(Math.random() * 20) + 1,
       actionsTaken: [],
       followUpRequired: Math.random() > 0.8,
-      duplicateOf: Math.random() > 0.95 ? Math.floor(Math.random() * i) + 1 : null,
-      relatedReports: Math.random() > 0.9 ? [Math.floor(Math.random() * i) + 1] : [],
+      duplicateOf:
+        Math.random() > 0.95 ? Math.floor(Math.random() * i) + 1 : null,
+      relatedReports:
+        Math.random() > 0.9 ? [Math.floor(Math.random() * i) + 1] : [],
 
       // User context
       reporterHistory: {
@@ -219,11 +253,15 @@ const generateMockReports = () => {
       ).toISOString(),
       reviewedAt:
         Math.random() > 0.7
-          ? new Date(reportDate.getTime() + Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString()
+          ? new Date(
+              reportDate.getTime() + Math.random() * 3 * 24 * 60 * 60 * 1000
+            ).toISOString()
           : null,
       resolvedAt:
         Math.random() > 0.6
-          ? new Date(reportDate.getTime() + Math.random() * 5 * 24 * 60 * 60 * 1000).toISOString()
+          ? new Date(
+              reportDate.getTime() + Math.random() * 5 * 24 * 60 * 60 * 1000
+            ).toISOString()
           : null,
 
       // Metadata
@@ -233,9 +271,12 @@ const generateMockReports = () => {
           : Math.random() > 0.8
             ? ['repeat_offender']
             : [],
-      internalNotes: Math.random() > 0.8 ? 'Internal note about this report case.' : null,
+      internalNotes:
+        Math.random() > 0.8 ? 'Internal note about this report case.' : null,
       publicResponse:
-        Math.random() > 0.9 ? 'Thank you for your report. We have taken appropriate action.' : null,
+        Math.random() > 0.9
+          ? 'Thank you for your report. We have taken appropriate action.'
+          : null,
     };
 
     // Set resolution details for resolved reports
@@ -245,12 +286,22 @@ const generateMockReports = () => {
           action: 'content_removed',
           note: 'Content has been removed for violating community guidelines.',
         },
-        { action: 'warning_issued', note: 'Warning issued to the content creator.' },
-        { action: 'account_suspended', note: 'Account has been temporarily suspended.' },
+        {
+          action: 'warning_issued',
+          note: 'Warning issued to the content creator.',
+        },
+        {
+          action: 'account_suspended',
+          note: 'Account has been temporarily suspended.',
+        },
         { action: 'no_action', note: 'No violation found after review.' },
-        { action: 'content_edited', note: 'Content has been edited to comply with guidelines.' },
+        {
+          action: 'content_edited',
+          note: 'Content has been edited to comply with guidelines.',
+        },
       ];
-      const resolution = resolutions[Math.floor(Math.random() * resolutions.length)];
+      const resolution =
+        resolutions[Math.floor(Math.random() * resolutions.length)];
       report.resolution = resolution.action;
       report.resolutionNote = resolution.note;
       report.actionsTaken = [resolution.action];
@@ -301,7 +352,9 @@ export const reportService = {
       }
 
       if (contentType) {
-        reports = reports.filter((report) => report.contentType === contentType);
+        reports = reports.filter(
+          (report) => report.contentType === contentType
+        );
       }
 
       if (assignedTo) {
@@ -322,11 +375,15 @@ export const reportService = {
 
       // Date range filter
       if (dateFrom) {
-        reports = reports.filter((report) => new Date(report.createdAt) >= new Date(dateFrom));
+        reports = reports.filter(
+          (report) => new Date(report.createdAt) >= new Date(dateFrom)
+        );
       }
 
       if (dateTo) {
-        reports = reports.filter((report) => new Date(report.createdAt) <= new Date(dateTo));
+        reports = reports.filter(
+          (report) => new Date(report.createdAt) <= new Date(dateTo)
+        );
       }
 
       // Apply sorting
@@ -448,12 +505,18 @@ export const reportService = {
       };
 
       // Set reviewed timestamp if status changed to in_review
-      if (updateData.status === 'in_review' && mockReports[reportIndex].status !== 'in_review') {
+      if (
+        updateData.status === 'in_review' &&
+        mockReports[reportIndex].status !== 'in_review'
+      ) {
         updatedReport.reviewedAt = new Date().toISOString();
       }
 
       // Set resolved timestamp if status changed to resolved
-      if (updateData.status === 'resolved' && mockReports[reportIndex].status !== 'resolved') {
+      if (
+        updateData.status === 'resolved' &&
+        mockReports[reportIndex].status !== 'resolved'
+      ) {
         updatedReport.resolvedAt = new Date().toISOString();
       }
 
@@ -506,7 +569,8 @@ export const reportService = {
     try {
       await api.delay(600);
 
-      const { resolution, resolutionNote, actionsTaken, publicResponse } = resolutionData;
+      const { resolution, resolutionNote, actionsTaken, publicResponse } =
+        resolutionData;
 
       const reportIndex = mockReports.findIndex((r) => r.id === parseInt(id));
 
@@ -571,9 +635,13 @@ export const reportService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
 
-      const periodReports = mockReports.filter((r) => new Date(r.createdAt) >= startDate);
+      const periodReports = mockReports.filter(
+        (r) => new Date(r.createdAt) >= startDate
+      );
 
       const statusCounts = mockReports.reduce((acc, report) => {
         acc[report.status] = (acc[report.status] || 0) + 1;
@@ -592,7 +660,10 @@ export const reportService = {
 
       const resolutionTime = mockReports
         .filter((r) => r.resolvedAt)
-        .map((r) => (new Date(r.resolvedAt) - new Date(r.createdAt)) / (1000 * 60 * 60)) // hours
+        .map(
+          (r) =>
+            (new Date(r.resolvedAt) - new Date(r.createdAt)) / (1000 * 60 * 60)
+        ) // hours
         .reduce((sum, time, _, arr) => sum + time / arr.length, 0);
 
       return {
@@ -608,9 +679,12 @@ export const reportService = {
           pendingCount: statusCounts.pending || 0,
           overdueCount: mockReports.filter(
             (r) =>
-              r.status === 'pending' && new Date() - new Date(r.createdAt) > 24 * 60 * 60 * 1000
+              r.status === 'pending' &&
+              new Date() - new Date(r.createdAt) > 24 * 60 * 60 * 1000
           ).length,
-          resolutionRate: Math.round(((statusCounts.resolved || 0) / mockReports.length) * 100),
+          resolutionRate: Math.round(
+            ((statusCounts.resolved || 0) / mockReports.length) * 100
+          ),
         },
       };
     } catch (error) {
@@ -624,7 +698,8 @@ export const reportService = {
       await api.delay(400);
 
       const reports = mockReports.filter(
-        (r) => r.contentType === contentType && r.contentId === parseInt(contentId)
+        (r) =>
+          r.contentType === contentType && r.contentId === parseInt(contentId)
       );
 
       return {
@@ -647,7 +722,9 @@ export const reportService = {
       if (type === 'reporter') {
         reports = mockReports.filter((r) => r.reporterId === parseInt(userId));
       } else if (type === 'content_author') {
-        reports = mockReports.filter((r) => r.contentAuthorId === parseInt(userId));
+        reports = mockReports.filter(
+          (r) => r.contentAuthorId === parseInt(userId)
+        );
       }
 
       return {
@@ -666,28 +743,78 @@ export const reportService = {
       await api.delay(200);
 
       const types = [
-        { id: 'spam', name: 'Spam Content', priority: 'medium', category: 'content' },
+        {
+          id: 'spam',
+          name: 'Spam Content',
+          priority: 'medium',
+          category: 'content',
+        },
         {
           id: 'inappropriate',
           name: 'Inappropriate Content',
           priority: 'high',
           category: 'content',
         },
-        { id: 'plagiarism', name: 'Plagiarism', priority: 'high', category: 'content' },
-        { id: 'harassment', name: 'Harassment', priority: 'high', category: 'user_behavior' },
-        { id: 'violence', name: 'Violence/Gore', priority: 'medium', category: 'content' },
+        {
+          id: 'plagiarism',
+          name: 'Plagiarism',
+          priority: 'high',
+          category: 'content',
+        },
+        {
+          id: 'harassment',
+          name: 'Harassment',
+          priority: 'high',
+          category: 'user_behavior',
+        },
+        {
+          id: 'violence',
+          name: 'Violence/Gore',
+          priority: 'medium',
+          category: 'content',
+        },
         {
           id: 'copyright',
           name: 'Copyright Infringement',
           priority: 'high',
           category: 'platform_abuse',
         },
-        { id: 'false_info', name: 'False Information', priority: 'low', category: 'content' },
-        { id: 'adult_content', name: 'Adult Content', priority: 'medium', category: 'content' },
-        { id: 'hate_speech', name: 'Hate Speech', priority: 'critical', category: 'user_behavior' },
-        { id: 'scam', name: 'Scam/Fraud', priority: 'high', category: 'platform_abuse' },
-        { id: 'off_topic', name: 'Off-Topic', priority: 'low', category: 'content' },
-        { id: 'duplicate', name: 'Duplicate Content', priority: 'low', category: 'content' },
+        {
+          id: 'false_info',
+          name: 'False Information',
+          priority: 'low',
+          category: 'content',
+        },
+        {
+          id: 'adult_content',
+          name: 'Adult Content',
+          priority: 'medium',
+          category: 'content',
+        },
+        {
+          id: 'hate_speech',
+          name: 'Hate Speech',
+          priority: 'critical',
+          category: 'user_behavior',
+        },
+        {
+          id: 'scam',
+          name: 'Scam/Fraud',
+          priority: 'high',
+          category: 'platform_abuse',
+        },
+        {
+          id: 'off_topic',
+          name: 'Off-Topic',
+          priority: 'low',
+          category: 'content',
+        },
+        {
+          id: 'duplicate',
+          name: 'Duplicate Content',
+          priority: 'low',
+          category: 'content',
+        },
       ];
 
       return {

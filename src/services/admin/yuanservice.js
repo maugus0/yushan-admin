@@ -42,7 +42,8 @@ const generateMockYuanData = () => {
     yuanBalances.push({
       id: userId,
       userId,
-      username: usernames[Math.floor(Math.random() * usernames.length)] + '_' + userId,
+      username:
+        usernames[Math.floor(Math.random() * usernames.length)] + '_' + userId,
       currentBalance: Math.floor(Math.random() * 10000) + 100, // 100-10,100 yuan
       lifetimeEarned: Math.floor(Math.random() * 50000) + 1000, // 1,000-51,000 yuan
       lifetimeSpent: Math.floor(Math.random() * 45000) + 500, // 500-45,500 yuan
@@ -53,18 +54,25 @@ const generateMockYuanData = () => {
       subscriptionTier: Math.random() > 0.5 ? 'premium' : 'vip',
       subscriptionExpiresAt:
         Math.random() > 0.7
-          ? new Date(Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
+          ? new Date(
+              Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000
+            ).toISOString()
           : null,
 
       // Statistics
       totalTransactions: Math.floor(Math.random() * 500) + 50,
       averageMonthlySpending: Math.floor(Math.random() * 1000) + 50,
       favoriteExpenseCategory:
-        transactionTypes[Math.floor(Math.random() * transactionTypes.length)].id,
+        transactionTypes[Math.floor(Math.random() * transactionTypes.length)]
+          .id,
 
       // Account info
       accountStatus:
-        Math.random() > 0.05 ? 'active' : Math.random() > 0.5 ? 'suspended' : 'limited',
+        Math.random() > 0.05
+          ? 'active'
+          : Math.random() > 0.5
+            ? 'suspended'
+            : 'limited',
       verificationLevel: Math.random() > 0.3 ? 'verified' : 'unverified',
       riskScore: Math.floor(Math.random() * 100), // 0-100 (lower is better)
 
@@ -83,8 +91,11 @@ const generateMockYuanData = () => {
 
   // Generate transactions for users
   for (let i = 0; i < 5000; i++) {
-    const transactionDate = new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000);
-    const transactionType = transactionTypes[Math.floor(Math.random() * transactionTypes.length)];
+    const transactionDate = new Date(
+      Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
+    );
+    const transactionType =
+      transactionTypes[Math.floor(Math.random() * transactionTypes.length)];
     const userId = Math.floor(Math.random() * 200) + 1;
 
     yuanTransactions.push({
@@ -100,9 +111,11 @@ const generateMockYuanData = () => {
 
       // Related entities
       novelId: Math.random() > 0.5 ? Math.floor(Math.random() * 100) + 1 : null,
-      chapterId: Math.random() > 0.7 ? Math.floor(Math.random() * 50) + 1 : null,
+      chapterId:
+        Math.random() > 0.7 ? Math.floor(Math.random() * 50) + 1 : null,
       authorId: Math.random() > 0.6 ? Math.floor(Math.random() * 50) + 1 : null,
-      packageId: Math.random() > 0.8 ? Math.floor(Math.random() * 10) + 1 : null,
+      packageId:
+        Math.random() > 0.8 ? Math.floor(Math.random() * 10) + 1 : null,
 
       // Payment info
       paymentMethod:
@@ -135,7 +148,12 @@ const generateMockYuanData = () => {
       metadata: {
         userAgent: 'YushanApp/1.0',
         ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-        platform: Math.random() > 0.5 ? 'web' : Math.random() > 0.5 ? 'mobile' : 'tablet',
+        platform:
+          Math.random() > 0.5
+            ? 'web'
+            : Math.random() > 0.5
+              ? 'mobile'
+              : 'tablet',
       },
 
       // Flags
@@ -197,13 +215,38 @@ const generateMockYuanData = () => {
     { action: 'daily_login', name: 'Daily Login', yuan: 10, cooldown: 86400 }, // 24 hours
     { action: 'read_chapter', name: 'Read Chapter', yuan: 2, cooldown: 0 },
     { action: 'leave_review', name: 'Write Review', yuan: 50, cooldown: 3600 }, // 1 hour
-    { action: 'complete_novel', name: 'Complete Novel', yuan: 100, cooldown: 0 },
+    {
+      action: 'complete_novel',
+      name: 'Complete Novel',
+      yuan: 100,
+      cooldown: 0,
+    },
     { action: 'referral', name: 'Refer Friend', yuan: 500, cooldown: 0 },
-    { action: 'first_purchase', name: 'First Purchase', yuan: 100, cooldown: 0 },
-    { action: 'weekly_goal', name: 'Weekly Reading Goal', yuan: 200, cooldown: 604800 }, // 7 days
-    { action: 'tournament_win', name: 'Tournament Victory', yuan: 1000, cooldown: 0 },
+    {
+      action: 'first_purchase',
+      name: 'First Purchase',
+      yuan: 100,
+      cooldown: 0,
+    },
+    {
+      action: 'weekly_goal',
+      name: 'Weekly Reading Goal',
+      yuan: 200,
+      cooldown: 604800,
+    }, // 7 days
+    {
+      action: 'tournament_win',
+      name: 'Tournament Victory',
+      yuan: 1000,
+      cooldown: 0,
+    },
     { action: 'bug_report', name: 'Report Bug', yuan: 50, cooldown: 86400 },
-    { action: 'beta_testing', name: 'Beta Testing', yuan: 200, cooldown: 2592000 }, // 30 days
+    {
+      action: 'beta_testing',
+      name: 'Beta Testing',
+      yuan: 200,
+      cooldown: 2592000,
+    }, // 30 days
   ];
 
   rewardActions.forEach((reward, index) => {
@@ -215,8 +258,18 @@ const generateMockYuanData = () => {
       yuanReward: reward.yuan,
 
       // Conditions
-      maxPerUser: reward.action === 'first_purchase' ? 1 : reward.action === 'referral' ? 10 : null,
-      maxPerDay: reward.action === 'daily_login' ? 1 : reward.action === 'read_chapter' ? 50 : null,
+      maxPerUser:
+        reward.action === 'first_purchase'
+          ? 1
+          : reward.action === 'referral'
+            ? 10
+            : null,
+      maxPerDay:
+        reward.action === 'daily_login'
+          ? 1
+          : reward.action === 'read_chapter'
+            ? 50
+            : null,
       cooldownSeconds: reward.cooldown,
 
       // Requirements
@@ -229,7 +282,9 @@ const generateMockYuanData = () => {
       startDate: new Date(2024, 0, 1).toISOString(),
       endDate:
         Math.random() > 0.8
-          ? new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
+          ? new Date(
+              Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000
+            ).toISOString()
           : null,
 
       // Statistics
@@ -279,7 +334,9 @@ export const yuanService = {
 
       // Apply filters
       if (userId) {
-        transactions = transactions.filter((t) => t.userId === parseInt(userId));
+        transactions = transactions.filter(
+          (t) => t.userId === parseInt(userId)
+        );
       }
 
       if (type) {
@@ -295,20 +352,28 @@ export const yuanService = {
       }
 
       if (minAmount !== null) {
-        transactions = transactions.filter((t) => t.amount >= parseInt(minAmount));
+        transactions = transactions.filter(
+          (t) => t.amount >= parseInt(minAmount)
+        );
       }
 
       if (maxAmount !== null) {
-        transactions = transactions.filter((t) => t.amount <= parseInt(maxAmount));
+        transactions = transactions.filter(
+          (t) => t.amount <= parseInt(maxAmount)
+        );
       }
 
       // Date range filter
       if (dateFrom) {
-        transactions = transactions.filter((t) => new Date(t.createdAt) >= new Date(dateFrom));
+        transactions = transactions.filter(
+          (t) => new Date(t.createdAt) >= new Date(dateFrom)
+        );
       }
 
       if (dateTo) {
-        transactions = transactions.filter((t) => new Date(t.createdAt) <= new Date(dateTo));
+        transactions = transactions.filter(
+          (t) => new Date(t.createdAt) <= new Date(dateTo)
+        );
       }
 
       // Search filter
@@ -390,17 +455,23 @@ export const yuanService = {
       }
 
       if (minBalance !== null) {
-        balances = balances.filter((b) => b.currentBalance >= parseInt(minBalance));
+        balances = balances.filter(
+          (b) => b.currentBalance >= parseInt(minBalance)
+        );
       }
 
       if (maxBalance !== null) {
-        balances = balances.filter((b) => b.currentBalance <= parseInt(maxBalance));
+        balances = balances.filter(
+          (b) => b.currentBalance <= parseInt(maxBalance)
+        );
       }
 
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
-        balances = balances.filter((b) => b.username.toLowerCase().includes(searchLower));
+        balances = balances.filter((b) =>
+          b.username.toLowerCase().includes(searchLower)
+        );
       }
 
       // Apply sorting
@@ -409,9 +480,12 @@ export const yuanService = {
         let bValue = b[sortBy];
 
         if (
-          ['currentBalance', 'lifetimeEarned', 'lifetimeSpent', 'totalTransactions'].includes(
-            sortBy
-          )
+          [
+            'currentBalance',
+            'lifetimeEarned',
+            'lifetimeSpent',
+            'totalTransactions',
+          ].includes(sortBy)
         ) {
           aValue = parseInt(aValue);
           bValue = parseInt(bValue);
@@ -497,7 +571,9 @@ export const yuanService = {
 
       // Update user balance if transaction is completed
       if (transactionData.status === 'completed') {
-        const userBalance = mockBalances.find((b) => b.userId === transactionData.userId);
+        const userBalance = mockBalances.find(
+          (b) => b.userId === transactionData.userId
+        );
         if (userBalance) {
           if (transactionData.category === 'income') {
             userBalance.currentBalance += transactionData.amount;
@@ -526,7 +602,9 @@ export const yuanService = {
     try {
       await api.delay(400);
 
-      const transactionIndex = mockTransactions.findIndex((t) => t.id === parseInt(id));
+      const transactionIndex = mockTransactions.findIndex(
+        (t) => t.id === parseInt(id)
+      );
 
       if (transactionIndex === -1) {
         throw new Error('Transaction not found');
@@ -555,7 +633,9 @@ export const yuanService = {
     try {
       await api.delay(400);
 
-      const activePackages = mockPackages.filter((p) => p.isActive && p.isVisible);
+      const activePackages = mockPackages.filter(
+        (p) => p.isActive && p.isVisible
+      );
 
       return {
         success: true,
@@ -655,9 +735,13 @@ export const yuanService = {
 
       const now = new Date();
       const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        now.getTime() - periodDays * 24 * 60 * 60 * 1000
+      );
 
-      const periodTransactions = mockTransactions.filter((t) => new Date(t.createdAt) >= startDate);
+      const periodTransactions = mockTransactions.filter(
+        (t) => new Date(t.createdAt) >= startDate
+      );
 
       const income = periodTransactions
         .filter((t) => t.category === 'income' && t.status === 'completed')
@@ -667,12 +751,27 @@ export const yuanService = {
         .filter((t) => t.category === 'expense' && t.status === 'completed')
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const totalBalance = mockBalances.reduce((sum, b) => sum + b.currentBalance, 0);
-      const totalLifetimeEarned = mockBalances.reduce((sum, b) => sum + b.lifetimeEarned, 0);
-      const totalLifetimeSpent = mockBalances.reduce((sum, b) => sum + b.lifetimeSpent, 0);
+      const totalBalance = mockBalances.reduce(
+        (sum, b) => sum + b.currentBalance,
+        0
+      );
+      const totalLifetimeEarned = mockBalances.reduce(
+        (sum, b) => sum + b.lifetimeEarned,
+        0
+      );
+      const totalLifetimeSpent = mockBalances.reduce(
+        (sum, b) => sum + b.lifetimeSpent,
+        0
+      );
 
-      const packageSales = mockPackages.reduce((sum, p) => sum + p.totalSales, 0);
-      const packageRevenue = mockPackages.reduce((sum, p) => sum + p.revenue, 0);
+      const packageSales = mockPackages.reduce(
+        (sum, p) => sum + p.totalSales,
+        0
+      );
+      const packageRevenue = mockPackages.reduce(
+        (sum, p) => sum + p.revenue,
+        0
+      );
 
       const activeUsers = mockBalances.filter(
         (b) => new Date(b.lastTransactionAt) >= startDate
@@ -686,7 +785,8 @@ export const yuanService = {
       const averageTransactionValue =
         periodTransactions.length > 0
           ? Math.round(
-              periodTransactions.reduce((sum, t) => sum + t.amount, 0) / periodTransactions.length
+              periodTransactions.reduce((sum, t) => sum + t.amount, 0) /
+                periodTransactions.length
             )
           : 0;
 
@@ -735,7 +835,9 @@ export const yuanService = {
 
       const { amount, reason, type = 'adjustment' } = adjustmentData;
 
-      const userBalance = mockBalances.find((b) => b.userId === parseInt(userId));
+      const userBalance = mockBalances.find(
+        (b) => b.userId === parseInt(userId)
+      );
 
       if (!userBalance) {
         throw new Error('User not found');

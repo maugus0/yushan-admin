@@ -2,8 +2,21 @@ import api from './api';
 
 // Generate mock novels data
 const generateMockNovels = () => {
-  const statuses = ['published', 'draft', 'reviewing', 'suspended', 'completed'];
-  const categories = ['Fantasy', 'Romance', 'Action', 'Sci-Fi', 'Mystery', 'Horror'];
+  const statuses = [
+    'published',
+    'draft',
+    'reviewing',
+    'suspended',
+    'completed',
+  ];
+  const categories = [
+    'Fantasy',
+    'Romance',
+    'Action',
+    'Sci-Fi',
+    'Mystery',
+    'Horror',
+  ];
   const languages = ['English', 'Chinese', 'Japanese', 'Korean', 'Spanish'];
 
   const authors = [
@@ -64,7 +77,8 @@ const generateMockNovels = () => {
       Math.floor(Math.random() * 28) + 1
     );
     const updatedDate = new Date(
-      createdDate.getTime() + Math.random() * (Date.now() - createdDate.getTime())
+      createdDate.getTime() +
+        Math.random() * (Date.now() - createdDate.getTime())
     );
     const status = statuses[Math.floor(Math.random() * statuses.length)];
 
@@ -72,10 +86,14 @@ const generateMockNovels = () => {
       id: i + 1,
       title:
         novelTitles[i % novelTitles.length] +
-        (i >= novelTitles.length ? ` ${Math.floor(i / novelTitles.length) + 1}` : ''),
+        (i >= novelTitles.length
+          ? ` ${Math.floor(i / novelTitles.length) + 1}`
+          : ''),
       slug: (
         novelTitles[i % novelTitles.length] +
-        (i >= novelTitles.length ? ` ${Math.floor(i / novelTitles.length) + 1}` : '')
+        (i >= novelTitles.length
+          ? ` ${Math.floor(i / novelTitles.length) + 1}`
+          : '')
       )
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-'),
@@ -105,11 +123,16 @@ const generateMockNovels = () => {
       isOriginal: Math.random() > 0.3,
       originalLanguage: languages[Math.floor(Math.random() * languages.length)],
       translatedBy:
-        Math.random() > 0.7 ? authors[Math.floor(Math.random() * authors.length)] : null,
+        Math.random() > 0.7
+          ? authors[Math.floor(Math.random() * authors.length)]
+          : null,
 
       // Metadata
       description: `An epic tale of adventure, romance, and mystery that will keep you on the edge of your seat. Follow the journey of heroes as they navigate through challenges and discover their true destiny.`,
-      tags: ['Adventure', 'Magic', 'Romance', 'Action'].slice(0, Math.floor(Math.random() * 4) + 1),
+      tags: ['Adventure', 'Magic', 'Romance', 'Action'].slice(
+        0,
+        Math.floor(Math.random() * 4) + 1
+      ),
       ageRating: ['General', 'Teen', 'Mature'][Math.floor(Math.random() * 3)],
       isCompleted: status === 'completed',
       isPremium: Math.random() > 0.7,
@@ -123,13 +146,18 @@ const generateMockNovels = () => {
 
       // Publishing
       publishedAt:
-        status === 'published' || status === 'completed' ? createdDate.toISOString() : null,
+        status === 'published' || status === 'completed'
+          ? createdDate.toISOString()
+          : null,
       lastChapterAt:
-        status === 'published' || status === 'completed' ? updatedDate.toISOString() : null,
+        status === 'published' || status === 'completed'
+          ? updatedDate.toISOString()
+          : null,
       scheduledAt: null,
 
       // Revenue (for premium novels)
-      revenue: Math.random() > 0.7 ? Math.floor(Math.random() * 10000) + 500 : 0,
+      revenue:
+        Math.random() > 0.7 ? Math.floor(Math.random() * 10000) + 500 : 0,
 
       // Timestamps
       createdAt: createdDate.toISOString(),
@@ -141,7 +169,8 @@ const generateMockNovels = () => {
 
       // Analytics
       trending: Math.random() > 0.8,
-      trendingRank: Math.random() > 0.8 ? Math.floor(Math.random() * 100) + 1 : null,
+      trendingRank:
+        Math.random() > 0.8 ? Math.floor(Math.random() * 100) + 1 : null,
       weeklyViews: Math.floor(Math.random() * 50000) + 1000,
       monthlyViews: Math.floor(Math.random() * 200000) + 5000,
 
@@ -302,7 +331,8 @@ export const novelService = {
         monthlyViews: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        publishedAt: novelData.status === 'published' ? new Date().toISOString() : null,
+        publishedAt:
+          novelData.status === 'published' ? new Date().toISOString() : null,
         lastChapterAt: null,
         coverImage: `https://picsum.photos/300/400?random=${Date.now()}`,
         bannerImage: `https://picsum.photos/800/300?random=${Date.now() + 1}`,
@@ -337,7 +367,10 @@ export const novelService = {
       };
 
       // Update publish date if status changed to published
-      if (updateData.status === 'published' && mockNovels[novelIndex].status !== 'published') {
+      if (
+        updateData.status === 'published' &&
+        mockNovels[novelIndex].status !== 'published'
+      ) {
         updatedNovel.publishedAt = new Date().toISOString();
       }
 
@@ -524,7 +557,9 @@ export const novelService = {
 
       const { page = 1, pageSize = 20, status = '' } = params;
 
-      let novels = mockNovels.filter((novel) => novel.authorId === parseInt(authorId));
+      let novels = mockNovels.filter(
+        (novel) => novel.authorId === parseInt(authorId)
+      );
 
       if (status) {
         novels = novels.filter((novel) => novel.status === status);

@@ -22,7 +22,8 @@ const DeleteConfirm = ({
 
   const expectedConfirmationText = confirmationText || itemName || 'DELETE';
   const isConfirmationValid = requireConfirmation
-    ? confirmationChecked && (!confirmationText || confirmationInput === expectedConfirmationText)
+    ? confirmationChecked &&
+      (!confirmationText || confirmationInput === expectedConfirmationText)
     : true;
 
   const handleConfirm = () => {
@@ -52,7 +53,8 @@ const DeleteConfirm = ({
       high: {
         color: '#ff4d4f',
         alertType: 'error',
-        description: 'This action cannot be undone and may affect multiple items.',
+        description:
+          'This action cannot be undone and may affect multiple items.',
       },
     };
     return configs[dangerLevel] || configs.medium;
@@ -98,7 +100,9 @@ const DeleteConfirm = ({
 
         {/* Item Information */}
         <div>
-          <Text>Are you sure you want to permanently delete this {itemType}?</Text>
+          <Text>
+            Are you sure you want to permanently delete this {itemType}?
+          </Text>
           {itemName && (
             <div
               style={{

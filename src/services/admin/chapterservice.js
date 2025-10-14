@@ -54,11 +54,17 @@ const generateMockChapters = () => {
             : null,
 
         // Status and publishing
-        status: Math.random() > 0.1 ? 'published' : Math.random() > 0.5 ? 'draft' : 'scheduled',
+        status:
+          Math.random() > 0.1
+            ? 'published'
+            : Math.random() > 0.5
+              ? 'draft'
+              : 'scheduled',
         isPublic: Math.random() > 0.2,
         isPremium: Math.random() > 0.8,
         isLocked: Math.random() > 0.9,
-        unlockPrice: Math.random() > 0.9 ? Math.floor(Math.random() * 100) + 50 : 0,
+        unlockPrice:
+          Math.random() > 0.9 ? Math.floor(Math.random() * 100) + 50 : 0,
 
         // Content metrics
         wordCount: Math.floor(Math.random() * 3000) + 1000,
@@ -80,7 +86,8 @@ const generateMockChapters = () => {
 
         // Moderation
         isReported: Math.random() > 0.98,
-        reportCount: Math.random() > 0.98 ? Math.floor(Math.random() * 5) + 1 : 0,
+        reportCount:
+          Math.random() > 0.98 ? Math.floor(Math.random() * 5) + 1 : 0,
         moderationStatus: 'approved',
         moderationNotes: null,
 
@@ -124,7 +131,9 @@ export const chapterService = {
 
       // Filter by novel
       if (novelId) {
-        chapters = chapters.filter((chapter) => chapter.novelId === parseInt(novelId));
+        chapters = chapters.filter(
+          (chapter) => chapter.novelId === parseInt(novelId)
+        );
       }
 
       // Search filter
@@ -144,12 +153,16 @@ export const chapterService = {
 
       // Premium filter
       if (isPremium !== null) {
-        chapters = chapters.filter((chapter) => chapter.isPremium === isPremium);
+        chapters = chapters.filter(
+          (chapter) => chapter.isPremium === isPremium
+        );
       }
 
       // Reported filter
       if (isReported !== null) {
-        chapters = chapters.filter((chapter) => chapter.isReported === isReported);
+        chapters = chapters.filter(
+          (chapter) => chapter.isReported === isReported
+        );
       }
 
       // Apply sorting
@@ -192,9 +205,16 @@ export const chapterService = {
     try {
       await api.delay(400);
 
-      const { page = 1, pageSize = 50, includeContent = false, status = '' } = params;
+      const {
+        page = 1,
+        pageSize = 50,
+        includeContent = false,
+        status = '',
+      } = params;
 
-      let chapters = mockChapters.filter((chapter) => chapter.novelId === parseInt(novelId));
+      let chapters = mockChapters.filter(
+        (chapter) => chapter.novelId === parseInt(novelId)
+      );
 
       if (status) {
         chapters = chapters.filter((chapter) => chapter.status === status);
@@ -257,9 +277,13 @@ export const chapterService = {
       const { novelId } = chapterData;
 
       // Find the highest chapter number for this novel
-      const existingChapters = mockChapters.filter((c) => c.novelId === parseInt(novelId));
+      const existingChapters = mockChapters.filter(
+        (c) => c.novelId === parseInt(novelId)
+      );
       const maxChapterNumber =
-        existingChapters.length > 0 ? Math.max(...existingChapters.map((c) => c.chapterNumber)) : 0;
+        existingChapters.length > 0
+          ? Math.max(...existingChapters.map((c) => c.chapterNumber))
+          : 0;
 
       const newChapter = {
         id: Math.max(...mockChapters.map((c) => c.id)) + 1,
@@ -268,7 +292,9 @@ export const chapterService = {
           ? chapterData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
           : `chapter-${maxChapterNumber + 1}`,
         ...chapterData,
-        wordCount: chapterData.content ? chapterData.content.split(/\s+/).length : 0,
+        wordCount: chapterData.content
+          ? chapterData.content.split(/\s+/).length
+          : 0,
         readingTime: chapterData.content
           ? Math.ceil(chapterData.content.split(/\s+/).length / 200)
           : 0,
@@ -282,7 +308,8 @@ export const chapterService = {
         moderationStatus: 'pending',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        publishedAt: chapterData.status === 'published' ? new Date().toISOString() : null,
+        publishedAt:
+          chapterData.status === 'published' ? new Date().toISOString() : null,
         lastEditedAt: new Date().toISOString(),
       };
 
@@ -322,7 +349,10 @@ export const chapterService = {
       }
 
       // Update publish date if status changed to published
-      if (updateData.status === 'published' && mockChapters[chapterIndex].status !== 'published') {
+      if (
+        updateData.status === 'published' &&
+        mockChapters[chapterIndex].status !== 'published'
+      ) {
         updatedChapter.publishedAt = new Date().toISOString();
       }
 
@@ -422,7 +452,9 @@ export const chapterService = {
       const updatedChapters = [];
 
       ids.forEach((id) => {
-        const chapterIndex = mockChapters.findIndex((c) => c.id === parseInt(id));
+        const chapterIndex = mockChapters.findIndex(
+          (c) => c.id === parseInt(id)
+        );
         if (chapterIndex !== -1) {
           mockChapters[chapterIndex] = {
             ...mockChapters[chapterIndex],
@@ -448,7 +480,9 @@ export const chapterService = {
     try {
       await api.delay(500);
 
-      const novelChapters = mockChapters.filter((c) => c.novelId === parseInt(novelId));
+      const novelChapters = mockChapters.filter(
+        (c) => c.novelId === parseInt(novelId)
+      );
 
       chapterOrders.forEach(({ chapterId, newOrder }) => {
         const chapter = novelChapters.find((c) => c.id === parseInt(chapterId));

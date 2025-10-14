@@ -41,7 +41,11 @@ const StatCard = ({
           />
           {trend && (
             <div style={{ marginTop: '8px' }}>
-              <TrendIndicator value={trend.value} isPositive={trend.isPositive} showIcon={true} />
+              <TrendIndicator
+                value={trend.value}
+                isPositive={trend.isPositive}
+                showIcon={true}
+              />
             </div>
           )}
           {extra && <div style={{ marginTop: '8px' }}>{extra}</div>}

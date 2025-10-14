@@ -1,5 +1,6 @@
 // Base API configuration for Yushan Admin
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 // Create axios-like mock API instance
 class MockAPIClient {

@@ -66,10 +66,30 @@ const Dashboard = () => {
   ];
 
   const recentActivity = [
-    { id: 1, action: 'New user registered', user: 'john_reader', time: '2 minutes ago' },
-    { id: 2, action: 'Novel published', user: 'author_jane', time: '5 minutes ago' },
-    { id: 3, action: 'Chapter updated', user: 'writer_bob', time: '10 minutes ago' },
-    { id: 4, action: 'Review submitted', user: 'reviewer_alice', time: '15 minutes ago' },
+    {
+      id: 1,
+      action: 'New user registered',
+      user: 'john_reader',
+      time: '2 minutes ago',
+    },
+    {
+      id: 2,
+      action: 'Novel published',
+      user: 'author_jane',
+      time: '5 minutes ago',
+    },
+    {
+      id: 3,
+      action: 'Chapter updated',
+      user: 'writer_bob',
+      time: '10 minutes ago',
+    },
+    {
+      id: 4,
+      action: 'Review submitted',
+      user: 'reviewer_alice',
+      time: '15 minutes ago',
+    },
   ];
 
   return (
@@ -77,7 +97,10 @@ const Dashboard = () => {
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <div>
           <Title level={2}>Dashboard Overview</Title>
-          <p>Welcome to Yushan Admin Panel. Here's what's happening on your platform.</p>
+          <p>
+            Welcome to Yushan Admin Panel. Here's what's happening on your
+            platform.
+          </p>
         </div>
 
         {/* Statistics Cards */}
@@ -213,7 +236,11 @@ const Dashboard = () => {
                   >
                     Manage Users
                   </Button>
-                  <Button icon={<BookOutlined />} block onClick={() => navigate('/admin/novels')}>
+                  <Button
+                    icon={<BookOutlined />}
+                    block
+                    onClick={() => navigate('/admin/novels')}
+                  >
                     Add New Novel
                   </Button>
                   <Button
@@ -223,7 +250,11 @@ const Dashboard = () => {
                   >
                     Review Comments
                   </Button>
-                  <Button icon={<StarOutlined />} block onClick={() => navigate('/admin/reviews')}>
+                  <Button
+                    icon={<StarOutlined />}
+                    block
+                    onClick={() => navigate('/admin/reviews')}
+                  >
                     Check Reviews
                   </Button>
                 </Space>

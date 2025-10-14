@@ -1,5 +1,19 @@
-import { Modal, Descriptions, Space, Typography, Tag, Avatar, Image, Divider } from 'antd';
-import { EyeOutlined, UserOutlined, CalendarOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  Modal,
+  Descriptions,
+  Space,
+  Typography,
+  Tag,
+  Avatar,
+  Image,
+  Divider,
+} from 'antd';
+import {
+  EyeOutlined,
+  UserOutlined,
+  CalendarOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const { Text, Paragraph, Title } = Typography;
@@ -34,7 +48,9 @@ const ViewModal = ({
         return (
           <Text strong={field.strong}>
             {typeof value === 'number' ? value.toLocaleString() : value}
-            {field.suffix && <span style={{ marginLeft: 4 }}>{field.suffix}</span>}
+            {field.suffix && (
+              <span style={{ marginLeft: 4 }}>{field.suffix}</span>
+            )}
           </Text>
         );
 
@@ -42,13 +58,18 @@ const ViewModal = ({
         return (
           <Space>
             <CalendarOutlined />
-            <Text>{dayjs(value).format(field.format || 'YYYY-MM-DD HH:mm:ss')}</Text>
+            <Text>
+              {dayjs(value).format(field.format || 'YYYY-MM-DD HH:mm:ss')}
+            </Text>
           </Space>
         );
 
       case 'status':
         return (
-          <Tag color={field.colorMap?.[value] || 'default'} style={{ textTransform: 'capitalize' }}>
+          <Tag
+            color={field.colorMap?.[value] || 'default'}
+            style={{ textTransform: 'capitalize' }}
+          >
             {field.labelMap?.[value] || value}
           </Tag>
         );
@@ -276,7 +297,9 @@ const ViewModal = ({
                 <Descriptions.Item label="Created">
                   <Space>
                     <CalendarOutlined />
-                    <Text>{dayjs(data.createdAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
+                    <Text>
+                      {dayjs(data.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                    </Text>
                   </Space>
                 </Descriptions.Item>
               )}
@@ -284,7 +307,9 @@ const ViewModal = ({
                 <Descriptions.Item label="Last Updated">
                   <Space>
                     <CalendarOutlined />
-                    <Text>{dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
+                    <Text>
+                      {dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
+                    </Text>
                   </Space>
                 </Descriptions.Item>
               )}

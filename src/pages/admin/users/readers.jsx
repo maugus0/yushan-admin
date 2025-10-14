@@ -330,8 +330,12 @@ const Readers = () => {
     try {
       switch (actionKey) {
         case 'suspend_users':
-          await userService.bulkUpdateUsers(selectedKeys, { status: 'suspended' });
-          message.success(`${selectedKeys.length} readers suspended successfully`);
+          await userService.bulkUpdateUsers(selectedKeys, {
+            status: 'suspended',
+          });
+          message.success(
+            `${selectedKeys.length} readers suspended successfully`
+          );
           break;
         case 'ban_users':
           await userService.bulkUpdateUsers(selectedKeys, { status: 'banned' });
@@ -339,7 +343,9 @@ const Readers = () => {
           break;
         case 'delete':
           await userService.bulkDeleteUsers(selectedKeys);
-          message.success(`${selectedKeys.length} readers deleted successfully`);
+          message.success(
+            `${selectedKeys.length} readers deleted successfully`
+          );
           break;
         default:
           message.info(`Bulk action ${actionKey} executed`);
@@ -381,7 +387,11 @@ const Readers = () => {
     fieldTypes.text('profile.location', 'Location', { span: 12 }),
   ];
 
-  const breadcrumbItems = [{ title: 'Admin' }, { title: 'User Management' }, { title: 'Readers' }];
+  const breadcrumbItems = [
+    { title: 'Admin' },
+    { title: 'User Management' },
+    { title: 'Readers' },
+  ];
 
   return (
     <div>
@@ -391,7 +401,12 @@ const Readers = () => {
         title="Readers"
         subtitle="Manage reader accounts and their activities"
         extra={[
-          <Button key="add" type="primary" icon={<PlusOutlined />} onClick={handleAddNew}>
+          <Button
+            key="add"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddNew}
+          >
             Add Reader
           </Button>,
         ]}
@@ -413,7 +428,8 @@ const Readers = () => {
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} readers`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} readers`,
         }}
         onChange={handleTableChange}
         enableSelection={true}

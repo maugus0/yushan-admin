@@ -61,14 +61,12 @@ const DataTable = ({
   ...restProps
 }) => {
   // Bulk actions management
-  const { selectedRowKeys, selectedRows, rowSelection, clearSelection } = useBulkActions();
+  const { selectedRowKeys, selectedRows, rowSelection, clearSelection } =
+    useBulkActions();
 
   // Column visibility management - removed unused visibleColumns
-  const { getVisibleColumns, ColumnSelector: ColumnSelectorComponent } = useColumnSelector(
-    columns,
-    null,
-    columnStorageKey
-  );
+  const { getVisibleColumns, ColumnSelector: ColumnSelectorComponent } =
+    useColumnSelector(columns, null, columnStorageKey);
 
   // Handle table changes (pagination, sorting, filtering)
   const handleTableChange = (paginationInfo, filters, sorterInfo) => {
@@ -155,7 +153,9 @@ const DataTable = ({
           }}
         >
           {/* Left side - Title and bulk actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}
+          >
             {title && (
               <div>
                 <Text strong style={{ fontSize: '16px' }}>

@@ -90,7 +90,8 @@ export const authService = {
       const { username, password, rememberMe } = credentials;
       const admin = mockAdmins.find(
         (admin) =>
-          (admin.username === username || admin.email === username) && admin.password === password
+          (admin.username === username || admin.email === username) &&
+          admin.password === password
       );
 
       if (!admin) {
@@ -195,7 +196,8 @@ export const authService = {
       await api.delay(300);
 
       const currentToken =
-        localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+        localStorage.getItem('admin_token') ||
+        sessionStorage.getItem('admin_token');
       if (!currentToken) {
         throw new Error('No token to refresh');
       }
@@ -285,7 +287,9 @@ export const authService = {
 
   // Check if user is authenticated
   isAuthenticated: () => {
-    const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+    const token =
+      localStorage.getItem('admin_token') ||
+      sessionStorage.getItem('admin_token');
     const user = localStorage.getItem('admin_user');
     return !!(token && user);
   },

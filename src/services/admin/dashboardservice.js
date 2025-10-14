@@ -1,7 +1,11 @@
 import api from './api';
 
 // Generate realistic time-series data
-const generateTimeSeriesData = (days = 30, baseValue = 1000, variance = 0.2) => {
+const generateTimeSeriesData = (
+  days = 30,
+  baseValue = 1000,
+  variance = 0.2
+) => {
   const data = [];
   let currentValue = baseValue;
 
@@ -378,7 +382,9 @@ export const dashboardService = {
               id: 2,
               type: 'info',
               message: 'Backup completed successfully',
-              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              timestamp: new Date(
+                Date.now() - 2 * 60 * 60 * 1000
+              ).toISOString(),
             },
           ],
         },

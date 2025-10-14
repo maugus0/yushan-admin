@@ -408,7 +408,10 @@ export const categoryService = {
               category.children.push(child);
               return true;
             }
-            if (category.children && findAndAddChild(category.children, parentId, child)) {
+            if (
+              category.children &&
+              findAndAddChild(category.children, parentId, child)
+            ) {
               return true;
             }
           }
@@ -446,14 +449,22 @@ export const categoryService = {
             return categories[i];
           }
           if (categories[i].children) {
-            const updated = findAndUpdateCategory(categories[i].children, targetId, data);
+            const updated = findAndUpdateCategory(
+              categories[i].children,
+              targetId,
+              data
+            );
             if (updated) return updated;
           }
         }
         return null;
       };
 
-      const updatedCategory = findAndUpdateCategory(mockCategories, id, updateData);
+      const updatedCategory = findAndUpdateCategory(
+        mockCategories,
+        id,
+        updateData
+      );
 
       if (!updatedCategory) {
         throw new Error('Category not found');
@@ -480,7 +491,10 @@ export const categoryService = {
             return deleted;
           }
           if (categories[i].children) {
-            const deleted = findAndDeleteCategory(categories[i].children, targetId);
+            const deleted = findAndDeleteCategory(
+              categories[i].children,
+              targetId
+            );
             if (deleted) return deleted;
           }
         }
@@ -525,7 +539,11 @@ export const categoryService = {
 
       if (parentId) {
         // Reorder children of a specific parent
-        const findAndReorderChildren = (categories, targetParentId, newOrder) => {
+        const findAndReorderChildren = (
+          categories,
+          targetParentId,
+          newOrder
+        ) => {
           for (const category of categories) {
             if (category.id === targetParentId && category.children) {
               const reorderedChildren = newOrder
@@ -542,7 +560,11 @@ export const categoryService = {
             }
             if (
               category.children &&
-              findAndReorderChildren(category.children, targetParentId, newOrder)
+              findAndReorderChildren(
+                category.children,
+                targetParentId,
+                newOrder
+              )
             ) {
               return true;
             }

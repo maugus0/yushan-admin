@@ -79,7 +79,11 @@ const EmptyState = ({
   const actionButtons = (
     <Space direction="vertical" align="center">
       {showDefaultAction && onDefaultAction && (
-        <Button type="primary" icon={defaultActionIcon} onClick={onDefaultAction}>
+        <Button
+          type="primary"
+          icon={defaultActionIcon}
+          onClick={onDefaultAction}
+        >
           {defaultActionText}
         </Button>
       )}

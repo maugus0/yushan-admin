@@ -64,7 +64,8 @@ const Comments = () => {
     },
     {
       id: 3,
-      content: 'This is spam content with inappropriate links and promotional material.',
+      content:
+        'This is spam content with inappropriate links and promotional material.',
       author: 'spam_user',
       novel: 'Dragon Emperor',
       chapter: 'Chapter 1: The Beginning',
@@ -126,7 +127,9 @@ const Comments = () => {
 
         // Apply filters
         if (filters.status) {
-          filteredData = filteredData.filter((item) => item.status === filters.status);
+          filteredData = filteredData.filter(
+            (item) => item.status === filters.status
+          );
         }
 
         if (filters.hasReports) {
@@ -318,13 +321,18 @@ const Comments = () => {
       <PageHeader
         title="Comments Management"
         subtitle="Moderate and manage user comments"
-        breadcrumbs={[{ title: 'Dashboard', href: '/admin/dashboard' }, { title: 'Comments' }]}
+        breadcrumbs={[
+          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Comments' },
+        ]}
         actions={[
           <Button key="flagged" type="default" icon={<FlagOutlined />}>
-            View Flagged ({data.filter((item) => item.status === 'flagged').length})
+            View Flagged (
+            {data.filter((item) => item.status === 'flagged').length})
           </Button>,
           <Button key="pending" type="primary" icon={<MessageOutlined />}>
-            Review Pending ({data.filter((item) => item.status === 'pending').length})
+            Review Pending (
+            {data.filter((item) => item.status === 'pending').length})
           </Button>,
         ]}
       />
@@ -368,7 +376,8 @@ const Comments = () => {
               ...pagination,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} comments`,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} comments`,
             }}
             onChange={handleTableChange}
             loading={loading}

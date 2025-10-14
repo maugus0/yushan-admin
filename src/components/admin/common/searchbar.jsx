@@ -1,6 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Input, Select, Space, Button, AutoComplete } from 'antd';
-import { SearchOutlined, ClearOutlined, FilterOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  ClearOutlined,
+  FilterOutlined,
+} from '@ant-design/icons';
 import { debounce } from 'lodash';
 
 const { Option } = Select;
@@ -43,7 +47,9 @@ const SearchBar = ({
     // Update autocomplete options
     if (suggestions.length > 0) {
       const filteredSuggestions = suggestions
-        .filter((suggestion) => suggestion.toLowerCase().includes(value.toLowerCase()))
+        .filter((suggestion) =>
+          suggestion.toLowerCase().includes(value.toLowerCase())
+        )
         .slice(0, 10)
         .map((suggestion) => ({ value: suggestion }));
       setAutoCompleteOptions(filteredSuggestions);
@@ -79,7 +85,12 @@ const SearchBar = ({
           suffix={
             <Space>
               {showClear && inputValue && (
-                <Button type="text" size="small" icon={<ClearOutlined />} onClick={handleClear} />
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<ClearOutlined />}
+                  onClick={handleClear}
+                />
               )}
               <Button
                 type="text"
@@ -103,7 +114,12 @@ const SearchBar = ({
         suffix={
           <Space>
             {showClear && inputValue && (
-              <Button type="text" size="small" icon={<ClearOutlined />} onClick={handleClear} />
+              <Button
+                type="text"
+                size="small"
+                icon={<ClearOutlined />}
+                onClick={handleClear}
+              />
             )}
             <Button
               type="text"
@@ -130,7 +146,10 @@ const SearchBar = ({
         >
           <Option value="all">All Categories</Option>
           {categories.map((category) => (
-            <Option key={category.value || category} value={category.value || category}>
+            <Option
+              key={category.value || category}
+              value={category.value || category}
+            >
               {category.label || category}
             </Option>
           ))}
