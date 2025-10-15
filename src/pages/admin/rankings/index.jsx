@@ -591,8 +591,6 @@ const Rankings = () => {
     try {
       const response = await rankingService.getNovelRank(values.novelId);
 
-      console.log('Novel rank API response:', response);
-
       if (response.success) {
         const isInTop100 = response.data !== null;
 
