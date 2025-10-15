@@ -32,6 +32,7 @@ import {
   LoadingSpinner,
 } from '../../../components/admin/common';
 import { rankingService } from '../../../services/admin/rankingservice';
+import { logApiError } from '../../../utils/admin/errorReporting';
 
 // Import default images from assets
 import novelDefaultImg from '../../../assets/images/novel_default.png';
@@ -237,13 +238,8 @@ const Rankings = () => {
         if (response && response.success) {
           const { content, totalElements } = response.data;
 
-          console.log('API Response:', response);
-          console.log('Content:', content);
-          console.log('First item sample:', content?.[0]);
-
           // Transform data to match table structure
           const transformedData = content.map((item, index) => {
-            console.log(`Item ${index}:`, item);
             return {
               id: item.uuid || item.id || index,
               rank: currentPage * currentPageSize + index + 1,
@@ -271,7 +267,11 @@ const Rankings = () => {
           }));
         }
       } catch (error) {
-        console.error('Failed to fetch rankings:', error);
+        logApiError(error, `ranking/${activeTab}`, {
+          activeTab,
+          filters,
+          pagination: params,
+        });
         message.error('Failed to fetch rankings: ' + error.message);
         setData([]);
         setPagination((prev) => ({
@@ -596,8 +596,6 @@ const Rankings = () => {
     try {
       const response = await rankingService.getNovelRank(values.novelId);
 
-      console.log('Novel rank API response:', response);
-
       if (response.success) {
         const isInTop100 = response.data !== null;
 
@@ -633,7 +631,7 @@ const Rankings = () => {
         }
       }
     } catch (error) {
-      console.error('Novel rank lookup error:', error);
+      logApiError(error, 'ranking/novel/rank', { novelId: values.novelId });
       message.error('Failed to fetch novel rank: ' + error.message);
     } finally {
       setRankLookupLoading(false);
