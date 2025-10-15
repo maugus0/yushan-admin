@@ -5,7 +5,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
-import errorReporter from '../../utils/admin/errorReporting';
+import errorReporter from '../../../utils/admin/errorReporting';
 
 const { Text, Paragraph } = Typography;
 
