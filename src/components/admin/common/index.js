@@ -23,3 +23,4 @@ export {
 export { default as PageHeader } from './pageheader';
 export { default as SearchBar } from './searchbar';
 export { default as StatusBadge } from './statusbadge';
+export { default as ErrorLogsViewer } from './ErrorLogsViewer';
