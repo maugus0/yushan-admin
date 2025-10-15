@@ -237,13 +237,8 @@ const Rankings = () => {
         if (response && response.success) {
           const { content, totalElements } = response.data;
 
-          console.log('API Response:', response);
-          console.log('Content:', content);
-          console.log('First item sample:', content?.[0]);
-
           // Transform data to match table structure
           const transformedData = content.map((item, index) => {
-            console.log(`Item ${index}:`, item);
             return {
               id: item.uuid || item.id || index,
               rank: currentPage * currentPageSize + index + 1,
