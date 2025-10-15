@@ -197,15 +197,9 @@ const authService = {
         throw new Error('No refresh token available');
       }
 
-      const response = await apiClient.post(
-        '/auth/refresh',
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${refreshToken}`,
-          },
-        }
-      );
+      const response = await apiClient.post('/auth/refresh', {
+        refreshToken: refreshToken,
+      });
 
       if (response.data?.code === 200) {
         const tokenData = response.data.data;
