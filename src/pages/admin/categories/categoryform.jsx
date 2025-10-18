@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Form,
-  Input,
-  Switch,
-  Button,
-  Space,
-  Card,
-  message,
-  Spin,
-} from 'antd';
+import { Form, Input, Switch, Button, Space, Card, message, Spin } from 'antd';
 import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import { categoryService } from '../../../services/admin/categoryservice';
 
@@ -50,7 +41,7 @@ const CategoryForm = ({ categoryId, onSuccess, onCancel, mode = 'create' }) => {
     setSubmitting(true);
     try {
       let response;
-      
+
       if (mode === 'edit') {
         response = await categoryService.updateCategory(categoryId, values);
         message.success('Category updated successfully');
@@ -137,13 +128,13 @@ const CategoryForm = ({ categoryId, onSuccess, onCancel, mode = 'create' }) => {
           name="isActive"
           valuePropName="checked"
           extra={
-            mode === 'create' 
-              ? "Note: Backend currently only supports creating active categories. This will be enabled once backend API is updated."
-              : "Toggle to activate or deactivate this category"
+            mode === 'create'
+              ? 'Note: Backend currently only supports creating active categories. This will be enabled once backend API is updated.'
+              : 'Toggle to activate or deactivate this category'
           }
           tooltip={
             mode === 'create'
-              ? "Creating inactive categories will be available soon"
+              ? 'Creating inactive categories will be available soon'
               : undefined
           }
         >

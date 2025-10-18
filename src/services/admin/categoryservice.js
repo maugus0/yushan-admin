@@ -304,7 +304,7 @@ export const categoryService = {
   getAllCategories: async (params = {}) => {
     try {
       const { includeInactive = true } = params;
-      
+
       // Use active endpoint if we don't want inactive categories
       const endpoint = includeInactive ? '/categories' : '/categories/active';
       const response = await api.get(endpoint);
@@ -317,9 +317,7 @@ export const categoryService = {
           message: response.data.message,
         };
       } else {
-        throw new Error(
-          response.data.message || 'Failed to fetch categories'
-        );
+        throw new Error(response.data.message || 'Failed to fetch categories');
       }
     } catch (error) {
       logApiError(error, '/categories', params);
@@ -343,9 +341,7 @@ export const categoryService = {
           message: response.data.message,
         };
       } else {
-        throw new Error(
-          response.data.message || 'Failed to fetch category'
-        );
+        throw new Error(response.data.message || 'Failed to fetch category');
       }
     } catch (error) {
       logApiError(error, `/categories/${id}`, { categoryId: id });
@@ -369,9 +365,7 @@ export const categoryService = {
           message: response.data.message,
         };
       } else {
-        throw new Error(
-          response.data.message || 'Failed to create category'
-        );
+        throw new Error(response.data.message || 'Failed to create category');
       }
     } catch (error) {
       logApiError(error, '/categories', { requestData: categoryData });
@@ -395,9 +389,7 @@ export const categoryService = {
           message: response.data.message,
         };
       } else {
-        throw new Error(
-          response.data.message || 'Failed to update category'
-        );
+        throw new Error(response.data.message || 'Failed to update category');
       }
     } catch (error) {
       logApiError(error, `/categories/${id}`, {
@@ -424,9 +416,7 @@ export const categoryService = {
           message: response.data.message,
         };
       } else {
-        throw new Error(
-          response.data.message || 'Failed to delete category'
-        );
+        throw new Error(response.data.message || 'Failed to delete category');
       }
     } catch (error) {
       logApiError(error, `/categories/${id}${hard ? '/hard' : ''}`, {
@@ -545,9 +535,7 @@ export const categoryService = {
           count: response.data.data.totalElements || 0,
         };
       } else {
-        throw new Error(
-          response.data.message || 'Failed to fetch novel count'
-        );
+        throw new Error(response.data.message || 'Failed to fetch novel count');
       }
     } catch (error) {
       logApiError(error, `/novels?category=${categoryId}`, {
@@ -568,9 +556,9 @@ export const categoryService = {
       const countPromises = categoryIds.map((id) =>
         categoryService.getCategoryNovelCount(id)
       );
-      
+
       const results = await Promise.all(countPromises);
-      
+
       // Create a map of categoryId -> count
       const countsMap = {};
       categoryIds.forEach((id, index) => {

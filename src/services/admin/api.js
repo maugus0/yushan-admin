@@ -16,7 +16,9 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Check for accessToken (used by authservice.js)
-    const token = localStorage.getItem('accessToken') || localStorage.getItem('admin_token');
+    const token =
+      localStorage.getItem('accessToken') ||
+      localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -32,7 +32,7 @@ const Categories = () => {
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
-  
+
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
@@ -71,7 +71,10 @@ const Categories = () => {
           }
 
           // Apply date range filter
-          if (filters.createdDateRange && filters.createdDateRange.length === 2) {
+          if (
+            filters.createdDateRange &&
+            filters.createdDateRange.length === 2
+          ) {
             const [startDate, endDate] = filters.createdDateRange;
             filteredData = filteredData.filter((item) => {
               const itemDate = new Date(item.createTime);
@@ -82,15 +85,17 @@ const Categories = () => {
           // Fetch novel counts for all categories
           const categoryIds = filteredData.map((item) => item.id);
           let countsResponse = { counts: {} };
-          
+
           // Only fetch counts if we have categories
           if (categoryIds.length > 0) {
             try {
-              countsResponse = await categoryService.getCategoryNovelCounts(
-                categoryIds
-              );
+              countsResponse =
+                await categoryService.getCategoryNovelCounts(categoryIds);
             } catch (countError) {
-              console.warn('Failed to fetch novel counts, using 0 for all:', countError);
+              console.warn(
+                'Failed to fetch novel counts, using 0 for all:',
+                countError
+              );
               // Create empty counts map if fetch fails
               countsResponse = { counts: {} };
             }
@@ -390,10 +395,12 @@ const Categories = () => {
           <p>Choose how to delete "{record.name}":</p>
           <ul style={{ marginTop: '12px', paddingLeft: '20px' }}>
             <li>
-              <strong>Soft Delete:</strong> Mark as deleted (can be recovered later)
+              <strong>Soft Delete:</strong> Mark as deleted (can be recovered
+              later)
             </li>
             <li>
-              <strong>Hard Delete:</strong> Permanently remove from database (cannot be undone)
+              <strong>Hard Delete:</strong> Permanently remove from database
+              (cannot be undone)
             </li>
           </ul>
         </div>
@@ -500,7 +507,9 @@ const Categories = () => {
 
   const handleViewNovels = (record) => {
     // Navigate to novels page with category filter pre-applied
-    navigate(`/admin/novels?category=${record.id}&categoryName=${encodeURIComponent(record.name)}`);
+    navigate(
+      `/admin/novels?category=${record.id}&categoryName=${encodeURIComponent(record.name)}`
+    );
   };
 
   return (
