@@ -15,7 +15,10 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('admin_token');
+    // Check for accessToken (used by authservice.js)
+    const token =
+      localStorage.getItem('accessToken') ||
+      localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,9 +37,12 @@ api.interceptors.response.use(
   (error) => {
     // Handle common errors
     if (error.response?.status === 401) {
-      // Token expired or invalid
+      // Token expired or invalid - clear all auth tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_refresh_token');
+      localStorage.removeItem('admin_user');
       window.location.href = '/yushan-admin/login';
     }
 
