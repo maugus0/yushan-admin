@@ -397,13 +397,28 @@ const Categories = () => {
           <ul style={{ marginTop: '12px', paddingLeft: '20px' }}>
             <li>
               <strong>Soft Delete:</strong> Mark as deleted (can be recovered
-              later)
+              later, recommended if category has novels)
             </li>
             <li>
               <strong>Hard Delete:</strong> Permanently remove from database
-              (cannot be undone)
+              (only works if category has no novels)
             </li>
           </ul>
+          {record.novelCount > 0 && (
+            <div
+              style={{
+                marginTop: '12px',
+                padding: '8px 12px',
+                background: '#fff7e6',
+                border: '1px solid #ffd591',
+                borderRadius: '4px',
+              }}
+            >
+              ⚠️ This category currently has{' '}
+              <strong>{record.novelCount} novel(s)</strong>. Hard delete will
+              fail unless all novels are removed first.
+            </div>
+          )}
         </div>
       ),
       okText: 'Soft Delete',
@@ -444,7 +459,41 @@ const Categories = () => {
               // Extra confirmation for hard delete
               Modal.confirm({
                 title: 'Confirm Hard Delete',
-                content: `Are you absolutely sure? Hard deleting "${record.name}" is PERMANENT and cannot be undone!`,
+                content: (
+                  <div>
+                    <p>
+                      Are you absolutely sure? Hard deleting "{record.name}" is
+                      PERMANENT and cannot be undone!
+                    </p>
+                    {record.novelCount > 0 && (
+                      <div
+                        style={{
+                          marginTop: '12px',
+                          padding: '12px',
+                          background: '#fff2e8',
+                          border: '1px solid #ffbb96',
+                          borderRadius: '4px',
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: 0,
+                            fontWeight: 500,
+                            color: '#d4380d',
+                          }}
+                        >
+                          ⚠️ Warning: This category has {record.novelCount}{' '}
+                          novel(s)
+                        </p>
+                        <p style={{ margin: '8px 0 0 0', fontSize: '12px' }}>
+                          Hard delete will fail due to database constraints. You
+                          must first remove or reassign all novels in this
+                          category.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ),
                 okText: 'Yes, Hard Delete',
                 okType: 'danger',
                 cancelText: 'Cancel',
@@ -454,7 +503,72 @@ const Categories = () => {
                     message.success('Category permanently deleted');
                     fetchData();
                   } catch (error) {
-                    message.error('Failed to hard delete: ' + error.message);
+                    // Check if error is foreign key constraint violation
+                    const errorMessage = error.message?.toLowerCase() || '';
+                    const isForeignKeyError =
+                      errorMessage.includes('foreign key constraint') ||
+                      errorMessage.includes('fk_novel_category') ||
+                      errorMessage.includes('still referenced');
+
+                    if (isForeignKeyError) {
+                      Modal.error({
+                        title: 'Cannot Hard Delete Category',
+                        width: 520,
+                        content: (
+                          <div>
+                            <p>
+                              <strong>"{record.name}"</strong> cannot be
+                              permanently deleted because it still has novels
+                              associated with it.
+                            </p>
+                            <div
+                              style={{
+                                marginTop: '16px',
+                                padding: '12px',
+                                background: '#f6ffed',
+                                border: '1px solid #b7eb8f',
+                                borderRadius: '4px',
+                              }}
+                            >
+                              <p style={{ margin: 0, fontWeight: 500 }}>
+                                ✅ What you can do:
+                              </p>
+                              <ol
+                                style={{
+                                  margin: '8px 0 0 0',
+                                  paddingLeft: '20px',
+                                }}
+                              >
+                                <li>
+                                  Use <strong>Soft Delete</strong> instead
+                                  (recommended)
+                                </li>
+                                <li>
+                                  Navigate to novels in this category and
+                                  delete/reassign them first
+                                </li>
+                                <li>
+                                  Then return here to hard delete the empty
+                                  category
+                                </li>
+                              </ol>
+                            </div>
+                            <div
+                              style={{
+                                marginTop: '12px',
+                                fontSize: '12px',
+                                color: '#666',
+                              }}
+                            >
+                              💡 Tip: Click "View Novels" to see and manage all
+                              novels in this category.
+                            </div>
+                          </div>
+                        ),
+                      });
+                    } else {
+                      message.error('Failed to hard delete: ' + error.message);
+                    }
                   }
                 },
               });
