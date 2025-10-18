@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/yushan-admin/static/css/main.d271641d.css",
-    "main.js": "/yushan-admin/static/js/main.6ef02ad1.js",
+    "main.js": "/yushan-admin/static/js/main.2f44b67b.js",
     "static/media/user.png": "/yushan-admin/static/media/user.e6436ee0e3508e207bc4.png",
     "static/media/user_female.png": "/yushan-admin/static/media/user_female.912e042a7a7ca4b68a84.png",
     "static/media/novel_default.png": "/yushan-admin/static/media/novel_default.f15ad647d7bcb27e575c.png",
     "static/media/user_male.png": "/yushan-admin/static/media/user_male.59b848e45364f11c9906.png",
     "index.html": "/yushan-admin/index.html",
     "main.d271641d.css.map": "/yushan-admin/static/css/main.d271641d.css.map",
-    "main.6ef02ad1.js.map": "/yushan-admin/static/js/main.6ef02ad1.js.map"
+    "main.2f44b67b.js.map": "/yushan-admin/static/js/main.2f44b67b.js.map"
   },
   "entrypoints": [
     "static/css/main.d271641d.css",
-    "static/js/main.6ef02ad1.js"
+    "static/js/main.2f44b67b.js"
   ]
 }
