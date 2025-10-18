@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Badge } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { Button, Space, Table, Tooltip, Badge, Modal } from 'antd';
 import {
   PlusOutlined,
   TagsOutlined,
@@ -16,8 +17,12 @@ import {
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
+import { categoryService } from '../../../services/admin/categoryservice';
+import CategoryForm from './categoryform';
+import { message } from 'antd';
 
 const Categories = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -27,9 +32,128 @@ const Categories = () => {
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
+  
+  // Modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
 
-  // Mock data for categories
-  const mockCategories = [
+  // Fetch data from API
+  const fetchData = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        const response = await categoryService.getAllCategories({
+          includeInactive: true,
+        });
+
+        if (response.success) {
+          let filteredData = response.data;
+
+          // Apply search filter
+          if (searchValue) {
+            filteredData = filteredData.filter(
+              (item) =>
+                item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+                item.description
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase())
+            );
+          }
+
+          // Apply status filter - map isActive to status for UI
+          if (filters.status) {
+            const isActiveFilter = filters.status === 'active';
+            filteredData = filteredData.filter(
+              (item) => item.isActive === isActiveFilter
+            );
+          }
+
+          // Apply date range filter
+          if (filters.createdDateRange && filters.createdDateRange.length === 2) {
+            const [startDate, endDate] = filters.createdDateRange;
+            filteredData = filteredData.filter((item) => {
+              const itemDate = new Date(item.createTime);
+              return itemDate >= startDate && itemDate <= endDate;
+            });
+          }
+
+          // Fetch novel counts for all categories
+          const categoryIds = filteredData.map((item) => item.id);
+          let countsResponse = { counts: {} };
+          
+          // Only fetch counts if we have categories
+          if (categoryIds.length > 0) {
+            try {
+              countsResponse = await categoryService.getCategoryNovelCounts(
+                categoryIds
+              );
+            } catch (countError) {
+              console.warn('Failed to fetch novel counts, using 0 for all:', countError);
+              // Create empty counts map if fetch fails
+              countsResponse = { counts: {} };
+            }
+          }
+
+          // Map API response to match UI expectations
+          const mappedData = filteredData.map((item) => ({
+            ...item,
+            status: item.isActive ? 'active' : 'inactive',
+            novelCount: countsResponse.counts[item.id] || 0, // Use fetched count
+            color: getRandomColor(), // Generate color for display
+            createdAt: item.createTime,
+            updatedAt: item.updateTime,
+          }));
+
+          // Apply pagination
+          const pageSize = params.pageSize || pagination.pageSize;
+          const current = params.current || pagination.current;
+          const startIndex = (current - 1) * pageSize;
+          const endIndex = startIndex + pageSize;
+
+          setData(mappedData.slice(startIndex, endIndex));
+          setPagination((prev) => ({
+            ...prev,
+            current: current,
+            total: mappedData.length,
+          }));
+        }
+      } catch (error) {
+        message.error('Failed to fetch categories: ' + error.message);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchValue, filters, pagination.pageSize, pagination.current]
+  );
+
+  // Helper function to generate random colors for categories
+  const getRandomColor = () => {
+    const colors = [
+      '#722ed1',
+      '#eb2f96',
+      '#fa8c16',
+      '#1890ff',
+      '#f5222d',
+      '#52c41a',
+      '#13c2c2',
+      '#2f54eb',
+      '#faad14',
+      '#a0d911',
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue, filters]);
+
+  // Remove mock data - replaced with API
+  /* const mockCategories = [
     {
       id: 1,
       name: 'Fantasy',
@@ -91,69 +215,7 @@ const Categories = () => {
       createdAt: '2024-03-01T15:40:00Z',
       updatedAt: '2024-07-20T10:15:00Z',
     },
-  ];
-
-  // Fetch data
-  const fetchData = useCallback(
-    async (params = {}) => {
-      setLoading(true);
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        let filteredData = mockCategories;
-
-        // Apply search filter
-        if (searchValue) {
-          filteredData = filteredData.filter(
-            (item) =>
-              item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.description.toLowerCase().includes(searchValue.toLowerCase())
-          );
-        }
-
-        // Apply status filter
-        if (filters.status) {
-          filteredData = filteredData.filter(
-            (item) => item.status === filters.status
-          );
-        }
-
-        // Apply novel count filter
-        if (filters.novelCountRange) {
-          const [min, max] = filters.novelCountRange;
-          filteredData = filteredData.filter(
-            (item) =>
-              item.novelCount >= (min || 0) &&
-              item.novelCount <= (max || Infinity)
-          );
-        }
-
-        const pageSize = params.pageSize || pagination.pageSize;
-        const current = params.current || pagination.current;
-        const startIndex = (current - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        setData(filteredData.slice(startIndex, endIndex));
-        setPagination((prev) => ({
-          ...prev,
-          current: current,
-          total: filteredData.length,
-        }));
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, filters, pagination.pageSize, pagination.current]
-  );
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, filters]);
+  ]; */
 
   // Filter configuration
   const filterConfig = [
@@ -280,11 +342,13 @@ const Categories = () => {
               key: 'novels',
               icon: <BookOutlined />,
               label: 'View Novels',
+              onClick: () => handleViewNovels(record),
             },
             {
               key: 'toggle',
               icon: <TagsOutlined />,
               label: record.status === 'active' ? 'Deactivate' : 'Activate',
+              onClick: () => handleToggleStatus(record),
             },
           ]}
         />
@@ -307,23 +371,136 @@ const Categories = () => {
   };
 
   const handleView = (record) => {
-    console.log('View category:', record);
+    setSelectedCategory(record);
+    setViewModalVisible(true);
   };
 
   const handleEdit = (record) => {
-    console.log('Edit category:', record);
+    setSelectedCategory(record);
+    setModalMode('edit');
+    setModalVisible(true);
   };
 
-  const handleDelete = (record) => {
-    console.log('Delete category:', record);
+  const handleDelete = async (record) => {
+    // Show confirmation modal with two delete options
+    Modal.confirm({
+      title: 'Delete Category',
+      content: (
+        <div>
+          <p>Choose how to delete "{record.name}":</p>
+          <ul style={{ marginTop: '12px', paddingLeft: '20px' }}>
+            <li>
+              <strong>Soft Delete:</strong> Mark as deleted (can be recovered later)
+            </li>
+            <li>
+              <strong>Hard Delete:</strong> Permanently remove from database (cannot be undone)
+            </li>
+          </ul>
+        </div>
+      ),
+      okText: 'Soft Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          await categoryService.deleteCategory(record.id, false);
+          message.success('Category soft deleted successfully');
+          fetchData(); // Refresh the list
+        } catch (error) {
+          message.error('Failed to delete category: ' + error.message);
+        }
+      },
+      footer: (_, { CancelBtn }) => (
+        <>
+          <CancelBtn />
+          <Button
+            danger
+            onClick={async () => {
+              Modal.destroyAll();
+              try {
+                await categoryService.deleteCategory(record.id, false);
+                message.success('Category soft deleted successfully');
+                fetchData();
+              } catch (error) {
+                message.error('Failed to soft delete: ' + error.message);
+              }
+            }}
+          >
+            Soft Delete
+          </Button>
+          <Button
+            type="primary"
+            danger
+            onClick={async () => {
+              Modal.destroyAll();
+              // Extra confirmation for hard delete
+              Modal.confirm({
+                title: 'Confirm Hard Delete',
+                content: `Are you absolutely sure? Hard deleting "${record.name}" is PERMANENT and cannot be undone!`,
+                okText: 'Yes, Hard Delete',
+                okType: 'danger',
+                cancelText: 'Cancel',
+                onOk: async () => {
+                  try {
+                    await categoryService.deleteCategory(record.id, true);
+                    message.success('Category permanently deleted');
+                    fetchData();
+                  } catch (error) {
+                    message.error('Failed to hard delete: ' + error.message);
+                  }
+                },
+              });
+            }}
+          >
+            Hard Delete
+          </Button>
+        </>
+      ),
+    });
   };
 
   const handleAddNew = () => {
-    console.log('Add new category');
+    setSelectedCategory(null);
+    setModalMode('create');
+    setModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+    setSelectedCategory(null);
+  };
+
+  const handleModalSuccess = () => {
+    setModalVisible(false);
+    setSelectedCategory(null);
+    fetchData(); // Refresh the list after successful create/update
+  };
+
+  const handleViewModalClose = () => {
+    setViewModalVisible(false);
+    setSelectedCategory(null);
+  };
+
+  const handleToggleStatus = async (record) => {
+    try {
+      const newStatus = !record.isActive;
+      await categoryService.toggleCategoryStatus(record.id, newStatus);
+      message.success(
+        `Category ${newStatus ? 'activated' : 'deactivated'} successfully`
+      );
+      fetchData(); // Refresh the list
+    } catch (error) {
+      message.error('Failed to toggle category status: ' + error.message);
+    }
   };
 
   const handleTableChange = (paginationInfo) => {
     fetchData(paginationInfo);
+  };
+
+  const handleViewNovels = (record) => {
+    // Navigate to novels page with category filter pre-applied
+    navigate(`/admin/novels?category=${record.id}&categoryName=${encodeURIComponent(record.name)}`);
   };
 
   return (
@@ -398,6 +575,156 @@ const Categories = () => {
           />
         )}
       </Space>
+
+      {/* Create/Edit Modal */}
+      <Modal
+        title={modalMode === 'edit' ? 'Edit Category' : 'Create New Category'}
+        open={modalVisible}
+        onCancel={handleModalClose}
+        footer={null}
+        width={600}
+        destroyOnClose
+      >
+        <CategoryForm
+          categoryId={selectedCategory?.id}
+          mode={modalMode}
+          onSuccess={handleModalSuccess}
+          onCancel={handleModalClose}
+        />
+      </Modal>
+
+      {/* View Modal */}
+      <Modal
+        title="Category Details"
+        open={viewModalVisible}
+        onCancel={handleViewModalClose}
+        footer={[
+          <Button key="close" onClick={handleViewModalClose}>
+            Close
+          </Button>,
+          <Button
+            key="edit"
+            type="primary"
+            onClick={() => {
+              handleViewModalClose();
+              handleEdit(selectedCategory);
+            }}
+          >
+            Edit Category
+          </Button>,
+        ]}
+        width={600}
+      >
+        {selectedCategory && (
+          <div>
+            <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <div>
+                <Space>
+                  <div
+                    style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: '50%',
+                      backgroundColor: selectedCategory.color,
+                    }}
+                  />
+                  <FolderOutlined
+                    style={{
+                      color: selectedCategory.color,
+                      fontSize: '20px',
+                    }}
+                  />
+                </Space>
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Category Name
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 500 }}>
+                  {selectedCategory.name}
+                </div>
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Description
+                </div>
+                <div>{selectedCategory.description}</div>
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Status
+                </div>
+                <StatusBadge status={selectedCategory.status} />
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Slug
+                </div>
+                <code>{selectedCategory.slug}</code>
+              </div>
+
+              <Space size="large">
+                <div>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#999',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    <CalendarOutlined /> Created
+                  </div>
+                  <div>
+                    {new Date(selectedCategory.createdAt).toLocaleString()}
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#999',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    <CalendarOutlined /> Last Updated
+                  </div>
+                  <div>
+                    {new Date(selectedCategory.updatedAt).toLocaleString()}
+                  </div>
+                </div>
+              </Space>
+            </Space>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

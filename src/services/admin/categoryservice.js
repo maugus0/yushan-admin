@@ -1,4 +1,5 @@
 import api from './api';
+import { logApiError } from '../../utils/admin/errorReporting';
 
 // Mock categories data
 const generateMockCategories = () => {
@@ -294,243 +295,312 @@ const generateMockCategories = () => {
   ];
 };
 
+// Keep mock data generator for reference/fallback if needed
 const mockCategories = generateMockCategories();
 
+// Real API-based category service
 export const categoryService = {
   // Get all categories
   getAllCategories: async (params = {}) => {
     try {
-      await api.delay(400);
+      const { includeInactive = true } = params;
+      
+      // Use active endpoint if we don't want inactive categories
+      const endpoint = includeInactive ? '/categories' : '/categories/active';
+      const response = await api.get(endpoint);
 
-      const {
-        includeInactive = false,
-        includeChildren = true,
-        search = '',
-        page = 1,
-        pageSize = 50,
-      } = params;
-
-      let categories = [...mockCategories];
-
-      // Filter by active status
-      if (!includeInactive) {
-        categories = categories.filter((cat) => cat.isActive);
-      }
-
-      // Search filter
-      if (search) {
-        const searchLower = search.toLowerCase();
-        categories = categories.filter(
-          (cat) =>
-            cat.name.toLowerCase().includes(searchLower) ||
-            cat.description.toLowerCase().includes(searchLower)
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data.categories,
+          total: response.data.data.totalCount,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to fetch categories'
         );
       }
-
-      // Remove children if not requested
-      if (!includeChildren) {
-        categories = categories.map((cat) => {
-          // eslint-disable-next-line no-unused-vars
-          const { children, ...categoryWithoutChildren } = cat;
-          return categoryWithoutChildren;
-        });
-      }
-
-      // Apply pagination
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize;
-      const paginatedCategories = categories.slice(start, end);
-
-      return {
-        success: true,
-        data: paginatedCategories,
-        total: categories.length,
-        page,
-        pageSize,
-      };
     } catch (error) {
-      throw new Error('Failed to fetch categories');
+      logApiError(error, '/categories', params);
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch categories'
+      );
     }
   },
 
   // Get category by ID
   getCategoryById: async (id) => {
     try {
-      await api.delay(300);
+      const response = await api.get(`/categories/${id}`);
 
-      const findCategory = (categories, targetId) => {
-        for (const category of categories) {
-          if (category.id === parseInt(targetId)) {
-            return category;
-          }
-          if (category.children) {
-            const found = findCategory(category.children, targetId);
-            if (found) return found;
-          }
-        }
-        return null;
-      };
-
-      const category = findCategory(mockCategories, id);
-
-      if (!category) {
-        throw new Error('Category not found');
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to fetch category'
+        );
       }
-
-      return {
-        success: true,
-        data: category,
-      };
     } catch (error) {
-      throw new Error(error.message || 'Failed to fetch category');
+      logApiError(error, `/categories/${id}`, { categoryId: id });
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch category'
+      );
     }
   },
 
   // Create new category
   createCategory: async (categoryData) => {
     try {
-      await api.delay(600);
+      const response = await api.post('/categories', categoryData);
 
-      const newCategory = {
-        id: Math.max(...mockCategories.map((c) => c.id)) + 1,
-        ...categoryData,
-        novelCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        children: [],
-      };
-
-      if (categoryData.parentId) {
-        // Add as child category
-        const findAndAddChild = (categories, parentId, child) => {
-          for (const category of categories) {
-            if (category.id === parentId) {
-              category.children.push(child);
-              return true;
-            }
-            if (
-              category.children &&
-              findAndAddChild(category.children, parentId, child)
-            ) {
-              return true;
-            }
-          }
-          return false;
+      if (response.data.code === 200 || response.data.code === 201) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message,
         };
-
-        findAndAddChild(mockCategories, categoryData.parentId, newCategory);
       } else {
-        // Add as top-level category
-        mockCategories.push(newCategory);
+        throw new Error(
+          response.data.message || 'Failed to create category'
+        );
       }
-
-      return {
-        success: true,
-        data: newCategory,
-      };
     } catch (error) {
-      throw new Error('Failed to create category');
+      logApiError(error, '/categories', { requestData: categoryData });
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to create category'
+      );
     }
   },
 
   // Update category
   updateCategory: async (id, updateData) => {
     try {
-      await api.delay(500);
+      const response = await api.put(`/categories/${id}`, updateData);
 
-      const findAndUpdateCategory = (categories, targetId, data) => {
-        for (let i = 0; i < categories.length; i++) {
-          if (categories[i].id === parseInt(targetId)) {
-            categories[i] = {
-              ...categories[i],
-              ...data,
-              updatedAt: new Date().toISOString(),
-            };
-            return categories[i];
-          }
-          if (categories[i].children) {
-            const updated = findAndUpdateCategory(
-              categories[i].children,
-              targetId,
-              data
-            );
-            if (updated) return updated;
-          }
-        }
-        return null;
-      };
-
-      const updatedCategory = findAndUpdateCategory(
-        mockCategories,
-        id,
-        updateData
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to update category'
+        );
+      }
+    } catch (error) {
+      logApiError(error, `/categories/${id}`, {
+        categoryId: id,
+        requestData: updateData,
+      });
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to update category'
       );
-
-      if (!updatedCategory) {
-        throw new Error('Category not found');
-      }
-
-      return {
-        success: true,
-        data: updatedCategory,
-      };
-    } catch (error) {
-      throw new Error(error.message || 'Failed to update category');
     }
   },
 
-  // Delete category
-  deleteCategory: async (id) => {
+  // Delete category (soft delete)
+  deleteCategory: async (id, hard = false) => {
     try {
-      await api.delay(400);
+      const endpoint = hard ? `/categories/${id}/hard` : `/categories/${id}`;
+      const response = await api.delete(endpoint);
 
-      const findAndDeleteCategory = (categories, targetId) => {
-        for (let i = 0; i < categories.length; i++) {
-          if (categories[i].id === parseInt(targetId)) {
-            const deleted = categories.splice(i, 1)[0];
-            return deleted;
-          }
-          if (categories[i].children) {
-            const deleted = findAndDeleteCategory(
-              categories[i].children,
-              targetId
-            );
-            if (deleted) return deleted;
-          }
-        }
-        return null;
-      };
-
-      const deletedCategory = findAndDeleteCategory(mockCategories, id);
-
-      if (!deletedCategory) {
-        throw new Error('Category not found');
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to delete category'
+        );
       }
-
-      return {
-        success: true,
-        data: deletedCategory,
-      };
     } catch (error) {
-      throw new Error(error.message || 'Failed to delete category');
+      logApiError(error, `/categories/${id}${hard ? '/hard' : ''}`, {
+        categoryId: id,
+        hardDelete: hard,
+      });
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to delete category'
+      );
     }
   },
 
-  // Get category tree (hierarchical structure)
-  getCategoryTree: async () => {
+  // Get active categories
+  getActiveCategories: async () => {
     try {
-      await api.delay(300);
+      const response = await api.get('/categories/active');
 
-      return {
-        success: true,
-        data: mockCategories.filter((cat) => cat.isActive),
-      };
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data.categories,
+          total: response.data.data.totalCount,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to fetch active categories'
+        );
+      }
     } catch (error) {
-      throw new Error('Failed to fetch category tree');
+      logApiError(error, '/categories/active', {});
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch active categories'
+      );
     }
   },
 
-  // Reorder categories
+  // Get category by slug
+  getCategoryBySlug: async (slug) => {
+    try {
+      const response = await api.get(`/categories/slug/${slug}`);
+
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to fetch category by slug'
+        );
+      }
+    } catch (error) {
+      logApiError(error, `/categories/slug/${slug}`, { slug });
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch category by slug'
+      );
+    }
+  },
+
+  // Toggle category status
+  toggleCategoryStatus: async (id, isActive) => {
+    try {
+      const response = await api.put(`/categories/${id}`, { isActive });
+
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to toggle category status'
+        );
+      }
+    } catch (error) {
+      logApiError(error, `/categories/${id}`, {
+        categoryId: id,
+        isActive,
+      });
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to toggle category status'
+      );
+    }
+  },
+
+  // Get novel count for a category
+  getCategoryNovelCount: async (categoryId) => {
+    try {
+      // Fetch novels filtered by category with minimal data (just need totalElements)
+      // Match the exact format from the working curl: ?page=0&size=20&sort=viewCnt&order=desc&category=2&status=published
+      const response = await api.get('/novels', {
+        params: {
+          page: 0,
+          size: 1, // We only need the count, not the actual data
+          sort: 'viewCnt',
+          order: 'desc',
+          category: categoryId,
+          status: 'published', // Use lowercase as shown in curl
+        },
+      });
+
+      if (response.data.code === 200) {
+        return {
+          success: true,
+          count: response.data.data.totalElements || 0,
+        };
+      } else {
+        throw new Error(
+          response.data.message || 'Failed to fetch novel count'
+        );
+      }
+    } catch (error) {
+      logApiError(error, `/novels?category=${categoryId}`, {
+        categoryId,
+      });
+      // Return 0 if there's an error instead of throwing
+      return {
+        success: false,
+        count: 0,
+      };
+    }
+  },
+
+  // Get novel counts for multiple categories (batch request)
+  getCategoryNovelCounts: async (categoryIds) => {
+    try {
+      // Fetch counts for all categories in parallel
+      const countPromises = categoryIds.map((id) =>
+        categoryService.getCategoryNovelCount(id)
+      );
+      
+      const results = await Promise.all(countPromises);
+      
+      // Create a map of categoryId -> count
+      const countsMap = {};
+      categoryIds.forEach((id, index) => {
+        countsMap[id] = results[index].count;
+      });
+
+      return {
+        success: true,
+        counts: countsMap,
+      };
+    } catch (error) {
+      logApiError(error, '/novels (batch counts)', {
+        categoryIds,
+      });
+      // Return empty counts map if there's an error
+      return {
+        success: false,
+        counts: {},
+      };
+    }
+  },
+};
+
+export default categoryService;
+
+// Legacy methods below - kept for reference but not connected to real API
+// Remove these if not needed
+// eslint-disable-next-line no-unused-vars
+const legacyMethods = {
+  // Reorder categories (not implemented in API)
   reorderCategories: async (reorderData) => {
     try {
       await api.delay(400);
@@ -597,31 +667,4 @@ export const categoryService = {
       throw new Error('Failed to reorder categories');
     }
   },
-
-  // Get category statistics
-  getCategoryStats: async (id) => {
-    try {
-      await api.delay(300);
-
-      const category = await categoryService.getCategoryById(id);
-
-      return {
-        success: true,
-        data: {
-          totalNovels: category.data.novelCount,
-          totalViews: Math.floor(Math.random() * 500000) + 100000,
-          averageRating: (Math.random() * 2 + 3).toFixed(1),
-          totalChapters: Math.floor(Math.random() * 10000) + 5000,
-          activeWriters: Math.floor(Math.random() * 200) + 50,
-          recentActivity: Math.floor(Math.random() * 50) + 10,
-          trending: Math.random() > 0.5,
-          growthRate: ((Math.random() - 0.5) * 20).toFixed(1),
-        },
-      };
-    } catch (error) {
-      throw new Error('Failed to fetch category statistics');
-    }
-  },
 };
-
-export default categoryService;
