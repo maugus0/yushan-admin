@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Space, Table, Tooltip, Badge, Modal } from 'antd';
+import { Button, Space, Table, Tooltip, Badge, Modal, Grid, Card } from 'antd';
 import {
   PlusOutlined,
   TagsOutlined,
   BookOutlined,
   CalendarOutlined,
   FolderOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
@@ -21,8 +24,12 @@ import { categoryService } from '../../../services/admin/categoryservice';
 import CategoryForm from './categoryform';
 import { message } from 'antd';
 
+const { useBreakpoint } = Grid;
+
 const Categories = () => {
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -627,6 +634,78 @@ const Categories = () => {
     );
   };
 
+  // Mobile Card Component
+  const CategoryCard = ({ category }) => (
+    <Card
+      size="small"
+      style={{ marginBottom: 16 }}
+      actions={[
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(category)}
+          key="view"
+        >
+          View
+        </Button>,
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          onClick={() => handleEdit(category)}
+          key="edit"
+        >
+          Edit
+        </Button>,
+        <Button
+          type="text"
+          icon={<DeleteOutlined />}
+          danger
+          onClick={() => handleDelete(category)}
+          key="delete"
+        >
+          Delete
+        </Button>,
+      ]}
+    >
+      <div
+        style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 12 }}
+      >
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            backgroundColor: category.color,
+            marginRight: 12,
+            marginTop: 2,
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 500, fontSize: '16px', marginBottom: 4 }}>
+            {category.name}
+          </div>
+          <div style={{ color: '#666', fontSize: '14px', marginBottom: 8 }}>
+            {category.description}
+          </div>
+          <Space size="middle" wrap>
+            <StatusBadge status={category.status} />
+            <Badge
+              count={category.novelCount}
+              showZero
+              style={{ backgroundColor: '#1890ff' }}
+            >
+              <BookOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
+            </Badge>
+          </Space>
+        </div>
+      </div>
+      <div style={{ fontSize: '12px', color: '#999' }}>
+        Created: {new Date(category.createdAt).toLocaleDateString()}
+      </div>
+    </Card>
+  );
+
   return (
     <div>
       <PageHeader
@@ -681,6 +760,45 @@ const Categories = () => {
               },
             ]}
           />
+        ) : isMobile ? (
+          <div>
+            {data.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+            {/* Mobile Pagination */}
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <Button
+                disabled={pagination.current <= 1}
+                onClick={() =>
+                  handleTableChange({
+                    ...pagination,
+                    current: pagination.current - 1,
+                  })
+                }
+                style={{ marginRight: 8 }}
+              >
+                Previous
+              </Button>
+              <span style={{ margin: '0 16px' }}>
+                {pagination.current} /{' '}
+                {Math.ceil(pagination.total / pagination.pageSize)}
+              </span>
+              <Button
+                disabled={
+                  pagination.current >=
+                  Math.ceil(pagination.total / pagination.pageSize)
+                }
+                onClick={() =>
+                  handleTableChange({
+                    ...pagination,
+                    current: pagination.current + 1,
+                  })
+                }
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         ) : (
           <Table
             columns={columns}
@@ -706,7 +824,7 @@ const Categories = () => {
         open={modalVisible}
         onCancel={handleModalClose}
         footer={null}
-        width={600}
+        width={isMobile ? '95%' : 600}
         destroyOnClose
       >
         <CategoryForm
@@ -737,7 +855,7 @@ const Categories = () => {
             Edit Category
           </Button>,
         ]}
-        width={600}
+        width={isMobile ? '95%' : 600}
       >
         {selectedCategory && (
           <div>

@@ -20,6 +20,7 @@ export {
   ButtonLoader,
   InlineLoader,
 } from './loadingspinner';
+export { default as MobileTable } from './MobileTable';
 export { default as PageHeader } from './pageheader';
 export { default as SearchBar } from './searchbar';
 export { default as StatusBadge } from './statusbadge';

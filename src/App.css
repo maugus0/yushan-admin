@@ -36,3 +36,8 @@
     transform: rotate(360deg);
   }
 }
+
+/* Import admin styles */
+@import url('./styles/admin/variables.css');
+@import url('./styles/admin/adminlayout.css');
+@import url('./styles/admin/mobile.css');
