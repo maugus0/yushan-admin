@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../contexts/admin/adminauthcontext';
@@ -12,9 +12,36 @@ const { Content } = Layout;
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const { isAuthenticated } = useAdminAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setCollapsed(false); // Always show full sidebar on mobile when visible
+        setSidebarVisible(false); // Hide sidebar by default on mobile
+      } else {
+        setSidebarVisible(true); // Always show sidebar on desktop
+      }
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Close mobile sidebar when route changes
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarVisible(false);
+    }
+  }, [location.pathname, isMobile]);
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -59,7 +86,17 @@ const AdminLayout = () => {
   };
 
   const handleToggleCollapsed = () => {
-    setCollapsed(!collapsed);
+    if (isMobile) {
+      setSidebarVisible(!sidebarVisible);
+    } else {
+      setCollapsed(!collapsed);
+    }
+  };
+
+  const handleSidebarClose = () => {
+    if (isMobile) {
+      setSidebarVisible(false);
+    }
   };
 
   const handleUserMenuClick = (key) => {
@@ -89,15 +126,36 @@ const AdminLayout = () => {
 
   return (
     <ErrorBoundary>
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout
+        style={{ minHeight: '100vh' }}
+        className={`admin-layout ${isMobile && sidebarVisible ? 'sidebar-open' : ''} ${!isMobile && collapsed ? 'sidebar-collapsed' : ''}`}
+      >
+        {/* Mobile sidebar backdrop */}
+        {isMobile && sidebarVisible && (
+          <div
+            className="admin-sidebar-backdrop show"
+            onClick={handleSidebarClose}
+          />
+        )}
+
         <AdminSidebar
-          collapsed={collapsed}
+          collapsed={!isMobile && collapsed}
           notifications={sidebarNotifications}
+          style={{
+            transform: isMobile
+              ? sidebarVisible
+                ? 'translateX(0)'
+                : 'translateX(-100%)'
+              : 'translateX(0)',
+            position: isMobile ? 'fixed' : 'fixed',
+            zIndex: isMobile ? 1050 : 1030,
+          }}
+          onMenuClick={handleSidebarClose}
         />
 
-        <Layout>
+        <Layout style={{ marginLeft: isMobile ? 0 : collapsed ? 80 : 256 }}>
           <AdminHeader
-            collapsed={collapsed}
+            collapsed={isMobile ? false : collapsed}
             onToggleCollapsed={handleToggleCollapsed}
             notifications={mockNotifications}
             unreadCount={
@@ -105,15 +163,16 @@ const AdminLayout = () => {
             }
             onUserMenuClick={handleUserMenuClick}
             onNotificationClick={handleNotificationClick}
-            showSearch={true}
+            showSearch={!isMobile}
             showNotifications={true}
-            showFullscreen={true}
+            showFullscreen={!isMobile}
+            isMobile={isMobile}
           />
 
           <Content
             style={{
-              margin: '24px',
-              padding: '24px',
+              margin: isMobile ? '16px' : '24px',
+              padding: isMobile ? '16px' : '24px',
               background: '#fff',
               borderRadius: '8px',
               minHeight: 280,

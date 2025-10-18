@@ -40,6 +40,7 @@ const AdminHeader = ({
   style = {},
   className = '',
   extra,
+  isMobile = false,
   ...props
 }) => {
   const { admin, logout } = useAdminAuth();
@@ -219,23 +220,25 @@ const AdminHeader = ({
                 icon={!admin.avatar && <UserOutlined />}
                 style={{ backgroundColor: '#1890ff' }}
               />
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                }}
-              >
-                <Text strong style={{ fontSize: '14px', lineHeight: 1.2 }}>
-                  {admin.username}
-                </Text>
-                <Text
-                  type="secondary"
-                  style={{ fontSize: '12px', lineHeight: 1.2 }}
+              {!isMobile && (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                  }}
                 >
-                  {admin.role?.replace('_', ' ') || 'Admin'}
-                </Text>
-              </div>
+                  <Text strong style={{ fontSize: '14px', lineHeight: 1.2 }}>
+                    {admin.username}
+                  </Text>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: '12px', lineHeight: 1.2 }}
+                  >
+                    {admin.role?.replace('_', ' ') || 'Admin'}
+                  </Text>
+                </div>
+              )}
             </Space>
           </Dropdown>
         )}

@@ -75,7 +75,7 @@ export const checkServiceAvailability = async () => {
 
 // Service configuration
 export const serviceConfig = {
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000',
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
   retryDelay: 1000, // 1 second

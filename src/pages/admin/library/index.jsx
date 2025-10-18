@@ -8,6 +8,8 @@ import {
   Typography,
   Tag,
   Progress,
+  Grid,
+  Card,
 } from 'antd';
 import {
   BookOutlined,
@@ -22,6 +24,9 @@ import {
   ShareAltOutlined,
   BarsOutlined,
   TeamOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
@@ -33,8 +38,11 @@ import {
 } from '../../../components/admin/common';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const Library = () => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [activeTab, setActiveTab] = useState('collections');
@@ -557,6 +565,262 @@ const Library = () => {
     fetchData(paginationInfo);
   };
 
+  // Mobile Card Components
+  const CollectionCard = ({ collection }) => (
+    <Card
+      size="small"
+      style={{ marginBottom: 16 }}
+      actions={[
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(collection)}
+          key="view"
+        >
+          View
+        </Button>,
+        <Button
+          type="text"
+          icon={<ShareAltOutlined />}
+          onClick={() => console.log('Share', collection)}
+          key="share"
+        >
+          Share
+        </Button>,
+        <Button type="text" icon={<MoreOutlined />} key="more">
+          More
+        </Button>,
+      ]}
+    >
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontWeight: 500, fontSize: '16px', marginBottom: 4 }}>
+          {collection.name}
+        </div>
+        <div style={{ color: '#666', fontSize: '14px', marginBottom: 8 }}>
+          {collection.description}
+        </div>
+        <Space size="middle" wrap style={{ marginBottom: 8 }}>
+          <Space size="small">
+            <Avatar size="small" icon={<UserOutlined />} />
+            <Text style={{ fontSize: '14px' }}>{collection.owner}</Text>
+          </Space>
+          {!collection.isPublic && <Tag color="orange">Private</Tag>}
+        </Space>
+        <Space size="middle" wrap style={{ marginBottom: 8 }}>
+          <Space size="small">
+            <BookOutlined />
+            <Text style={{ fontSize: '12px' }}>
+              {collection.novelCount} novels
+            </Text>
+          </Space>
+          <Space size="small">
+            <TeamOutlined />
+            <Text style={{ fontSize: '12px' }}>
+              {collection.followerCount.toLocaleString()} followers
+            </Text>
+          </Space>
+        </Space>
+        <Space wrap>
+          {collection.tags.map((tag) => (
+            <Tag key={tag} color="blue" style={{ fontSize: '11px' }}>
+              {tag}
+            </Tag>
+          ))}
+        </Space>
+      </div>
+      <div style={{ fontSize: '12px', color: '#999' }}>
+        Updated: {new Date(collection.updatedAt).toLocaleDateString()}
+      </div>
+    </Card>
+  );
+
+  const BookmarkCard = ({ bookmark }) => {
+    const typeDisplay = getBookmarkTypeDisplay(bookmark.bookmarkType);
+    return (
+      <Card
+        size="small"
+        style={{ marginBottom: 16 }}
+        actions={[
+          <Button
+            type="text"
+            icon={<BookOutlined />}
+            onClick={() => console.log('Go to chapter', bookmark)}
+            key="goto"
+          >
+            Go to
+          </Button>,
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(bookmark)}
+            key="edit"
+          >
+            Edit
+          </Button>,
+          <Button
+            type="text"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDelete(bookmark)}
+            key="delete"
+          >
+            Delete
+          </Button>,
+        ]}
+      >
+        <div style={{ marginBottom: 12 }}>
+          <Space style={{ marginBottom: 8 }}>
+            <Avatar size="small" icon={<UserOutlined />} />
+            <Text strong style={{ fontSize: '14px' }}>
+              {bookmark.user}
+            </Text>
+            {bookmark.isPrivate && <Tag color="orange">Private</Tag>}
+          </Space>
+          <div style={{ fontWeight: 500, fontSize: '16px', marginBottom: 4 }}>
+            {bookmark.novel}
+          </div>
+          <div style={{ fontSize: '14px', marginBottom: 8, color: '#666' }}>
+            Ch. {bookmark.chapterNumber}: {bookmark.chapter}
+          </div>
+          <Space style={{ marginBottom: 8 }}>
+            <span style={{ color: typeDisplay.color }}>{typeDisplay.icon}</span>
+            <Tag color={typeDisplay.color} style={{ fontSize: '11px' }}>
+              {bookmark.bookmarkType.replace('_', ' ').toUpperCase()}
+            </Tag>
+          </Space>
+          <div style={{ fontSize: '13px', fontStyle: 'italic', color: '#666' }}>
+            "{bookmark.note}"
+          </div>
+        </div>
+        <div style={{ fontSize: '12px', color: '#999' }}>
+          Last accessed: {new Date(bookmark.lastAccessed).toLocaleDateString()}
+        </div>
+      </Card>
+    );
+  };
+
+  const HistoryCard = ({ history }) => (
+    <Card
+      size="small"
+      style={{ marginBottom: 16 }}
+      actions={[
+        <Button
+          type="text"
+          icon={<BookOutlined />}
+          onClick={() => console.log('Resume reading', history)}
+          key="resume"
+        >
+          Resume
+        </Button>,
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(history)}
+          key="view"
+        >
+          View
+        </Button>,
+        <Button type="text" icon={<MoreOutlined />} key="more">
+          More
+        </Button>,
+      ]}
+    >
+      <div style={{ marginBottom: 12 }}>
+        <Space style={{ marginBottom: 8 }}>
+          <Avatar size="small" icon={<UserOutlined />} />
+          <Text strong style={{ fontSize: '14px' }}>
+            {history.user}
+          </Text>
+        </Space>
+        <div style={{ fontWeight: 500, fontSize: '16px', marginBottom: 4 }}>
+          {history.novel}
+        </div>
+        <Tag
+          color={getReadingStatusColor(history.status)}
+          style={{ marginBottom: 8 }}
+        >
+          {history.status.toUpperCase()}
+        </Tag>
+        <div style={{ marginBottom: 8 }}>
+          <Text style={{ fontSize: '14px', marginBottom: 4, display: 'block' }}>
+            Chapter {history.lastChapter} / {history.totalChapters}
+          </Text>
+          <Progress
+            percent={Math.round(history.readingProgress)}
+            size="small"
+            status={history.status === 'completed' ? 'success' : 'active'}
+          />
+        </div>
+        <Space size="middle" wrap>
+          <Space size="small">
+            <ClockCircleOutlined />
+            <Text style={{ fontSize: '12px' }}>
+              {Math.round(history.timeSpent / 60)}h {history.timeSpent % 60}m
+            </Text>
+          </Space>
+          {history.rating && (
+            <Space size="small">
+              <StarOutlined style={{ color: '#fadb14' }} />
+              <Text style={{ fontSize: '12px' }}>{history.rating}/5</Text>
+            </Space>
+          )}
+        </Space>
+      </div>
+      <div style={{ fontSize: '12px', color: '#999' }}>
+        Last read: {new Date(history.lastRead).toLocaleDateString()}
+      </div>
+    </Card>
+  );
+
+  const renderMobileCards = () => {
+    return (
+      <div>
+        {data.map((item) => {
+          if (activeTab === 'collections') {
+            return <CollectionCard key={item.id} collection={item} />;
+          } else if (activeTab === 'bookmarks') {
+            return <BookmarkCard key={item.id} bookmark={item} />;
+          } else {
+            return <HistoryCard key={item.id} history={item} />;
+          }
+        })}
+        {/* Mobile Pagination */}
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <Button
+            disabled={pagination.current <= 1}
+            onClick={() =>
+              handleTableChange({
+                ...pagination,
+                current: pagination.current - 1,
+              })
+            }
+            style={{ marginRight: 8 }}
+          >
+            Previous
+          </Button>
+          <span style={{ margin: '0 16px' }}>
+            {pagination.current} /{' '}
+            {Math.ceil(pagination.total / pagination.pageSize)}
+          </span>
+          <Button
+            disabled={
+              pagination.current >=
+              Math.ceil(pagination.total / pagination.pageSize)
+            }
+            onClick={() =>
+              handleTableChange({
+                ...pagination,
+                current: pagination.current + 1,
+              })
+            }
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   const columns = [
     ...getColumns(),
     {
@@ -644,15 +908,25 @@ const Library = () => {
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         {/* Tab Navigation */}
-        <Space>
+        <Space
+          wrap
+          style={{
+            width: '100%',
+            justifyContent: isMobile ? 'center' : 'flex-start',
+          }}
+        >
           {tabs.map((tab) => (
             <Button
               key={tab.key}
               type={activeTab === tab.key ? 'primary' : 'default'}
               icon={tab.icon}
               onClick={() => setActiveTab(tab.key)}
+              style={{
+                fontSize: isMobile ? '12px' : '14px',
+                padding: isMobile ? '4px 8px' : undefined,
+              }}
             >
-              {tab.label}
+              {isMobile ? tab.icon : tab.label}
             </Button>
           ))}
         </Space>
@@ -687,6 +961,8 @@ const Library = () => {
               },
             ]}
           />
+        ) : isMobile ? (
+          renderMobileCards()
         ) : (
           <Table
             columns={columns}
