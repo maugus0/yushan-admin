@@ -223,7 +223,7 @@ const ViewModal = ({
       onCancel={onCancel}
       footer={null}
       width={width}
-      destroyOnClose
+      destroyOnHidden
     >
       <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
         {/* Main Content */}

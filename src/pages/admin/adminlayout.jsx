@@ -44,8 +44,14 @@ const AdminLayout = () => {
   }, [location.pathname, isMobile]);
 
   // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/admin/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Don't render anything if not authenticated
   if (!isAuthenticated) {
-    navigate('/admin/login');
     return null;
   }
 
