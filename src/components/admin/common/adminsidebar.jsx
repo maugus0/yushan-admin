@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Layout, Menu, Typography, Badge } from 'antd';
+import { Layout, Menu, Typography } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   DashboardOutlined,
@@ -26,7 +26,6 @@ const AdminSidebar = ({
   theme = 'light',
   style = {},
   className = '',
-  notifications = {},
   onMenuClick,
   ...props
 }) => {
@@ -43,18 +42,7 @@ const AdminSidebar = ({
     {
       key: 'users',
       icon: <UserOutlined />,
-      label: (
-        <span>
-          Users
-          {notifications.users > 0 && (
-            <Badge
-              count={notifications.users}
-              size="small"
-              style={{ marginLeft: 8 }}
-            />
-          )}
-        </span>
-      ),
+      label: 'Users',
       children: [
         {
           key: '/admin/users',
@@ -76,18 +64,7 @@ const AdminSidebar = ({
     {
       key: '/admin/novels',
       icon: <BookOutlined />,
-      label: (
-        <span>
-          Novels
-          {notifications.novels > 0 && (
-            <Badge
-              count={notifications.novels}
-              size="small"
-              style={{ marginLeft: 8 }}
-            />
-          )}
-        </span>
-      ),
+      label: 'Novels',
     },
     {
       key: '/admin/chapters',
@@ -102,34 +79,12 @@ const AdminSidebar = ({
     {
       key: '/admin/comments',
       icon: <MessageOutlined />,
-      label: (
-        <span>
-          Comments
-          {notifications.comments > 0 && (
-            <Badge
-              count={notifications.comments}
-              size="small"
-              style={{ marginLeft: 8 }}
-            />
-          )}
-        </span>
-      ),
+      label: 'Comments',
     },
     {
       key: '/admin/reviews',
       icon: <StarOutlined />,
-      label: (
-        <span>
-          Reviews
-          {notifications.reviews > 0 && (
-            <Badge
-              count={notifications.reviews}
-              size="small"
-              style={{ marginLeft: 8 }}
-            />
-          )}
-        </span>
-      ),
+      label: 'Reviews',
     },
     {
       key: '/admin/library',
@@ -149,18 +104,7 @@ const AdminSidebar = ({
     {
       key: '/admin/reports',
       icon: <FlagOutlined />,
-      label: (
-        <span>
-          Reports
-          {notifications.reports > 0 && (
-            <Badge
-              count={notifications.reports}
-              size="small"
-              style={{ marginLeft: 8 }}
-            />
-          )}
-        </span>
-      ),
+      label: 'Reports',
     },
     {
       key: '/admin/settings',

@@ -7,6 +7,7 @@ import {
   Avatar,
   Image,
   Divider,
+  Grid,
 } from 'antd';
 import {
   EyeOutlined,
@@ -17,6 +18,7 @@ import {
 import dayjs from 'dayjs';
 
 const { Text, Paragraph, Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const ViewModal = ({
   visible,
@@ -27,6 +29,12 @@ const ViewModal = ({
   width = 800,
   layout = 'horizontal', // horizontal, vertical
 }) => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
+
+  // Adjust width and layout for mobile
+  const modalWidth = isMobile ? '95vw' : width;
+  const columnCount = isMobile ? 1 : layout === 'horizontal' ? 2 : 1;
   const renderFieldValue = (field, value) => {
     if (value === null || value === undefined || value === '') {
       return <Text type="secondary">-</Text>;
@@ -203,12 +211,14 @@ const ViewModal = ({
   };
 
   const getDescriptionItems = () => {
-    return fields.map((field) => ({
-      key: field.name,
-      label: field.label,
-      children: renderFieldValue(field, data[field.name]),
-      span: field.span || 1,
-    }));
+    return fields
+      .filter((field) => field && field.name) // Filter out null/undefined fields
+      .map((field) => ({
+        key: field.name,
+        label: field.label,
+        children: renderFieldValue(field, data[field.name]),
+        span: field.span || 1,
+      }));
   };
 
   return (
@@ -222,16 +232,33 @@ const ViewModal = ({
       open={visible}
       onCancel={onCancel}
       footer={null}
-      width={width}
+      width={modalWidth}
       destroyOnHidden
+      centered
+      className={isMobile ? 'mobile-view-modal' : ''}
+      styles={{
+        body: {
+          maxHeight: isMobile ? '70vh' : '60vh',
+          overflow: 'auto',
+          padding: isMobile ? '12px' : '24px',
+        },
+      }}
     >
       <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
         {/* Main Content */}
         <Descriptions
           bordered
-          column={layout === 'horizontal' ? 2 : 1}
-          size="small"
+          column={columnCount}
+          size={isMobile ? 'small' : 'default'}
           items={getDescriptionItems()}
+          labelStyle={{
+            width: isMobile ? '35%' : '25%',
+            fontWeight: 600,
+            backgroundColor: '#fafafa',
+          }}
+          contentStyle={{
+            backgroundColor: '#fff',
+          }}
         />
 
         {/* Additional Sections */}
@@ -250,8 +277,8 @@ const ViewModal = ({
               {section.type === 'description' && (
                 <Descriptions
                   bordered
-                  column={1}
-                  size="small"
+                  column={isMobile ? 1 : 2}
+                  size={isMobile ? 'small' : 'default'}
                   items={section.items.map((item) => ({
                     key: item.key,
                     label: item.label,
@@ -287,7 +314,7 @@ const ViewModal = ({
               </Space>
             </Divider>
 
-            <Descriptions bordered column={2} size="small">
+            <Descriptions bordered column={isMobile ? 1 : 2} size="small">
               {data.id && (
                 <Descriptions.Item label="ID">
                   <Text code>{data.id}</Text>

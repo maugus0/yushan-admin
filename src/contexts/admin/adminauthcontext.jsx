@@ -23,6 +23,7 @@ export const AdminAuthProvider = ({ children }) => {
         const isAuthenticated = await authService.initializeAuth();
         if (isAuthenticated) {
           const currentUser = authService.getCurrentUser();
+          // All user data including avatar is already in stored user data
           setAdmin(currentUser);
         }
       } catch (error) {
@@ -40,9 +41,10 @@ export const AdminAuthProvider = ({ children }) => {
     try {
       const result = await authService.login(credentials);
       if (result.success) {
+        // User data including avatar is already included in the login response
         setAdmin(result.data.user);
         message.success('Login successful!');
-        return { success: true };
+        return { success: true, user: result.data.user };
       } else {
         throw new Error('Login failed');
       }
@@ -54,19 +56,39 @@ export const AdminAuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
-    setLoading(true);
+  const logout = () => {
+    authService.logout();
+    setAdmin(null);
+  };
+
+  const refreshUserProfile = async () => {
+    if (!admin) return;
+
     try {
-      await authService.logout();
-      setAdmin(null);
-      message.success('Logged out successfully');
+      // Import dynamically to avoid issues
+      const { getCurrentUserProfile } = await import(
+        '../../services/admin/userservice'
+      );
+      const profileResponse = await getCurrentUserProfile();
+      if (profileResponse.success) {
+        const updatedAdmin = {
+          ...admin,
+          avatar: profileResponse.data.avatar || profileResponse.data.avatarUrl,
+          avatarUrl:
+            profileResponse.data.avatar || profileResponse.data.avatarUrl,
+          username: profileResponse.data.username,
+          email: profileResponse.data.email,
+          isAdmin: profileResponse.data.profile?.isAdmin,
+          isAuthor: profileResponse.data.profile?.isAuthor,
+          level: profileResponse.data.profile?.level,
+          status: profileResponse.data.status,
+        };
+        setAdmin(updatedAdmin);
+        // Also update localStorage
+        localStorage.setItem('adminUser', JSON.stringify(updatedAdmin));
+      }
     } catch (error) {
-      console.error('Logout error:', error);
-      // Even if logout API fails, clear local state
-      setAdmin(null);
-      message.success('Logged out successfully');
-    } finally {
-      setLoading(false);
+      console.warn('Failed to refresh user profile:', error);
     }
   };
 
@@ -75,7 +97,8 @@ export const AdminAuthProvider = ({ children }) => {
     loading,
     login,
     logout,
-    isAuthenticated: !!admin,
+    refreshUserProfile,
+    isAuthenticated: !!admin, // Add isAuthenticated property
   };
 
   return (

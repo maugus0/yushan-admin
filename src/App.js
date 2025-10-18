@@ -8,6 +8,7 @@ import { AdminAuthProvider } from './contexts/admin/adminauthcontext';
 import AdminLayout from './pages/admin/adminlayout';
 import AdminLogin from './pages/admin/login';
 import Dashboard from './pages/admin/dashboard';
+import AdminProfile from './pages/admin/profile';
 
 // User Management
 import UsersOverview from './pages/admin/users/index';
@@ -37,15 +38,19 @@ import 'antd/dist/reset.css';
 import './App.css';
 
 function App() {
+  // Use basename only when deploying to GitHub Pages or PUBLIC_URL is set
+  const basename = process.env.PUBLIC_URL ? '/yushan-admin' : '';
+
   return (
     <AdminAuthProvider>
-      <Router basename="/yushan-admin">
+      <Router basename={basename}>
         <Routes>
           <Route path="/" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="profile" element={<AdminProfile />} />
 
             {/* User Management */}
             <Route path="users" element={<UsersOverview />} />

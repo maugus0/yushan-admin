@@ -6,7 +6,6 @@ import {
   Avatar,
   Space,
   Typography,
-  Badge,
   Tooltip,
 } from 'antd';
 import {
@@ -14,7 +13,6 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
   LogoutOutlined,
-  SettingOutlined,
   BellOutlined,
   SearchOutlined,
   FullscreenOutlined,
@@ -33,7 +31,6 @@ const AdminHeader = ({
   showFullscreen = false,
   showUserMenu = true,
   notifications = [],
-  unreadCount = 0,
   onSearch,
   onNotificationClick,
   onUserMenuClick,
@@ -69,12 +66,6 @@ const AdminHeader = ({
       icon: <UserOutlined />,
       label: 'Profile',
       onClick: () => onUserMenuClick && onUserMenuClick('profile'),
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: 'Account Settings',
-      onClick: () => onUserMenuClick && onUserMenuClick('settings'),
     },
     { type: 'divider' },
     {
@@ -190,13 +181,11 @@ const AdminHeader = ({
             arrow
             trigger={['click']}
           >
-            <Badge count={unreadCount} size="small">
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                style={{ fontSize: '16px' }}
-              />
-            </Badge>
+            <Button
+              type="text"
+              icon={<BellOutlined />}
+              style={{ fontSize: '16px' }}
+            />
           </Dropdown>
         )}
 

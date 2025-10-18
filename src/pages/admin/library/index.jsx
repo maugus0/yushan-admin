@@ -18,11 +18,9 @@ import {
   ClockCircleOutlined,
   DownloadOutlined,
   BarsOutlined,
-  MoreOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
-  SearchBar,
   FilterPanel,
   ActionButtons,
   EmptyState,
@@ -239,10 +237,6 @@ const Library = () => {
   // Remove tabs - we only show user libraries now
 
   // Handlers
-  const handleSearch = (value) => {
-    setSearchValue(value);
-  };
-
   const handleFilter = (filterValues) => {
     setFilters(filterValues);
   };
@@ -320,6 +314,52 @@ Average User Level: ${Math.round(avgLevel * 10) / 10}
 Note: This is a basic summary. Full analytics dashboard would be implemented here.`);
   };
 
+  const handleExportUserDetails = (user) => {
+    // Export individual user details to Excel
+    const userData = [
+      {
+        Username: user.username,
+        Email: user.email,
+        Level: user.level,
+        Experience: user.exp,
+        'Total Books': user.totalBooks,
+        'Reading Time (hours)': user.readTime,
+        Birthday: user.birthday
+          ? new Date(user.birthday).toLocaleDateString()
+          : '',
+        'Account Created': new Date(user.createdAt).toLocaleDateString(),
+        'Last Updated': new Date(user.updatedAt).toLocaleDateString(),
+        Yuan: user.yuan,
+      },
+    ];
+
+    const fileName = getTimestampedFilename(
+      `user_details_${user.username}`,
+      'xlsx'
+    );
+    exportToCSV(userData, fileName, 'User Details');
+  };
+
+  const handleExportUserLibrary = (user) => {
+    // Export user's library data to Excel
+    const libraryData = [
+      {
+        Username: user.username,
+        'Books in Library': user.totalBooks,
+        'Reading Time': user.readTime + ' hours',
+        Level: user.level,
+        Experience: user.exp,
+        'Account Created': new Date(user.createdAt).toLocaleDateString(),
+        'Last Active': user.lastActive
+          ? new Date(user.lastActive).toLocaleDateString()
+          : '',
+      },
+    ];
+
+    const fileName = getTimestampedFilename(`library_${user.username}`, 'xlsx');
+    exportToCSV(libraryData, fileName, `${user.username}'s Library`);
+  };
+
   const handleTableChange = (paginationInfo) => {
     fetchData(paginationInfo);
   };
@@ -340,17 +380,11 @@ Note: This is a basic summary. Full analytics dashboard would be implemented her
         </Button>,
         <Button
           type="text"
-          icon={<UserOutlined />}
-          onClick={() => {
-            // TODO: Implement profile view functionality
-            // For now, do nothing to avoid console spam
-          }}
-          key="profile"
+          icon={<DownloadOutlined />}
+          onClick={() => handleExportUserDetails(user)}
+          key="export"
         >
-          Profile
-        </Button>,
-        <Button type="text" icon={<MoreOutlined />} key="more">
-          More
+          Export Details
         </Button>,
       ]}
     >
@@ -506,16 +540,13 @@ Note: This is a basic summary. Full analytics dashboard would be implemented her
           showEdit={false}
           showDelete={false}
           showMore={true}
+          onMore={(record) => handleExportUserDetails(record)}
           customActions={[
-            {
-              key: 'profile',
-              icon: <UserOutlined />,
-              label: 'View Profile',
-            },
             {
               key: 'export',
               icon: <DownloadOutlined />,
               label: 'Export Library',
+              onClick: (record) => handleExportUserLibrary(record),
             },
           ]}
         />
@@ -559,15 +590,6 @@ Note: This is a basic summary. Full analytics dashboard would be implemented her
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
-        <SearchBar
-          placeholder="Search users by username or email..."
-          onSearch={handleSearch}
-          onClear={() => setSearchValue('')}
-          searchValue={searchValue}
-          showFilter={true}
-          loading={loading}
-        />
-
         <FilterPanel
           filters={getFilterConfig()}
           onFilter={handleFilter}

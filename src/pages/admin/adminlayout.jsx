@@ -14,7 +14,7 @@ const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const { isAuthenticated } = useAdminAuth();
+  const { isAuthenticated, loading } = useAdminAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -43,16 +43,32 @@ const AdminLayout = () => {
     }
   }, [location.pathname, isMobile]);
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated and not loading
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       navigate('/admin/login');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
-  // Don't render anything if not authenticated
-  if (!isAuthenticated) {
+  // Don't render anything if not authenticated and not loading
+  if (!loading && !isAuthenticated) {
     return null;
+  }
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   // Mock notifications data
@@ -110,9 +126,6 @@ const AdminLayout = () => {
       case 'profile':
         navigate('/admin/profile');
         break;
-      case 'settings':
-        navigate('/admin/account-settings');
-        break;
       case 'logout':
         // Logout is handled in AdminHeader
         break;
@@ -126,7 +139,7 @@ const AdminLayout = () => {
       navigate('/admin/notifications');
     } else {
       // Handle individual notification click
-      console.log('Notification clicked:', notification);
+      // TODO: Add notification handling logic
     }
   };
 

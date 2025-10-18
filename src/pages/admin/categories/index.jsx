@@ -824,7 +824,24 @@ const Categories = () => {
         open={modalVisible}
         onCancel={handleModalClose}
         footer={null}
-        width={isMobile ? '95%' : 600}
+        width={isMobile ? '95vw' : 600}
+        style={
+          isMobile
+            ? {
+                top: '10px',
+                maxHeight: '90vh',
+                paddingBottom: 0,
+              }
+            : {}
+        }
+        bodyStyle={
+          isMobile
+            ? {
+                maxHeight: 'calc(90vh - 110px)',
+                overflowY: 'auto',
+              }
+            : {}
+        }
         destroyOnClose
       >
         <CategoryForm
@@ -840,32 +857,76 @@ const Categories = () => {
         title="Category Details"
         open={viewModalVisible}
         onCancel={handleViewModalClose}
-        footer={[
-          <Button key="close" onClick={handleViewModalClose}>
-            Close
-          </Button>,
-          <Button
-            key="edit"
-            type="primary"
-            onClick={() => {
-              handleViewModalClose();
-              handleEdit(selectedCategory);
-            }}
-          >
-            Edit Category
-          </Button>,
-        ]}
-        width={isMobile ? '95%' : 600}
+        footer={
+          isMobile ? (
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
+              <Button
+                key="edit"
+                type="primary"
+                block
+                onClick={() => {
+                  handleViewModalClose();
+                  handleEdit(selectedCategory);
+                }}
+              >
+                Edit Category
+              </Button>
+              <Button key="close" block onClick={handleViewModalClose}>
+                Close
+              </Button>
+            </div>
+          ) : (
+            [
+              <Button key="close" onClick={handleViewModalClose}>
+                Close
+              </Button>,
+              <Button
+                key="edit"
+                type="primary"
+                onClick={() => {
+                  handleViewModalClose();
+                  handleEdit(selectedCategory);
+                }}
+              >
+                Edit Category
+              </Button>,
+            ]
+          )
+        }
+        width={isMobile ? '95vw' : 600}
+        style={
+          isMobile
+            ? {
+                top: '10px',
+                maxHeight: '90vh',
+                paddingBottom: 0,
+              }
+            : {}
+        }
+        bodyStyle={
+          isMobile
+            ? {
+                maxHeight: 'calc(90vh - 110px)',
+                overflowY: 'auto',
+              }
+            : {}
+        }
       >
         {selectedCategory && (
-          <div>
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
+          <div style={{ padding: isMobile ? '8px 0' : '16px 0' }}>
+            <Space
+              direction="vertical"
+              style={{ width: '100%' }}
+              size={isMobile ? 'middle' : 'large'}
+            >
               <div>
-                <Space>
+                <Space size={isMobile ? 'small' : 'middle'}>
                   <div
                     style={{
-                      width: 16,
-                      height: 16,
+                      width: isMobile ? 12 : 16,
+                      height: isMobile ? 12 : 16,
                       borderRadius: '50%',
                       backgroundColor: selectedCategory.color,
                     }}
@@ -873,7 +934,7 @@ const Categories = () => {
                   <FolderOutlined
                     style={{
                       color: selectedCategory.color,
-                      fontSize: '20px',
+                      fontSize: isMobile ? '16px' : '20px',
                     }}
                   />
                 </Space>
@@ -882,14 +943,20 @@ const Categories = () => {
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
                 >
                   Category Name
                 </div>
-                <div style={{ fontSize: '18px', fontWeight: 500 }}>
+                <div
+                  style={{
+                    fontSize: isMobile ? '16px' : '18px',
+                    fontWeight: 500,
+                    wordBreak: 'break-word',
+                  }}
+                >
                   {selectedCategory.name}
                 </div>
               </div>
@@ -897,20 +964,27 @@ const Categories = () => {
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
                 >
                   Description
                 </div>
-                <div>{selectedCategory.description}</div>
+                <div
+                  style={{
+                    wordBreak: 'break-word',
+                    lineHeight: isMobile ? '1.4' : '1.6',
+                  }}
+                >
+                  {selectedCategory.description}
+                </div>
               </div>
 
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
@@ -923,42 +997,63 @@ const Categories = () => {
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
                 >
                   Slug
                 </div>
-                <code>{selectedCategory.slug}</code>
+                <code
+                  style={{
+                    fontSize: isMobile ? '12px' : '14px',
+                    wordBreak: 'break-all',
+                  }}
+                >
+                  {selectedCategory.slug}
+                </code>
               </div>
 
-              <Space size="large">
-                <div>
+              <Space
+                size={isMobile ? 'small' : 'large'}
+                direction={isMobile ? 'vertical' : 'horizontal'}
+                style={{ width: '100%' }}
+              >
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      fontSize: '12px',
+                      fontSize: isMobile ? '10px' : '12px',
                       color: '#999',
                       marginBottom: '4px',
                     }}
                   >
                     <CalendarOutlined /> Created
                   </div>
-                  <div>
+                  <div
+                    style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      wordBreak: 'break-word',
+                    }}
+                  >
                     {new Date(selectedCategory.createdAt).toLocaleString()}
                   </div>
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      fontSize: '12px',
+                      fontSize: isMobile ? '10px' : '12px',
                       color: '#999',
                       marginBottom: '4px',
                     }}
                   >
                     <CalendarOutlined /> Last Updated
                   </div>
-                  <div>
+                  <div
+                    style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      wordBreak: 'break-word',
+                    }}
+                  >
                     {new Date(selectedCategory.updatedAt).toLocaleString()}
                   </div>
                 </div>
