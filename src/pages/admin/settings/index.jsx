@@ -13,6 +13,7 @@ import {
   Col,
   ColorPicker,
   Slider,
+  Grid,
 } from 'antd';
 import {
   SettingOutlined,
@@ -29,8 +30,11 @@ import { PageHeader, LoadingSpinner } from '../../../components/admin/common';
 
 const { TextArea } = Input;
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 const Settings = () => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('general');
   const [form] = Form.useForm();
@@ -177,12 +181,15 @@ const Settings = () => {
 
   // Render form fields based on active section
   const renderFormFields = () => {
+    // Responsive column props for form fields
+    const colProps = { xs: 24, sm: 24, md: 12, lg: 12, xl: 12 };
+
     switch (activeSection) {
       case 'general':
         return (
           <>
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col {...colProps}>
                 <Form.Item
                   name="siteName"
                   label="Site Name"
@@ -191,7 +198,7 @@ const Settings = () => {
                   <Input placeholder="Enter site name" />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col {...colProps}>
                 <Form.Item
                   name="siteUrl"
                   label="Site URL"
@@ -209,8 +216,8 @@ const Settings = () => {
               />
             </Form.Item>
 
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col {...colProps}>
                 <Form.Item
                   name="adminEmail"
                   label="Admin Email"
@@ -219,7 +226,7 @@ const Settings = () => {
                   <Input placeholder="admin@example.com" />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col {...colProps}>
                 <Form.Item name="timeZone" label="Time Zone">
                   <Select placeholder="Select timezone">
                     <Option value="UTC">UTC</Option>
@@ -232,8 +239,8 @@ const Settings = () => {
               </Col>
             </Row>
 
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col {...colProps}>
                 <Form.Item name="language" label="Default Language">
                   <Select placeholder="Select language">
                     <Option value="en">English</Option>
@@ -243,7 +250,7 @@ const Settings = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col {...colProps}>
                 <Form.Item
                   name="maintenanceMode"
                   label="Maintenance Mode"
@@ -722,25 +729,37 @@ const Settings = () => {
         ]}
       />
 
-      <Row gutter={24}>
+      <Row gutter={[16, 16]}>
         {/* Settings Navigation */}
-        <Col span={6}>
-          <Card title="Settings Categories" size="small">
-            <Space direction="vertical" style={{ width: '100%' }}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={5}>
+          <Card
+            title="Settings Categories"
+            size={isMobile ? 'default' : 'small'}
+            style={{ marginBottom: isMobile ? '16px' : '0' }}
+          >
+            <Space
+              direction={isMobile ? 'horizontal' : 'vertical'}
+              style={{ width: '100%' }}
+              wrap={isMobile}
+            >
               {sections.map((section) => (
                 <Button
                   key={section.key}
                   type={activeSection === section.key ? 'primary' : 'text'}
                   icon={section.icon}
-                  block
-                  style={{ textAlign: 'left' }}
+                  block={!isMobile}
+                  size={isMobile ? 'small' : 'default'}
+                  style={{
+                    textAlign: isMobile ? 'center' : 'left',
+                    minWidth: isMobile ? 'auto' : 'unset',
+                  }}
                   onClick={() => {
                     setActiveSection(section.key);
                     form.setFieldsValue(settings[section.key]);
                     setHasChanges(false);
                   }}
                 >
-                  {section.label}
+                  {isMobile ? section.icon : section.label}
                 </Button>
               ))}
             </Space>
@@ -748,7 +767,7 @@ const Settings = () => {
         </Col>
 
         {/* Settings Form */}
-        <Col span={18}>
+        <Col xs={24} sm={24} md={18} lg={18} xl={19}>
           <Card
             title={
               <Space>

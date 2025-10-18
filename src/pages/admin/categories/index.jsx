@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Space, Table, Tooltip, Badge, Modal } from 'antd';
+import { Button, Space, Table, Tooltip, Badge, Modal, Grid, Card } from 'antd';
 import {
   PlusOutlined,
   TagsOutlined,
   BookOutlined,
   CalendarOutlined,
   FolderOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
@@ -21,8 +24,12 @@ import { categoryService } from '../../../services/admin/categoryservice';
 import CategoryForm from './categoryform';
 import { message } from 'antd';
 
+const { useBreakpoint } = Grid;
+
 const Categories = () => {
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -627,6 +634,78 @@ const Categories = () => {
     );
   };
 
+  // Mobile Card Component
+  const CategoryCard = ({ category }) => (
+    <Card
+      size="small"
+      style={{ marginBottom: 16 }}
+      actions={[
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(category)}
+          key="view"
+        >
+          View
+        </Button>,
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          onClick={() => handleEdit(category)}
+          key="edit"
+        >
+          Edit
+        </Button>,
+        <Button
+          type="text"
+          icon={<DeleteOutlined />}
+          danger
+          onClick={() => handleDelete(category)}
+          key="delete"
+        >
+          Delete
+        </Button>,
+      ]}
+    >
+      <div
+        style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 12 }}
+      >
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            backgroundColor: category.color,
+            marginRight: 12,
+            marginTop: 2,
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 500, fontSize: '16px', marginBottom: 4 }}>
+            {category.name}
+          </div>
+          <div style={{ color: '#666', fontSize: '14px', marginBottom: 8 }}>
+            {category.description}
+          </div>
+          <Space size="middle" wrap>
+            <StatusBadge status={category.status} />
+            <Badge
+              count={category.novelCount}
+              showZero
+              style={{ backgroundColor: '#1890ff' }}
+            >
+              <BookOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
+            </Badge>
+          </Space>
+        </div>
+      </div>
+      <div style={{ fontSize: '12px', color: '#999' }}>
+        Created: {new Date(category.createdAt).toLocaleDateString()}
+      </div>
+    </Card>
+  );
+
   return (
     <div>
       <PageHeader
@@ -681,6 +760,45 @@ const Categories = () => {
               },
             ]}
           />
+        ) : isMobile ? (
+          <div>
+            {data.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+            {/* Mobile Pagination */}
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <Button
+                disabled={pagination.current <= 1}
+                onClick={() =>
+                  handleTableChange({
+                    ...pagination,
+                    current: pagination.current - 1,
+                  })
+                }
+                style={{ marginRight: 8 }}
+              >
+                Previous
+              </Button>
+              <span style={{ margin: '0 16px' }}>
+                {pagination.current} /{' '}
+                {Math.ceil(pagination.total / pagination.pageSize)}
+              </span>
+              <Button
+                disabled={
+                  pagination.current >=
+                  Math.ceil(pagination.total / pagination.pageSize)
+                }
+                onClick={() =>
+                  handleTableChange({
+                    ...pagination,
+                    current: pagination.current + 1,
+                  })
+                }
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         ) : (
           <Table
             columns={columns}
@@ -706,7 +824,24 @@ const Categories = () => {
         open={modalVisible}
         onCancel={handleModalClose}
         footer={null}
-        width={600}
+        width={isMobile ? '95vw' : 600}
+        style={
+          isMobile
+            ? {
+                top: '10px',
+                maxHeight: '90vh',
+                paddingBottom: 0,
+              }
+            : {}
+        }
+        bodyStyle={
+          isMobile
+            ? {
+                maxHeight: 'calc(90vh - 110px)',
+                overflowY: 'auto',
+              }
+            : {}
+        }
         destroyOnClose
       >
         <CategoryForm
@@ -722,32 +857,76 @@ const Categories = () => {
         title="Category Details"
         open={viewModalVisible}
         onCancel={handleViewModalClose}
-        footer={[
-          <Button key="close" onClick={handleViewModalClose}>
-            Close
-          </Button>,
-          <Button
-            key="edit"
-            type="primary"
-            onClick={() => {
-              handleViewModalClose();
-              handleEdit(selectedCategory);
-            }}
-          >
-            Edit Category
-          </Button>,
-        ]}
-        width={600}
+        footer={
+          isMobile ? (
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
+              <Button
+                key="edit"
+                type="primary"
+                block
+                onClick={() => {
+                  handleViewModalClose();
+                  handleEdit(selectedCategory);
+                }}
+              >
+                Edit Category
+              </Button>
+              <Button key="close" block onClick={handleViewModalClose}>
+                Close
+              </Button>
+            </div>
+          ) : (
+            [
+              <Button key="close" onClick={handleViewModalClose}>
+                Close
+              </Button>,
+              <Button
+                key="edit"
+                type="primary"
+                onClick={() => {
+                  handleViewModalClose();
+                  handleEdit(selectedCategory);
+                }}
+              >
+                Edit Category
+              </Button>,
+            ]
+          )
+        }
+        width={isMobile ? '95vw' : 600}
+        style={
+          isMobile
+            ? {
+                top: '10px',
+                maxHeight: '90vh',
+                paddingBottom: 0,
+              }
+            : {}
+        }
+        bodyStyle={
+          isMobile
+            ? {
+                maxHeight: 'calc(90vh - 110px)',
+                overflowY: 'auto',
+              }
+            : {}
+        }
       >
         {selectedCategory && (
-          <div>
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
+          <div style={{ padding: isMobile ? '8px 0' : '16px 0' }}>
+            <Space
+              direction="vertical"
+              style={{ width: '100%' }}
+              size={isMobile ? 'middle' : 'large'}
+            >
               <div>
-                <Space>
+                <Space size={isMobile ? 'small' : 'middle'}>
                   <div
                     style={{
-                      width: 16,
-                      height: 16,
+                      width: isMobile ? 12 : 16,
+                      height: isMobile ? 12 : 16,
                       borderRadius: '50%',
                       backgroundColor: selectedCategory.color,
                     }}
@@ -755,7 +934,7 @@ const Categories = () => {
                   <FolderOutlined
                     style={{
                       color: selectedCategory.color,
-                      fontSize: '20px',
+                      fontSize: isMobile ? '16px' : '20px',
                     }}
                   />
                 </Space>
@@ -764,14 +943,20 @@ const Categories = () => {
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
                 >
                   Category Name
                 </div>
-                <div style={{ fontSize: '18px', fontWeight: 500 }}>
+                <div
+                  style={{
+                    fontSize: isMobile ? '16px' : '18px',
+                    fontWeight: 500,
+                    wordBreak: 'break-word',
+                  }}
+                >
                   {selectedCategory.name}
                 </div>
               </div>
@@ -779,20 +964,27 @@ const Categories = () => {
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
                 >
                   Description
                 </div>
-                <div>{selectedCategory.description}</div>
+                <div
+                  style={{
+                    wordBreak: 'break-word',
+                    lineHeight: isMobile ? '1.4' : '1.6',
+                  }}
+                >
+                  {selectedCategory.description}
+                </div>
               </div>
 
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
@@ -805,42 +997,63 @@ const Categories = () => {
               <div>
                 <div
                   style={{
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     color: '#999',
                     marginBottom: '4px',
                   }}
                 >
                   Slug
                 </div>
-                <code>{selectedCategory.slug}</code>
+                <code
+                  style={{
+                    fontSize: isMobile ? '12px' : '14px',
+                    wordBreak: 'break-all',
+                  }}
+                >
+                  {selectedCategory.slug}
+                </code>
               </div>
 
-              <Space size="large">
-                <div>
+              <Space
+                size={isMobile ? 'small' : 'large'}
+                direction={isMobile ? 'vertical' : 'horizontal'}
+                style={{ width: '100%' }}
+              >
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      fontSize: '12px',
+                      fontSize: isMobile ? '10px' : '12px',
                       color: '#999',
                       marginBottom: '4px',
                     }}
                   >
                     <CalendarOutlined /> Created
                   </div>
-                  <div>
+                  <div
+                    style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      wordBreak: 'break-word',
+                    }}
+                  >
                     {new Date(selectedCategory.createdAt).toLocaleString()}
                   </div>
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      fontSize: '12px',
+                      fontSize: isMobile ? '10px' : '12px',
                       color: '#999',
                       marginBottom: '4px',
                     }}
                   >
                     <CalendarOutlined /> Last Updated
                   </div>
-                  <div>
+                  <div
+                    style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      wordBreak: 'break-word',
+                    }}
+                  >
                     {new Date(selectedCategory.updatedAt).toLocaleString()}
                   </div>
                 </div>

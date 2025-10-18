@@ -2,6 +2,7 @@
 export { default as AdminLayout } from './adminlayout';
 export { default as AdminLogin } from './login';
 export { default as Dashboard } from './dashboard';
+export { default as AdminProfile } from './profile';
 
 // User Management
 export { default as UsersOverview } from './users';

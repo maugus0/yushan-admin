@@ -1,3 +1,225 @@
+import axios from 'axios';
+
+// Configure axios with base URL and interceptors
+const API_BASE_URL = 'https://yushan-backend-staging.up.railway.app/api';
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
+
+// Request interceptor to add auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('tokenType');
+      localStorage.removeItem('expiresIn');
+      window.location.href = '/admin/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Real API functions for profile
+const getCurrentUserProfile = async () => {
+  try {
+    const response = await apiClient.get('/users/me');
+    // Handle the specific API response format
+    if (response.data && response.data.code === 200) {
+      return {
+        success: true,
+        data: formatUserDataFromAPI(response.data.data),
+      };
+    } else {
+      throw new Error(response.data?.message || 'Failed to fetch profile');
+    }
+  } catch (error) {
+    console.error('Error fetching current user profile:', error);
+    return {
+      success: false,
+      error:
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to fetch profile',
+    };
+  }
+};
+
+const getUserProfile = async (userId) => {
+  try {
+    const response = await apiClient.get(`/users/${userId}`);
+    return formatUserData(response.data);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    throw error;
+  }
+};
+
+const getUserProfileByUsername = async (username) => {
+  try {
+    // Try UUID lookup first
+    if (isValidUUID(username)) {
+      return await getUserProfile(username);
+    }
+
+    // Search by username
+    const response = await apiClient.get('/search/users', {
+      params: { username: username, limit: 1 },
+    });
+
+    if (response.data && response.data.length > 0) {
+      return formatUserData(response.data[0]);
+    }
+
+    throw new Error('User not found');
+  } catch (error) {
+    console.error('Error fetching user profile by username:', error);
+    throw error;
+  }
+};
+
+// Helper functions
+const isValidUUID = (str) => {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+const formatUserData = (userData) => {
+  return {
+    id: userData.id || userData._id,
+    username: userData.username || userData.name,
+    email: userData.email,
+    avatar: userData.avatar || userData.profilePicture,
+    status: userData.status || 'active',
+    userType: userData.userType || userData.role || 'reader',
+    joinDate: userData.createdAt || userData.joinDate,
+    lastActive: userData.lastActiveAt || userData.lastActive,
+    profile: {
+      bio: userData.bio || userData.profile?.bio,
+      location: userData.location || userData.profile?.location,
+      gender: userData.gender || userData.profile?.gender,
+      birthDate: userData.birthDate || userData.profile?.birthDate,
+      preferences: userData.preferences || userData.profile?.preferences,
+    },
+    stats: userData.stats || userData.profile?.stats,
+    ...userData,
+  };
+};
+
+// New formatter specifically for the Yushan API response format
+const formatUserDataFromAPI = (apiData) => {
+  return {
+    id: apiData.uuid,
+    uuid: apiData.uuid,
+    username: apiData.username,
+    email: apiData.email,
+    avatar: apiData.avatarUrl,
+    status: mapApiStatusToLocal(apiData.status),
+    userType: determineUserType(apiData),
+    joinDate: apiData.createTime,
+    lastActive: apiData.lastActive,
+    createdAt: apiData.createTime,
+    updatedAt: apiData.updateTime,
+    profile: {
+      bio: apiData.profileDetail,
+      gender: mapApiGenderToLocal(apiData.gender),
+      birthDate: apiData.birthday,
+      level: apiData.level,
+      experience: apiData.exp,
+      yuan: apiData.yuan,
+      readTime: apiData.readTime,
+      readBookNum: apiData.readBookNum,
+      isAuthor: apiData.isAuthor,
+      isAdmin: apiData.isAdmin,
+    },
+    stats: {
+      level: apiData.level,
+      experience: apiData.exp,
+      yuan: apiData.yuan || 0,
+      readTime: apiData.readTime || 0,
+      booksRead: apiData.readBookNum || 0,
+    },
+    // Raw API data for any other needs
+    rawApiData: apiData,
+  };
+};
+
+// Helper function to map API status to local status
+const mapApiStatusToLocal = (apiStatus) => {
+  const statusMap = {
+    NORMAL: 'active',
+    SUSPENDED: 'suspended',
+    BANNED: 'banned',
+    INACTIVE: 'inactive',
+  };
+  return statusMap[apiStatus] || 'active';
+};
+
+// Helper function to map API gender to local gender
+const mapApiGenderToLocal = (apiGender) => {
+  const genderMap = {
+    MALE: 'male',
+    FEMALE: 'female',
+    UNKNOWN: 'prefer-not-to-say',
+    OTHER: 'other',
+  };
+  return genderMap[apiGender] || 'prefer-not-to-say';
+};
+
+// Helper function to determine user type
+const determineUserType = (apiData) => {
+  if (apiData.isAdmin) return 'admin';
+  if (apiData.isAuthor) return 'writer';
+  return 'reader';
+};
+
+const getUserStatusColor = (status) => {
+  const statusColors = {
+    active: '#52c41a',
+    inactive: '#faad14',
+    suspended: '#fa8c16',
+    banned: '#f5222d',
+    pending: '#1890ff',
+  };
+  return statusColors[status] || '#d9d9d9';
+};
+
+const getGenderDisplayText = (gender) => {
+  const genderMap = {
+    male: 'Male',
+    female: 'Female',
+    other: 'Other',
+    'prefer-not-to-say': 'Prefer not to say',
+    MALE: 'Male',
+    FEMALE: 'Female',
+    UNKNOWN: 'Prefer not to say',
+    OTHER: 'Other',
+    '': 'Not specified',
+    null: 'Not specified',
+    undefined: 'Not specified',
+  };
+  return genderMap[gender] || 'Not specified';
+};
+
 // Mock data for development
 const generateMockReaders = () => {
   const readers = [];
@@ -345,6 +567,22 @@ export const userService = {
       throw error;
     }
   },
+};
+
+// Add real API functions to userService for backward compatibility
+userService.getCurrentUserProfile = getCurrentUserProfile;
+userService.getUserProfile = getUserProfile;
+userService.getUserProfileByUsername = getUserProfileByUsername;
+userService.getUserStatusColor = getUserStatusColor;
+userService.getGenderDisplayText = getGenderDisplayText;
+
+// Export all functions
+export {
+  getCurrentUserProfile,
+  getUserProfile,
+  getUserProfileByUsername,
+  getUserStatusColor,
+  getGenderDisplayText,
 };
 
 export default userService;

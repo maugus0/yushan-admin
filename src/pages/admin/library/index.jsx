@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Space,
@@ -7,37 +7,43 @@ import {
   Avatar,
   Typography,
   Tag,
-  Progress,
+  Grid,
+  Card,
 } from 'antd';
 import {
   BookOutlined,
   UserOutlined,
-  HeartOutlined,
   EyeOutlined,
   CalendarOutlined,
-  FolderOutlined,
-  StarOutlined,
   ClockCircleOutlined,
   DownloadOutlined,
-  ShareAltOutlined,
   BarsOutlined,
-  TeamOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
-  SearchBar,
   FilterPanel,
   ActionButtons,
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
+import ViewModal, {
+  viewFieldTypes,
+} from '../../../components/admin/modals/viewmodal';
+import { libraryService } from '../../../services/admin/libraryservice';
+import {
+  exportToCSV,
+  getTimestampedFilename,
+} from '../../../utils/admin/exportutils';
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const Library = () => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [activeTab, setActiveTab] = useState('collections');
+  // Remove activeTab since we only show user libraries
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -45,493 +51,192 @@ const Library = () => {
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
-
-  // Mock data for different library sections
-  const mockData = {
-    collections: [
-      {
-        id: 1,
-        collectionId: 'COL_001',
-        name: 'Cultivation Favorites',
-        description: 'My favorite cultivation novels of all time',
-        owner: 'epic_reader_99',
-        novelCount: 15,
-        followerCount: 1247,
-        isPublic: true,
-        status: 'active',
-        novels: ['The Cultivation Path', 'Dragon Emperor', 'Immortal Realm'],
-        tags: ['cultivation', 'xianxia', 'favorites'],
-        createdAt: '2024-09-01T10:30:00Z',
-        updatedAt: '2024-09-20T14:30:00Z',
-        views: 5674,
-      },
-      {
-        id: 2,
-        collectionId: 'COL_002',
-        name: 'Fantasy Adventures',
-        description: 'Epic fantasy adventures and magical worlds',
-        owner: 'fantasy_lover',
-        novelCount: 23,
-        followerCount: 892,
-        isPublic: true,
-        status: 'active',
-        novels: ['Mystic Journey', 'Celestial Warrior', 'Magic Academy'],
-        tags: ['fantasy', 'adventure', 'magic'],
-        createdAt: '2024-08-15T16:45:00Z',
-        updatedAt: '2024-09-19T11:20:00Z',
-        views: 3456,
-      },
-      {
-        id: 3,
-        collectionId: 'COL_003',
-        name: 'Private Reading List',
-        description: 'Personal reading queue - currently reading',
-        owner: 'private_reader',
-        novelCount: 8,
-        followerCount: 0,
-        isPublic: false,
-        status: 'active',
-        novels: ['Secret Novel', 'Hidden Story', 'Private Tale'],
-        tags: ['personal', 'reading', 'queue'],
-        createdAt: '2024-09-10T08:15:00Z',
-        updatedAt: '2024-09-18T19:45:00Z',
-        views: 0,
-      },
-    ],
-    bookmarks: [
-      {
-        id: 1,
-        bookmarkId: 'BMK_001',
-        user: 'epic_reader_99',
-        novel: 'The Cultivation Path',
-        chapter: 'Chapter 47: The Breaking Point',
-        chapterNumber: 47,
-        bookmarkType: 'reading_progress',
-        note: 'Amazing cliff-hanger! Need to continue tomorrow.',
-        isPrivate: false,
-        createdAt: '2024-09-20T22:30:00Z',
-        lastAccessed: '2024-09-20T22:30:00Z',
-      },
-      {
-        id: 2,
-        bookmarkId: 'BMK_002',
-        user: 'fantasy_lover',
-        novel: 'Mystic Journey',
-        chapter: 'Chapter 12: The Enchanted Forest',
-        chapterNumber: 12,
-        bookmarkType: 'favorite_scene',
-        note: 'This scene was so beautifully written!',
-        isPrivate: false,
-        createdAt: '2024-09-19T18:45:00Z',
-        lastAccessed: '2024-09-20T10:15:00Z',
-      },
-      {
-        id: 3,
-        bookmarkId: 'BMK_003',
-        user: 'careful_reader',
-        novel: 'Dragon Emperor',
-        chapter: 'Chapter 89: The Final Battle',
-        chapterNumber: 89,
-        bookmarkType: 'important_plot',
-        note: 'Key plot point - remember this for later!',
-        isPrivate: true,
-        createdAt: '2024-09-18T14:20:00Z',
-        lastAccessed: '2024-09-19T16:30:00Z',
-      },
-    ],
-    reading_history: [
-      {
-        id: 1,
-        historyId: 'HIS_001',
-        user: 'epic_reader_99',
-        novel: 'The Cultivation Path',
-        lastChapter: 47,
-        totalChapters: 156,
-        readingProgress: 30.1,
-        timeSpent: 1247, // minutes
-        lastRead: '2024-09-20T22:30:00Z',
-        startedReading: '2024-08-15T10:00:00Z',
-        status: 'reading',
-        rating: 5,
-        bookmarked: true,
-      },
-      {
-        id: 2,
-        historyId: 'HIS_002',
-        user: 'fantasy_lover',
-        novel: 'Mystic Journey',
-        lastChapter: 89,
-        totalChapters: 89,
-        readingProgress: 100,
-        timeSpent: 2156,
-        lastRead: '2024-09-19T20:45:00Z',
-        startedReading: '2024-07-20T14:30:00Z',
-        status: 'completed',
-        rating: 4,
-        bookmarked: false,
-      },
-      {
-        id: 3,
-        historyId: 'HIS_003',
-        user: 'casual_reader',
-        novel: 'Dragon Emperor',
-        lastChapter: 15,
-        totalChapters: 203,
-        readingProgress: 7.4,
-        timeSpent: 245,
-        lastRead: '2024-09-10T16:20:00Z',
-        startedReading: '2024-09-05T12:00:00Z',
-        status: 'paused',
-        rating: null,
-        bookmarked: true,
-      },
-    ],
-  };
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch data
-  const fetchData = useCallback(
-    async (params = {}) => {
-      setLoading(true);
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800));
+  const fetchData = async (params = {}) => {
+    setLoading(true);
+    try {
+      const pageSize = params.pageSize || pagination.pageSize;
+      const current = params.current || pagination.current;
 
-        let filteredData = mockData[activeTab] || [];
+      // Call the real API to get user libraries
+      const response = await libraryService.getAllLibraries({
+        page: current,
+        pageSize: pageSize,
+        search: searchValue,
+        sortBy: 'createTime',
+        sortOrder: 'DESC',
+        ...filters,
+      });
 
-        // Apply search filter
-        if (searchValue) {
-          filteredData = filteredData.filter((item) => {
-            if (activeTab === 'collections') {
-              return (
-                item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-                item.description
-                  .toLowerCase()
-                  .includes(searchValue.toLowerCase()) ||
-                item.owner.toLowerCase().includes(searchValue.toLowerCase())
-              );
-            } else if (activeTab === 'bookmarks') {
-              return (
-                item.user.toLowerCase().includes(searchValue.toLowerCase()) ||
-                item.novel.toLowerCase().includes(searchValue.toLowerCase()) ||
-                item.note.toLowerCase().includes(searchValue.toLowerCase())
-              );
-            } else {
-              return (
-                item.user.toLowerCase().includes(searchValue.toLowerCase()) ||
-                item.novel.toLowerCase().includes(searchValue.toLowerCase())
-              );
-            }
-          });
-        }
-
-        // Apply filters
-        if (filters.status) {
-          filteredData = filteredData.filter(
-            (item) => item.status === filters.status
-          );
-        }
-
-        if (filters.isPublic !== undefined && activeTab === 'collections') {
-          filteredData = filteredData.filter(
-            (item) => item.isPublic === filters.isPublic
-          );
-        }
-
-        if (filters.bookmarkType && activeTab === 'bookmarks') {
-          filteredData = filteredData.filter(
-            (item) => item.bookmarkType === filters.bookmarkType
-          );
-        }
-
-        const pageSize = params.pageSize || pagination.pageSize;
-        const current = params.current || pagination.current;
-        const startIndex = (current - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        setData(filteredData.slice(startIndex, endIndex));
+      if (response.success) {
+        setData(response.data);
         setPagination((prev) => ({
           ...prev,
-          current: current,
-          total: filteredData.length,
+          current: response.page,
+          total: response.total,
         }));
-      } catch (error) {
-        console.error('Failed to fetch library data:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        throw new Error('Failed to fetch user libraries');
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, filters, pagination.pageSize, pagination.current, activeTab]
-  );
+    } catch (error) {
+      console.error('Failed to fetch library data:', error);
+      // Handle error gracefully
+      setData([]);
+      setPagination((prev) => ({
+        ...prev,
+        total: 0,
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, filters, activeTab]);
+  }, [searchValue, filters]);
 
-  // Get bookmark type display
-  const getBookmarkTypeDisplay = (type) => {
-    const config = {
-      reading_progress: { color: 'blue', icon: <ClockCircleOutlined /> },
-      favorite_scene: { color: 'red', icon: <HeartOutlined /> },
-      important_plot: { color: 'orange', icon: <StarOutlined /> },
-    };
-    return config[type] || { color: 'default', icon: <BookOutlined /> };
-  };
+  // Remove unused helper functions for bookmarks and reading status
 
-  // Get reading status color
-  const getReadingStatusColor = (status) => {
-    const colors = {
-      reading: 'processing',
-      completed: 'success',
-      paused: 'warning',
-      dropped: 'error',
-    };
-    return colors[status] || 'default';
-  };
-
-  // Filter configurations for different tabs
+  // Filter configurations for user libraries
   const getFilterConfig = () => {
-    const baseFilters = [
+    return [
       {
-        name: 'status',
-        label: 'Status',
+        name: 'level',
+        label: 'User Level',
         type: 'select',
         options: [
-          { value: 'active', label: 'Active' },
-          { value: 'reading', label: 'Reading' },
-          { value: 'completed', label: 'Completed' },
-          { value: 'paused', label: 'Paused' },
-          { value: 'dropped', label: 'Dropped' },
+          { value: 1, label: 'Level 1' },
+          { value: 2, label: 'Level 2' },
+          { value: 3, label: 'Level 3' },
+          { value: 4, label: 'Level 4' },
+          { value: 5, label: 'Level 5' },
+        ],
+      },
+      {
+        name: 'minBooks',
+        label: 'Min Books',
+        type: 'number',
+        placeholder: 'Minimum books read',
+      },
+      {
+        name: 'maxBooks',
+        label: 'Max Books',
+        type: 'number',
+        placeholder: 'Maximum books read',
+      },
+      {
+        name: 'isAuthor',
+        label: 'User Type',
+        type: 'select',
+        options: [
+          { value: true, label: 'Authors' },
+          { value: false, label: 'Readers' },
         ],
       },
     ];
-
-    if (activeTab === 'collections') {
-      return [
-        ...baseFilters,
-        {
-          name: 'isPublic',
-          label: 'Visibility',
-          type: 'select',
-          options: [
-            { value: true, label: 'Public' },
-            { value: false, label: 'Private' },
-          ],
-        },
-      ];
-    } else if (activeTab === 'bookmarks') {
-      return [
-        {
-          name: 'bookmarkType',
-          label: 'Bookmark Type',
-          type: 'select',
-          options: [
-            { value: 'reading_progress', label: 'Reading Progress' },
-            { value: 'favorite_scene', label: 'Favorite Scene' },
-            { value: 'important_plot', label: 'Important Plot' },
-          ],
-        },
-      ];
-    }
-
-    return baseFilters;
   };
 
-  // Dynamic columns based on active tab
+  // Columns for user libraries
   const getColumns = () => {
-    if (activeTab === 'collections') {
-      return [
-        {
-          title: 'Collection',
-          key: 'collection',
-          render: (_, record) => (
-            <Space direction="vertical" size={4}>
-              <Text strong style={{ fontSize: '15px' }}>
-                {record.name}
-              </Text>
-              <Text type="secondary">{record.description}</Text>
-              <Space>
-                <Avatar size="small" icon={<UserOutlined />} />
-                <Text>{record.owner}</Text>
-                {!record.isPublic && <Tag color="orange">Private</Tag>}
-              </Space>
-              <Space>
-                {record.tags.map((tag) => (
-                  <Tag key={tag} color="blue">
-                    {tag}
-                  </Tag>
-                ))}
-              </Space>
-            </Space>
-          ),
-        },
-        {
-          title: 'Statistics',
-          key: 'stats',
-          render: (_, record) => (
-            <Space direction="vertical" size={4}>
-              <Space>
-                <BookOutlined />
-                <Text>{record.novelCount} novels</Text>
-              </Space>
-              <Space>
-                <TeamOutlined />
-                <Text>{record.followerCount.toLocaleString()} followers</Text>
-              </Space>
-              <Space>
-                <EyeOutlined />
-                <Text>{record.views.toLocaleString()} views</Text>
-              </Space>
-            </Space>
-          ),
-        },
-        {
-          title: 'Sample Novels',
-          key: 'novels',
-          render: (_, record) => (
-            <Space direction="vertical" size={2}>
-              {record.novels.slice(0, 3).map((novel, index) => (
-                <Text key={index} type="secondary" style={{ fontSize: '12px' }}>
-                  • {novel}
-                </Text>
-              ))}
-              {record.novels.length > 3 && (
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  +{record.novels.length - 3} more...
-                </Text>
-              )}
-            </Space>
-          ),
-        },
-      ];
-    } else if (activeTab === 'bookmarks') {
-      return [
-        {
-          title: 'Bookmark',
-          key: 'bookmark',
-          render: (_, record) => {
-            const typeDisplay = getBookmarkTypeDisplay(record.bookmarkType);
-            return (
-              <Space direction="vertical" size={4}>
-                <Space>
-                  <Avatar size="small" icon={<UserOutlined />} />
-                  <Text strong>{record.user}</Text>
-                  {record.isPrivate && <Tag color="orange">Private</Tag>}
-                </Space>
-                <Text strong>{record.novel}</Text>
-                <Space>
-                  <span style={{ color: typeDisplay.color }}>
-                    {typeDisplay.icon}
-                  </span>
-                  <Tag color={typeDisplay.color}>
-                    {record.bookmarkType.replace('_', ' ').toUpperCase()}
-                  </Tag>
-                </Space>
-              </Space>
-            );
-          },
-        },
-        {
-          title: 'Chapter & Note',
-          key: 'chapter',
-          render: (_, record) => (
-            <Space direction="vertical" size={4}>
-              <Text strong>
-                Ch. {record.chapterNumber}: {record.chapter}
-              </Text>
-              <Text type="secondary" style={{ fontStyle: 'italic' }}>
-                "{record.note}"
-              </Text>
-            </Space>
-          ),
-        },
-      ];
-    } else {
-      return [
-        {
-          title: 'Reader & Novel',
-          key: 'reader',
-          render: (_, record) => (
-            <Space direction="vertical" size={4}>
-              <Space>
-                <Avatar icon={<UserOutlined />} />
-                <Text strong>{record.user}</Text>
-              </Space>
-              <Text strong style={{ fontSize: '15px' }}>
-                {record.novel}
-              </Text>
-              <Tag color={getReadingStatusColor(record.status)}>
-                {record.status.toUpperCase()}
-              </Tag>
-            </Space>
-          ),
-        },
-        {
-          title: 'Progress',
-          key: 'progress',
-          render: (_, record) => (
-            <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Text>
-                Chapter {record.lastChapter} / {record.totalChapters}
-              </Text>
-              <Progress
-                percent={Math.round(record.readingProgress)}
-                size="small"
-                status={record.status === 'completed' ? 'success' : 'active'}
+    return [
+      {
+        title: 'User Information',
+        key: 'user',
+        render: (_, record) => (
+          <Space direction="vertical" size={4}>
+            <Space>
+              <Avatar
+                size="large"
+                src={record.avatarUrl}
+                icon={<UserOutlined />}
+                style={{ minWidth: 40 }}
               />
+              <div>
+                <Text strong style={{ fontSize: '15px', display: 'block' }}>
+                  {record.username}
+                </Text>
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  {record.email}
+                </Text>
+              </div>
+            </Space>
+            {record.profileDetail && (
+              <Text type="secondary" style={{ fontSize: '13px' }}>
+                {record.profileDetail}
+              </Text>
+            )}
+            <Space wrap>
+              <Tag color="blue">Level {record.level}</Tag>
+              <Tag color="green">{record.exp} EXP</Tag>
+              {record.isAuthor && <Tag color="purple">Author</Tag>}
+              {record.isAdmin && <Tag color="red">Admin</Tag>}
+            </Space>
+          </Space>
+        ),
+      },
+      {
+        title: 'Library Statistics',
+        key: 'stats',
+        render: (_, record) => (
+          <Space direction="vertical" size={4}>
+            <Space>
+              <BookOutlined style={{ color: '#1890ff' }} />
+              <Text strong>{record.totalBooks} books</Text>
+            </Space>
+            <Space>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+              <Text>{record.totalReadingTime}h reading</Text>
+            </Space>
+            <Space>
               <Text type="secondary" style={{ fontSize: '12px' }}>
-                <ClockCircleOutlined /> {Math.round(record.timeSpent / 60)}h{' '}
-                {record.timeSpent % 60}m
+                Read Time: {record.readTime} min
               </Text>
             </Space>
-          ),
-        },
-        {
-          title: 'Reading Info',
-          key: 'info',
-          render: (_, record) => (
-            <Space direction="vertical" size={4}>
+            <Space>
               <Text type="secondary" style={{ fontSize: '12px' }}>
-                Started: {new Date(record.startedReading).toLocaleDateString()}
+                Yuan: {record.yuan}
               </Text>
-              <Text type="secondary" style={{ fontSize: '12px' }}>
-                Last read: {new Date(record.lastRead).toLocaleDateString()}
-              </Text>
-              {record.rating && (
-                <Space>
-                  <StarOutlined style={{ color: '#fadb14' }} />
-                  <Text>{record.rating}/5</Text>
-                </Space>
-              )}
-              {record.bookmarked && (
-                <Tag color="blue">
-                  <BookOutlined /> Bookmarked
-                </Tag>
-              )}
             </Space>
-          ),
-        },
-      ];
-    }
+          </Space>
+        ),
+      },
+      {
+        title: 'Personal Info',
+        key: 'personal',
+        render: (_, record) => (
+          <Space direction="vertical" size={4}>
+            {record.birthday && (
+              <Space>
+                <CalendarOutlined />
+                <Text style={{ fontSize: '13px' }}>
+                  {new Date(record.birthday).toLocaleDateString()}
+                </Text>
+              </Space>
+            )}
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              Joined: {new Date(record.createdAt).toLocaleDateString()}
+            </Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              Updated: {new Date(record.updatedAt).toLocaleDateString()}
+            </Text>
+            {record.lastActive && (
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                Last Active: {new Date(record.lastActive).toLocaleDateString()}
+              </Text>
+            )}
+          </Space>
+        ),
+      },
+    ];
   };
 
-  // Tab configuration
-  const tabs = [
-    { key: 'collections', label: 'Collections', icon: <FolderOutlined /> },
-    { key: 'bookmarks', label: 'Bookmarks', icon: <BookOutlined /> },
-    {
-      key: 'reading_history',
-      label: 'Reading History',
-      icon: <BarsOutlined />,
-    },
-  ];
+  // Remove tabs - we only show user libraries now
 
   // Handlers
-  const handleSearch = (value) => {
-    setSearchValue(value);
-  };
-
   const handleFilter = (filterValues) => {
     setFilters(filterValues);
   };
@@ -542,31 +247,278 @@ const Library = () => {
   };
 
   const handleView = (record) => {
-    console.log('View library record:', record);
+    setSelectedUser(record);
+    setViewModalVisible(true);
   };
 
-  const handleEdit = (record) => {
-    console.log('Edit library record:', record);
+  const handleExportAll = () => {
+    if (!data || data.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    // Define export columns based on the table structure
+    const exportColumns = [
+      { key: 'username', title: 'Username', dataIndex: 'username' },
+      { key: 'email', title: 'Email', dataIndex: 'email' },
+      { key: 'level', title: 'Level', dataIndex: 'level' },
+      { key: 'exp', title: 'Experience', dataIndex: 'exp' },
+      { key: 'totalBooks', title: 'Books in Library', dataIndex: 'totalBooks' },
+      { key: 'readTime', title: 'Reading Time (hours)', dataIndex: 'readTime' },
+      {
+        key: 'birthday',
+        title: 'Birthday',
+        dataIndex: 'birthday',
+        render: (value) => (value ? new Date(value).toLocaleDateString() : ''),
+      },
+      {
+        key: 'createdAt',
+        title: 'Account Created',
+        dataIndex: 'createdAt',
+        render: (value) => new Date(value).toLocaleDateString(),
+      },
+      {
+        key: 'updatedAt',
+        title: 'Last Updated',
+        dataIndex: 'updatedAt',
+        render: (value) => new Date(value).toLocaleDateString(),
+      },
+    ];
+
+    const filename = getTimestampedFilename('user_libraries', 'csv');
+    exportToCSV(data, exportColumns, filename.replace('.csv', ''));
   };
 
-  const handleDelete = (record) => {
-    console.log('Delete library record:', record);
+  const handleAnalytics = () => {
+    // For now, show basic analytics in console/alert
+    // In a real app, this would open an analytics dashboard or modal
+    const totalUsers = data.length;
+    const totalBooks = data.reduce(
+      (sum, user) => sum + (user.totalBooks || 0),
+      0
+    );
+    const totalReadingTime = data.reduce(
+      (sum, user) => sum + (user.readTime || 0),
+      0
+    );
+    const avgLevel =
+      data.reduce((sum, user) => sum + (user.level || 0), 0) / totalUsers;
+
+    alert(`Reading Analytics Summary:
+    
+Total Users: ${totalUsers}
+Total Books in All Libraries: ${totalBooks}
+Total Reading Time: ${Math.round(totalReadingTime)} hours
+Average User Level: ${Math.round(avgLevel * 10) / 10}
+
+Note: This is a basic summary. Full analytics dashboard would be implemented here.`);
+  };
+
+  const handleExportUserDetails = (user) => {
+    // Export individual user details to Excel
+    const userData = [
+      {
+        Username: user.username,
+        Email: user.email,
+        Level: user.level,
+        Experience: user.exp,
+        'Total Books': user.totalBooks,
+        'Reading Time (hours)': user.readTime,
+        Birthday: user.birthday
+          ? new Date(user.birthday).toLocaleDateString()
+          : '',
+        'Account Created': new Date(user.createdAt).toLocaleDateString(),
+        'Last Updated': new Date(user.updatedAt).toLocaleDateString(),
+        Yuan: user.yuan,
+      },
+    ];
+
+    const fileName = getTimestampedFilename(
+      `user_details_${user.username}`,
+      'xlsx'
+    );
+    exportToCSV(userData, fileName, 'User Details');
+  };
+
+  const handleExportUserLibrary = (user) => {
+    // Export user's library data to Excel
+    const libraryData = [
+      {
+        Username: user.username,
+        'Books in Library': user.totalBooks,
+        'Reading Time': user.readTime + ' hours',
+        Level: user.level,
+        Experience: user.exp,
+        'Account Created': new Date(user.createdAt).toLocaleDateString(),
+        'Last Active': user.lastActive
+          ? new Date(user.lastActive).toLocaleDateString()
+          : '',
+      },
+    ];
+
+    const fileName = getTimestampedFilename(`library_${user.username}`, 'xlsx');
+    exportToCSV(libraryData, fileName, `${user.username}'s Library`);
   };
 
   const handleTableChange = (paginationInfo) => {
     fetchData(paginationInfo);
   };
 
+  // Mobile Card Component for User Libraries
+  const UserLibraryCard = ({ user }) => (
+    <Card
+      size="small"
+      style={{ marginBottom: 16 }}
+      actions={[
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(user)}
+          key="view"
+        >
+          View Library
+        </Button>,
+        <Button
+          type="text"
+          icon={<DownloadOutlined />}
+          onClick={() => handleExportUserDetails(user)}
+          key="export"
+        >
+          Export Details
+        </Button>,
+      ]}
+    >
+      <div style={{ marginBottom: 12 }}>
+        {/* User Header */}
+        <Space style={{ marginBottom: 12, width: '100%' }}>
+          <Avatar
+            size="large"
+            src={user.avatarUrl}
+            icon={<UserOutlined />}
+            style={{ minWidth: 48, minHeight: 48 }}
+          />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 500, fontSize: '16px', marginBottom: 2 }}>
+              {user.username}
+            </div>
+            <div style={{ color: '#666', fontSize: '12px', marginBottom: 4 }}>
+              {user.email}
+            </div>
+            {user.profileDetail && (
+              <div style={{ color: '#999', fontSize: '11px' }}>
+                {user.profileDetail}
+              </div>
+            )}
+          </div>
+        </Space>
+
+        {/* User Tags */}
+        <Space wrap style={{ marginBottom: 12 }}>
+          <Tag color="blue">Level {user.level}</Tag>
+          <Tag color="green">{user.exp} EXP</Tag>
+          {user.isAuthor && <Tag color="purple">Author</Tag>}
+          {user.isAdmin && <Tag color="red">Admin</Tag>}
+        </Space>
+
+        {/* Library Stats */}
+        <div style={{ marginBottom: 12 }}>
+          <Space size="middle" wrap style={{ width: '100%' }}>
+            <Space size="small">
+              <BookOutlined style={{ color: '#1890ff' }} />
+              <Text strong style={{ fontSize: '14px' }}>
+                {user.totalBooks} books
+              </Text>
+            </Space>
+            <Space size="small">
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+              <Text style={{ fontSize: '14px' }}>{user.totalReadingTime}h</Text>
+            </Space>
+          </Space>
+          <div style={{ marginTop: 8 }}>
+            <Space size="middle" wrap>
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                Read Time: {user.readTime} min
+              </Text>
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                Yuan: {user.yuan}
+              </Text>
+            </Space>
+          </div>
+        </div>
+
+        {/* Personal Info */}
+        <div>
+          {user.birthday && (
+            <div style={{ marginBottom: 4 }}>
+              <Space size="small">
+                <CalendarOutlined style={{ fontSize: '12px' }} />
+                <Text style={{ fontSize: '12px' }}>
+                  Born: {new Date(user.birthday).toLocaleDateString()}
+                </Text>
+              </Space>
+            </div>
+          )}
+          <div style={{ fontSize: '11px', color: '#999' }}>
+            Joined: {new Date(user.createdAt).toLocaleDateString()}
+          </div>
+          {user.lastActive && (
+            <div style={{ fontSize: '11px', color: '#999' }}>
+              Last Active: {new Date(user.lastActive).toLocaleDateString()}
+            </div>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+
+  const renderMobileCards = () => {
+    return (
+      <div>
+        {data.map((user) => (
+          <UserLibraryCard key={user.id} user={user} />
+        ))}
+        {/* Mobile Pagination */}
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <Button
+            disabled={pagination.current <= 1}
+            onClick={() =>
+              handleTableChange({
+                ...pagination,
+                current: pagination.current - 1,
+              })
+            }
+            style={{ marginRight: 8 }}
+          >
+            Previous
+          </Button>
+          <span style={{ margin: '0 16px' }}>
+            {pagination.current} /{' '}
+            {Math.ceil(pagination.total / pagination.pageSize)}
+          </span>
+          <Button
+            disabled={
+              pagination.current >=
+              Math.ceil(pagination.total / pagination.pageSize)
+            }
+            onClick={() =>
+              handleTableChange({
+                ...pagination,
+                current: pagination.current + 1,
+              })
+            }
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   const columns = [
     ...getColumns(),
     {
-      title: activeTab === 'reading_history' ? 'Last Read' : 'Updated',
-      dataIndex:
-        activeTab === 'reading_history'
-          ? 'lastRead'
-          : activeTab === 'bookmarks'
-            ? 'lastAccessed'
-            : 'updatedAt',
+      title: 'Last Updated',
+      dataIndex: 'updatedAt',
       key: 'date',
       render: (date) => (
         <Tooltip title={new Date(date).toLocaleString()}>
@@ -585,39 +537,18 @@ const Library = () => {
         <ActionButtons
           record={record}
           onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          showEdit={false}
+          showDelete={false}
           showMore={true}
-          customActions={
-            activeTab === 'collections'
-              ? [
-                  {
-                    key: 'share',
-                    icon: <ShareAltOutlined />,
-                    label: 'Share Collection',
-                  },
-                  {
-                    key: 'export',
-                    icon: <DownloadOutlined />,
-                    label: 'Export',
-                  },
-                ]
-              : activeTab === 'bookmarks'
-                ? [
-                    {
-                      key: 'goto',
-                      icon: <BookOutlined />,
-                      label: 'Go to Chapter',
-                    },
-                  ]
-                : [
-                    {
-                      key: 'resume',
-                      icon: <BookOutlined />,
-                      label: 'Resume Reading',
-                    },
-                  ]
-          }
+          onMore={(record) => handleExportUserDetails(record)}
+          customActions={[
+            {
+              key: 'export',
+              icon: <DownloadOutlined />,
+              label: 'Export Library',
+              onClick: (record) => handleExportUserLibrary(record),
+            },
+          ]}
         />
       ),
     },
@@ -626,46 +557,39 @@ const Library = () => {
   return (
     <div>
       <PageHeader
-        title="Library Management"
-        subtitle="Manage user collections, bookmarks, and reading history"
+        title="User Libraries"
+        subtitle="View and manage user reading libraries (Read-only for administrators)"
         breadcrumbs={[
           { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Library' },
+          { title: 'User Libraries' },
         ]}
         actions={[
-          <Button key="export" type="default" icon={<DownloadOutlined />}>
-            Export Data
+          <Button
+            key="export"
+            type="default"
+            icon={<DownloadOutlined />}
+            onClick={handleExportAll}
+            disabled={loading || data.length === 0}
+            size={isMobile ? 'small' : 'default'}
+            style={{ width: isMobile ? '100%' : 'auto' }}
+          >
+            {isMobile ? 'Export' : 'Export All Data'}
           </Button>,
-          <Button key="analytics" type="primary" icon={<BarsOutlined />}>
-            Reading Analytics
+          <Button
+            key="analytics"
+            type="primary"
+            icon={<BarsOutlined />}
+            onClick={handleAnalytics}
+            disabled={loading || data.length === 0}
+            size={isMobile ? 'small' : 'default'}
+            style={{ width: isMobile ? '100%' : 'auto' }}
+          >
+            {isMobile ? 'Analytics' : 'Reading Analytics'}
           </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
-        {/* Tab Navigation */}
-        <Space>
-          {tabs.map((tab) => (
-            <Button
-              key={tab.key}
-              type={activeTab === tab.key ? 'primary' : 'default'}
-              icon={tab.icon}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </Button>
-          ))}
-        </Space>
-
-        <SearchBar
-          placeholder={`Search ${activeTab.replace('_', ' ')}...`}
-          onSearch={handleSearch}
-          onClear={() => setSearchValue('')}
-          searchValue={searchValue}
-          showFilter={true}
-          loading={loading}
-        />
-
         <FilterPanel
           filters={getFilterConfig()}
           onFilter={handleFilter}
@@ -675,11 +599,11 @@ const Library = () => {
         />
 
         {loading ? (
-          <LoadingSpinner tip={`Loading ${activeTab.replace('_', ' ')}...`} />
+          <LoadingSpinner tip="Loading user libraries..." />
         ) : data.length === 0 ? (
           <EmptyState
-            title="No Data Found"
-            description={`No ${activeTab.replace('_', ' ')} match your current search and filter criteria.`}
+            title="No User Libraries Found"
+            description="No users match your current search and filter criteria."
             actions={[
               {
                 children: 'Clear Filters',
@@ -687,6 +611,8 @@ const Library = () => {
               },
             ]}
           />
+        ) : isMobile ? (
+          renderMobileCards()
         ) : (
           <Table
             columns={columns}
@@ -696,7 +622,7 @@ const Library = () => {
               showSizeChanger: true,
               showQuickJumper: true,
               showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} ${activeTab.replace('_', ' ')}`,
+                `${range[0]}-${range[1]} of ${total} user libraries`,
             }}
             onChange={handleTableChange}
             loading={loading}
@@ -705,6 +631,58 @@ const Library = () => {
           />
         )}
       </Space>
+
+      {/* View User Library Modal */}
+      {selectedUser && (
+        <ViewModal
+          visible={viewModalVisible}
+          onCancel={() => {
+            setViewModalVisible(false);
+            setSelectedUser(null);
+          }}
+          title={`${selectedUser.username}'s Library Details`}
+          data={selectedUser}
+          width={900}
+          fields={[
+            viewFieldTypes.text('username', 'Username', { copyable: true }),
+            viewFieldTypes.text('email', 'Email', { copyable: true }),
+            viewFieldTypes.number('level', 'Level', { strong: true }),
+            viewFieldTypes.number('exp', 'Experience Points', { strong: true }),
+            viewFieldTypes.number('totalBooks', 'Books in Library', {
+              strong: true,
+              suffix: 'books',
+            }),
+            viewFieldTypes.number('readTime', 'Total Reading Time', {
+              strong: true,
+              suffix: 'hours',
+            }),
+            {
+              name: 'birthday',
+              label: 'Birthday',
+              type: 'date',
+              format: 'YYYY-MM-DD',
+            },
+            {
+              name: 'createdAt',
+              label: 'Account Created',
+              type: 'date',
+              format: 'YYYY-MM-DD HH:mm:ss',
+            },
+            {
+              name: 'updatedAt',
+              label: 'Last Updated',
+              type: 'date',
+              format: 'YYYY-MM-DD HH:mm:ss',
+            },
+            {
+              name: 'lastActive',
+              label: 'Last Active',
+              type: 'date',
+              format: 'YYYY-MM-DD HH:mm:ss',
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };

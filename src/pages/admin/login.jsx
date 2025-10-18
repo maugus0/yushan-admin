@@ -1,13 +1,14 @@
 import { Form, Input, Button, Card, Typography, Space } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAdminAuth } from '../../contexts/admin/adminauthcontext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
 const AdminLogin = () => {
   const [form] = Form.useForm();
   const { login, loading, isAuthenticated } = useAdminAuth();
+  const navigate = useNavigate();
 
   if (isAuthenticated) {
     return <Navigate to="/admin/dashboard" replace />;
@@ -15,7 +16,10 @@ const AdminLogin = () => {
 
   const handleLogin = async (values) => {
     const result = await login(values);
-    if (!result.success) {
+
+    if (result.success) {
+      navigate('/admin/dashboard', { replace: true });
+    } else {
       form.setFields([
         {
           name: 'password',
@@ -37,11 +41,15 @@ const AdminLogin = () => {
     >
       <Card
         style={{
-          width: 400,
+          width: '100%',
+          maxWidth: 400,
+          margin: '0 16px',
           boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
           borderRadius: 12,
         }}
-        bodyStyle={{ padding: '40px 32px' }}
+        styles={{
+          body: { padding: '40px 32px' },
+        }}
       >
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           <div style={{ textAlign: 'center' }}>

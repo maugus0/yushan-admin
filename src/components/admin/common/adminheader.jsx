@@ -6,7 +6,6 @@ import {
   Avatar,
   Space,
   Typography,
-  Badge,
   Tooltip,
 } from 'antd';
 import {
@@ -14,7 +13,6 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
   LogoutOutlined,
-  SettingOutlined,
   BellOutlined,
   SearchOutlined,
   FullscreenOutlined,
@@ -33,13 +31,13 @@ const AdminHeader = ({
   showFullscreen = false,
   showUserMenu = true,
   notifications = [],
-  unreadCount = 0,
   onSearch,
   onNotificationClick,
   onUserMenuClick,
   style = {},
   className = '',
   extra,
+  isMobile = false,
   ...props
 }) => {
   const { admin, logout } = useAdminAuth();
@@ -68,12 +66,6 @@ const AdminHeader = ({
       icon: <UserOutlined />,
       label: 'Profile',
       onClick: () => onUserMenuClick && onUserMenuClick('profile'),
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: 'Account Settings',
-      onClick: () => onUserMenuClick && onUserMenuClick('settings'),
     },
     { type: 'divider' },
     {
@@ -189,13 +181,11 @@ const AdminHeader = ({
             arrow
             trigger={['click']}
           >
-            <Badge count={unreadCount} size="small">
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                style={{ fontSize: '16px' }}
-              />
-            </Badge>
+            <Button
+              type="text"
+              icon={<BellOutlined />}
+              style={{ fontSize: '16px' }}
+            />
           </Dropdown>
         )}
 
@@ -219,23 +209,25 @@ const AdminHeader = ({
                 icon={!admin.avatar && <UserOutlined />}
                 style={{ backgroundColor: '#1890ff' }}
               />
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                }}
-              >
-                <Text strong style={{ fontSize: '14px', lineHeight: 1.2 }}>
-                  {admin.username}
-                </Text>
-                <Text
-                  type="secondary"
-                  style={{ fontSize: '12px', lineHeight: 1.2 }}
+              {!isMobile && (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                  }}
                 >
-                  {admin.role?.replace('_', ' ') || 'Admin'}
-                </Text>
-              </div>
+                  <Text strong style={{ fontSize: '14px', lineHeight: 1.2 }}>
+                    {admin.username}
+                  </Text>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: '12px', lineHeight: 1.2 }}
+                  >
+                    {admin.role?.replace('_', ' ') || 'Admin'}
+                  </Text>
+                </div>
+              )}
             </Space>
           </Dropdown>
         )}

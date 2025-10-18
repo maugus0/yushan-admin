@@ -449,6 +449,28 @@ export const formatList = (items, separator = ', ', lastSeparator = ' 和 ') => 
   return `${allButLast}${lastSeparator}${last}`;
 };
 
+/**
+ * Format reading time
+ * @param {number} hours - Reading time in hours
+ * @param {boolean} showUnit - Whether to show the unit
+ * @returns {string} - Formatted reading time string
+ */
+export const formatReadingTime = (hours, showUnit = true) => {
+  if (typeof hours !== 'number' || isNaN(hours)) {
+    return showUnit ? '0h' : '0';
+  }
+
+  // If less than 1 hour, show in minutes
+  if (hours < 1) {
+    const minutes = Math.round(hours * 60);
+    return showUnit ? `${minutes}min` : minutes.toString();
+  }
+
+  // Show in hours with 1 decimal place
+  const formatted = hours % 1 === 0 ? hours.toString() : hours.toFixed(1);
+  return showUnit ? `${formatted}h` : formatted;
+};
+
 export default {
   formatCurrency,
   formatNumber,
@@ -470,4 +492,5 @@ export default {
   formatSocialHandle,
   formatMessage,
   formatList,
+  formatReadingTime,
 };

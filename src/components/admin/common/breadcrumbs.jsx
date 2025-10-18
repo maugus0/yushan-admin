@@ -1,5 +1,5 @@
 import { Breadcrumb } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { HomeOutlined } from '@ant-design/icons';
 
 const Breadcrumbs = ({
@@ -15,6 +15,7 @@ const Breadcrumbs = ({
   ...props
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Auto-generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
@@ -25,13 +26,12 @@ const Breadcrumbs = ({
     if (showHome) {
       breadcrumbs.push({
         title: (
-          <Link to={homePath}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {homeIcon}
-              {homeTitle}
-            </span>
-          </Link>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {homeIcon}
+            {homeTitle}
+          </span>
         ),
+        onClick: () => navigate(homePath),
       });
     }
 
@@ -53,7 +53,8 @@ const Breadcrumbs = ({
         breadcrumbs.push({ title });
       } else {
         breadcrumbs.push({
-          title: <Link to={currentPath}>{title}</Link>,
+          title: title,
+          onClick: () => navigate(currentPath),
         });
       }
     });
@@ -70,7 +71,7 @@ const Breadcrumbs = ({
     return null;
   }
 
-  // Process items to ensure proper Link components
+  // Process items to ensure proper navigation
   const processedItems = breadcrumbItems.map((item, _index) => {
     if (typeof item === 'string') {
       return { title: item };
@@ -79,7 +80,8 @@ const Breadcrumbs = ({
     if (item.href && !item.title.props) {
       return {
         ...item,
-        title: <Link to={item.href}>{item.title}</Link>,
+        title: item.title,
+        onClick: () => navigate(item.href),
       };
     }
 
