@@ -517,15 +517,12 @@ export const categoryService = {
   getCategoryNovelCount: async (categoryId) => {
     try {
       // Fetch novels filtered by category with minimal data (just need totalElements)
-      // Match the exact format from the working curl: ?page=0&size=20&sort=viewCnt&order=desc&category=2&status=published
       const response = await api.get('/novels', {
         params: {
           page: 0,
-          size: 1, // We only need the count, not the actual data
-          sort: 'viewCnt',
-          order: 'desc',
+          size: 1, // Minimal size since we only need the count
           category: categoryId,
-          status: 'published', // Use lowercase as shown in curl
+          status: 'published', // Only count published novels
         },
       });
 

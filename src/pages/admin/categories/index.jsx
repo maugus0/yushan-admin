@@ -93,7 +93,7 @@ const Categories = () => {
                 await categoryService.getCategoryNovelCounts(categoryIds);
             } catch (countError) {
               console.warn(
-                'Failed to fetch novel counts, using 0 for all:',
+                'Failed to fetch novel counts, defaulting all counts to 0:',
                 countError
               );
               // Create empty counts map if fetch fails
@@ -106,7 +106,7 @@ const Categories = () => {
             ...item,
             status: item.isActive ? 'active' : 'inactive',
             novelCount: countsResponse.counts[item.id] || 0, // Use fetched count
-            color: getRandomColor(), // Generate color for display
+            color: getCategoryColor(item.id), // Generate consistent color based on ID
             createdAt: item.createTime,
             updatedAt: item.updateTime,
           }));
@@ -135,8 +135,8 @@ const Categories = () => {
     [searchValue, filters, pagination.pageSize, pagination.current]
   );
 
-  // Helper function to generate random colors for categories
-  const getRandomColor = () => {
+  // Helper function to generate consistent colors based on category ID
+  const getCategoryColor = (categoryId) => {
     const colors = [
       '#722ed1',
       '#eb2f96',
@@ -149,7 +149,8 @@ const Categories = () => {
       '#faad14',
       '#a0d911',
     ];
-    return colors[Math.floor(Math.random() * colors.length)];
+    // Use category ID to deterministically select a color
+    return colors[categoryId % colors.length];
   };
 
   useEffect(() => {
