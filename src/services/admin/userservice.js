@@ -169,7 +169,6 @@ const mapApiStatusToLocal = (apiStatus) => {
     NORMAL: 'active',
     SUSPENDED: 'suspended',
     BANNED: 'banned',
-    INACTIVE: 'inactive',
   };
   return statusMap[apiStatus] || 'active';
 };
@@ -356,49 +355,68 @@ const mockReaders = generateMockReaders();
 const mockWriters = generateMockWriters();
 const mockUsers = [...mockReaders, ...mockWriters];
 
+// Helper function to map local status to API status
+const mapLocalStatusToApi = (localStatus) => {
+  const statusMap = {
+    active: 'NORMAL',
+    suspended: 'SUSPENDED',
+    banned: 'BANNED',
+  };
+  return statusMap[localStatus] || 'NORMAL';
+};
+
 export const userService = {
-  // Get all users
+  // Get all users with real API
   getAllUsers: async (params = {}) => {
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      let filteredUsers = [...mockUsers];
-
-      // Apply filters
-      if (params.search) {
-        const searchLower = params.search.toLowerCase();
-        filteredUsers = filteredUsers.filter(
-          (user) =>
-            user.username.toLowerCase().includes(searchLower) ||
-            user.email.toLowerCase().includes(searchLower)
-        );
-      }
-
-      if (params.status) {
-        filteredUsers = filteredUsers.filter(
-          (user) => user.status === params.status
-        );
-      }
-
-      if (params.userType) {
-        filteredUsers = filteredUsers.filter(
-          (user) => user.userType === params.userType
-        );
-      }
-
-      // Apply pagination
-      const page = params.page || 1;
-      const pageSize = params.pageSize || 10;
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize;
-
-      return {
-        data: filteredUsers.slice(start, end),
-        total: filteredUsers.length,
-        page,
-        pageSize,
+      const queryParams = {
+        page: params.page ? params.page - 1 : 0, // Convert to 0-based index
+        size: params.pageSize || 10,
+        sortBy: params.sortBy || 'createTime',
+        sortOrder: params.sortOrder || 'desc',
       };
+
+      // Add status filter if provided
+      if (params.status) {
+        queryParams.status = mapLocalStatusToApi(params.status);
+      }
+
+      // Add userType filter using isAuthor and isAdmin
+      if (params.userType === 'reader') {
+        queryParams.isAuthor = false;
+      } else if (params.userType === 'writer') {
+        queryParams.isAuthor = true;
+      } else if (params.userType === 'admin') {
+        queryParams.isAdmin = true;
+      }
+
+      // Add direct filters if provided
+      if (params.isAuthor !== undefined) {
+        queryParams.isAuthor = params.isAuthor;
+      }
+      if (params.isAdmin !== undefined) {
+        queryParams.isAdmin = params.isAdmin;
+      }
+
+      const response = await apiClient.get('/admin/users', {
+        params: queryParams,
+      });
+
+      // Handle the API response format
+      if (response.data && response.data.code === 200) {
+        const apiData = response.data.data;
+        return {
+          data: apiData.content.map(formatUserDataFromAPI),
+          total: apiData.totalElements,
+          page: apiData.currentPage + 1, // Convert back to 1-based index
+          pageSize: apiData.size,
+          totalPages: apiData.totalPages,
+          hasNext: apiData.hasNext,
+          hasPrevious: apiData.hasPrevious,
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch users');
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       throw error;
@@ -408,7 +426,7 @@ export const userService = {
   // Get readers only
   getReaders: async (params = {}) => {
     try {
-      const allParams = { ...params, userType: 'reader' };
+      const allParams = { ...params, isAuthor: false };
       return await userService.getAllUsers(allParams);
     } catch (error) {
       console.error('Error fetching readers:', error);
@@ -419,7 +437,7 @@ export const userService = {
   // Get writers only
   getWriters: async (params = {}) => {
     try {
-      const allParams = { ...params, userType: 'writer' };
+      const allParams = { ...params, isAuthor: true };
       return await userService.getAllUsers(allParams);
     } catch (error) {
       console.error('Error fetching writers:', error);
@@ -430,12 +448,13 @@ export const userService = {
   // Get user by ID
   getUserById: async (id) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const user = mockUsers.find((u) => u.id === id);
-      if (!user) {
-        throw new Error('User not found');
+      const response = await apiClient.get(`/admin/users/${id}`);
+
+      if (response.data && response.data.code === 200) {
+        return { data: formatUserDataFromAPI(response.data.data) };
+      } else {
+        throw new Error(response.data?.message || 'User not found');
       }
-      return { data: user };
     } catch (error) {
       console.error('Error fetching user:', error);
       throw error;

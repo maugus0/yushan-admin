@@ -19,6 +19,7 @@ import {
 } from '../../../components/admin/charts';
 import { LoadingSpinner } from '../../../components/admin/common';
 import dashboardService from '../../../services/admin/dashboardservice';
+import analyticsService from '../../../services/admin/analyticsservice';
 import { message } from 'antd';
 
 const { Title } = Typography;
@@ -31,6 +32,7 @@ const Dashboard = () => {
   const [novelTrends, setNovelTrends] = useState([]);
   const [readingActivity, setReadingActivity] = useState([]);
   const [topContent, setTopContent] = useState(null);
+  const [dauData, setDauData] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -47,12 +49,14 @@ const Dashboard = () => {
         novelTrendsResponse,
         readingActivityResponse,
         topContentResponse,
+        dauResponse,
       ] = await Promise.all([
         dashboardService.getDashboardStats(),
         dashboardService.getUserTrends('daily'),
         dashboardService.getNovelTrends('daily'),
         dashboardService.getReadingActivity('daily'),
         dashboardService.getTopContent(10),
+        analyticsService.getPlatformDAU(),
       ]);
 
       setStats(statsResponse.data);
@@ -60,6 +64,11 @@ const Dashboard = () => {
       setNovelTrends(novelTrendsResponse.data.dataPoints || []);
       setReadingActivity(readingActivityResponse.data.dataPoints || []);
       setTopContent(topContentResponse.data);
+
+      // Set analytics data if successful
+      if (dauResponse.success) {
+        setDauData(dauResponse.data);
+      }
     } catch (error) {
       console.error('Dashboard fetch error:', error);
       message.error('Failed to load dashboard data');
@@ -246,6 +255,49 @@ const Dashboard = () => {
             />
           </Col>
         </Row>
+
+        {/* Active Users Analytics - DAU/WAU/MAU */}
+        {dauData && (
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+              <StatCard
+                title="Daily Active Users"
+                value={dauData.dau}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#1890ff' }}
+                suffix={
+                  <span style={{ fontSize: '14px', color: '#666' }}>Today</span>
+                }
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <StatCard
+                title="Weekly Active Users"
+                value={dauData.wau}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#52c41a' }}
+                suffix={
+                  <span style={{ fontSize: '14px', color: '#666' }}>
+                    Last 7 days
+                  </span>
+                }
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <StatCard
+                title="Monthly Active Users"
+                value={dauData.mau}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#722ed1' }}
+                suffix={
+                  <span style={{ fontSize: '14px', color: '#666' }}>
+                    Last 30 days
+                  </span>
+                }
+              />
+            </Col>
+          </Row>
+        )}
 
         {/* Charts Row 1 - User & Novel Growth + Categories */}
         <Row gutter={[16, 16]}>
@@ -799,6 +851,40 @@ const Dashboard = () => {
             </Card>
           </Col>
         </Row>
+
+        {/* Hourly Activity Breakdown */}
+        {dauData &&
+          dauData.hourlyBreakdown &&
+          dauData.hourlyBreakdown.length > 0 && (
+            <Row gutter={[16, 16]}>
+              <Col xs={24}>
+                <BarChart
+                  title="Hourly Activity Breakdown"
+                  subtitle="Active users by hour"
+                  data={dauData.hourlyBreakdown.map((item) => ({
+                    name: `${item.hour}:00`,
+                    activeUsers: item.activeUsers,
+                    newUsers: item.newUsers,
+                    readingSessions: item.readingSessions,
+                  }))}
+                  bars={[
+                    {
+                      dataKey: 'activeUsers',
+                      fill: '#1890ff',
+                      name: 'Active Users',
+                    },
+                    { dataKey: 'newUsers', fill: '#52c41a', name: 'New Users' },
+                    {
+                      dataKey: 'readingSessions',
+                      fill: '#722ed1',
+                      name: 'Reading Sessions',
+                    },
+                  ]}
+                  height={350}
+                />
+              </Col>
+            </Row>
+          )}
       </Space>
     </div>
   );

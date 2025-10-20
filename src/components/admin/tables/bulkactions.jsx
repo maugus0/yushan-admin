@@ -27,6 +27,7 @@ const BulkActions = ({
   actions = [],
   disabled = false,
   loading = false,
+  showActionsDropdown = true,
 }) => {
   const [actionLoading, setActionLoading] = useState({});
 
@@ -67,7 +68,7 @@ const BulkActions = ({
     }
   };
 
-  // Default bulk actions
+  // Default bulk actions (only used if no custom actions provided)
   const defaultActions = [
     {
       key: 'approve',
@@ -124,8 +125,8 @@ const BulkActions = ({
     },
   ];
 
-  // Merge default actions with custom actions
-  const allActions = [...defaultActions, ...actions];
+  // Use custom actions if provided, otherwise use default actions
+  const allActions = actions.length > 0 ? actions : defaultActions;
 
   // Create dropdown menu items
   const menuItems = allActions.map((action) => ({
@@ -157,61 +158,66 @@ const BulkActions = ({
         selected
       </Text>
 
-      <Dropdown
-        menu={{
-          items: menuItems,
-          onClick: handleMenuClick,
-        }}
-        disabled={disabled || loading}
-        trigger={['click']}
-      >
-        <Button>
-          Bulk Actions <DownOutlined />
-        </Button>
-      </Dropdown>
-
-      {/* Quick action buttons for common actions */}
-      <Space>
-        <Button
-          type="primary"
-          icon={<CheckOutlined />}
-          size="small"
-          loading={actionLoading.approve}
-          disabled={disabled}
-          onClick={() =>
-            handleAction(
-              'approve',
-              allActions.find((a) => a.key === 'approve')
-            )
-          }
+      {/* Only show dropdown if we have actions and showActionsDropdown is true */}
+      {allActions.length > 0 && showActionsDropdown && (
+        <Dropdown
+          menu={{
+            items: menuItems,
+            onClick: handleMenuClick,
+          }}
+          disabled={disabled || loading}
+          trigger={['click']}
         >
-          Approve
-        </Button>
+          <Button>
+            Bulk Actions <DownOutlined />
+          </Button>
+        </Dropdown>
+      )}
 
-        <Popconfirm
-          title="Delete selected items"
-          description={`Are you sure you want to delete ${selectedRowKeys.length} selected items?`}
-          onConfirm={() =>
-            handleAction(
-              'delete',
-              allActions.find((a) => a.key === 'delete')
-            )
-          }
-          okText="Delete"
-          okButtonProps={{ danger: true }}
-          disabled={disabled}
-        >
+      {/* Quick action buttons for common actions - only show if using default actions and showActionsDropdown is true */}
+      {actions.length === 0 && showActionsDropdown && (
+        <Space>
           <Button
-            danger
-            icon={<DeleteOutlined />}
+            type="primary"
+            icon={<CheckOutlined />}
             size="small"
-            loading={actionLoading.delete}
+            loading={actionLoading.approve}
+            disabled={disabled}
+            onClick={() =>
+              handleAction(
+                'approve',
+                allActions.find((a) => a.key === 'approve')
+              )
+            }
+          >
+            Approve
+          </Button>
+
+          <Popconfirm
+            title="Delete selected items"
+            description={`Are you sure you want to delete ${selectedRowKeys.length} selected items?`}
+            onConfirm={() =>
+              handleAction(
+                'delete',
+                allActions.find((a) => a.key === 'delete')
+              )
+            }
+            okText="Delete"
+            okButtonProps={{ danger: true }}
             disabled={disabled}
           >
-            Delete
-          </Button>
-        </Popconfirm>
-      </Space>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              size="small"
+              loading={actionLoading.delete}
+              disabled={disabled}
+            >
+              Delete
+            </Button>
+          </Popconfirm>
+        </Space>
+      )}
     </Space>
   );
 };

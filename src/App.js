@@ -14,8 +14,6 @@ import AdminProfile from './pages/admin/profile';
 import UsersOverview from './pages/admin/users/index';
 import Readers from './pages/admin/users/readers';
 import Writers from './pages/admin/users/writers';
-import ReaderDetail from './pages/admin/users/readerdetail';
-import WriterDetail from './pages/admin/users/writerdetail';
 
 // Novel Management
 import Novels from './pages/admin/novels';
@@ -55,9 +53,7 @@ function App() {
             {/* User Management */}
             <Route path="users" element={<UsersOverview />} />
             <Route path="users/readers" element={<Readers />} />
-            <Route path="users/readers/:id" element={<ReaderDetail />} />
             <Route path="users/writers" element={<Writers />} />
-            <Route path="users/writers/:id" element={<WriterDetail />} />
 
             {/* Content Management */}
             <Route path="novels" element={<Novels />} />
