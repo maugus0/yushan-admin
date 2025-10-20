@@ -20,6 +20,7 @@ const DataTable = ({
   enableSelection = true,
   bulkActions = [],
   onBulkAction,
+  showBulkActionsDropdown = true,
 
   // Column management
   enableColumnSelector = true,
@@ -171,6 +172,7 @@ const DataTable = ({
                 onAction={handleBulkAction}
                 actions={bulkActions}
                 loading={loading}
+                showActionsDropdown={showBulkActionsDropdown}
               />
             )}
           </div>

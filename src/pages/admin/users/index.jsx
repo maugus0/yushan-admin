@@ -16,18 +16,19 @@ import {
   UserOutlined,
   TeamOutlined,
   EditOutlined,
-  PlusOutlined,
   BookOutlined,
-  DollarOutlined,
   TrophyOutlined,
   RiseOutlined,
 } from '@ant-design/icons';
 
 // Import components
 import { userService } from '../../../services/admin/userservice';
+import analyticsService from '../../../services/admin/analyticsservice';
+import rankingService from '../../../services/admin/rankingservice';
 import PageHeader from '../../../components/admin/common/pageheader';
 import Breadcrumbs from '../../../components/admin/common/breadcrumbs';
 import StatusBadge from '../../../components/admin/common/statusbadge';
+import { BarChart } from '../../../components/admin/charts';
 
 const { Text } = Typography;
 
@@ -43,25 +44,41 @@ const UsersOverview = () => {
     activeUsers: 0,
   });
   const [recentUsers, setRecentUsers] = useState([]);
+  const [dauData, setDauData] = useState(null);
+  const [topReaders, setTopReaders] = useState([]);
+  const [topWriters, setTopWriters] = useState([]);
 
   // Fetch overview data
   const fetchOverviewData = async () => {
     setLoading(true);
     try {
-      // Fetch recent users
-      const [readersResponse, writersResponse] = await Promise.all([
+      // Fetch all data in parallel
+      const [
+        readersResponse,
+        writersResponse,
+        allReaders,
+        allWriters,
+        dauResponse,
+        topReadersResponse,
+        topWritersResponse,
+      ] = await Promise.all([
         userService.getReaders({ page: 1, pageSize: 5 }),
         userService.getWriters({ page: 1, pageSize: 5 }),
+        userService.getReaders({ page: 1, pageSize: 100 }),
+        userService.getWriters({ page: 1, pageSize: 100 }),
+        analyticsService.getPlatformDAU(),
+        rankingService.getUserRankings({
+          page: 0,
+          size: 5,
+          timeRange: 'overall',
+        }),
+        rankingService.getAuthorRankings({
+          page: 0,
+          size: 5,
+          sortType: 'vote',
+          timeRange: 'overall',
+        }),
       ]);
-
-      const allReaders = await userService.getReaders({
-        page: 1,
-        pageSize: 100,
-      });
-      const allWriters = await userService.getWriters({
-        page: 1,
-        pageSize: 100,
-      });
 
       // Calculate statistics
       const totalReaders = allReaders.total;
@@ -95,6 +112,21 @@ const UsersOverview = () => {
         .slice(0, 6);
 
       setRecentUsers(combinedUsers);
+
+      // Set DAU data
+      if (dauResponse.success) {
+        setDauData(dauResponse.data);
+      }
+
+      // Set top readers
+      if (topReadersResponse.success) {
+        setTopReaders(topReadersResponse.data.content || []);
+      }
+
+      // Set top writers
+      if (topWritersResponse.success) {
+        setTopWriters(topWritersResponse.data.content || []);
+      }
     } catch (error) {
       console.error('Failed to fetch overview data:', error);
     } finally {
@@ -105,52 +137,6 @@ const UsersOverview = () => {
   useEffect(() => {
     fetchOverviewData();
   }, []);
-
-  // Mock top performers data
-  const topReaders = [
-    {
-      id: 1,
-      name: 'Alice Johnson',
-      booksRead: 156,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
-    },
-    {
-      id: 2,
-      name: 'Bob Smith',
-      booksRead: 134,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
-    },
-    {
-      id: 3,
-      name: 'Carol Davis',
-      booksRead: 98,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carol',
-    },
-  ];
-
-  const topWriters = [
-    {
-      id: 1,
-      name: 'Sarah Connor',
-      earnings: 15420,
-      novels: 12,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-    },
-    {
-      id: 2,
-      name: 'Michael Scott',
-      earnings: 12890,
-      novels: 8,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-    },
-    {
-      id: 3,
-      name: 'Elena Vasquez',
-      earnings: 9650,
-      novels: 6,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena',
-    },
-  ];
 
   const breadcrumbItems = [
     { title: 'Admin' },
@@ -183,49 +169,199 @@ const UsersOverview = () => {
         ]}
       />
 
-      {/* Statistics Overview */}
-      <Row gutter={24} style={{ marginBottom: 24 }}>
+      {/* Total Users Statistics */}
+      <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
-          <Card>
+          <Card hoverable>
             <Statistic
               title="Total Users"
               value={stats.totalUsers}
               prefix={<TeamOutlined />}
-              valueStyle={{ color: '#3f8600' }}
+              valueStyle={{
+                color: '#3f8600',
+                fontSize: '28px',
+                fontWeight: 'bold',
+              }}
+              loading={loading}
             />
           </Card>
         </Col>
         <Col span={6}>
-          <Card>
+          <Card hoverable>
             <Statistic
               title="Readers"
               value={stats.totalReaders}
               prefix={<UserOutlined />}
-              valueStyle={{ color: '#1890ff' }}
+              valueStyle={{
+                color: '#1890ff',
+                fontSize: '28px',
+                fontWeight: 'bold',
+              }}
+              loading={loading}
             />
           </Card>
         </Col>
         <Col span={6}>
-          <Card>
+          <Card hoverable>
             <Statistic
               title="Writers"
               value={stats.totalWriters}
               prefix={<EditOutlined />}
-              valueStyle={{ color: '#722ed1' }}
+              valueStyle={{
+                color: '#722ed1',
+                fontSize: '28px',
+                fontWeight: 'bold',
+              }}
+              loading={loading}
             />
           </Card>
         </Col>
         <Col span={6}>
-          <Card>
+          <Card hoverable>
             <Statistic
               title="Active Users"
               value={stats.activeUsers}
               prefix={<RiseOutlined />}
-              valueStyle={{ color: '#fa8c16' }}
+              valueStyle={{
+                color: '#fa8c16',
+                fontSize: '28px',
+                fontWeight: 'bold',
+              }}
+              loading={loading}
             />
           </Card>
         </Col>
       </Row>
+
+      {/* DAU/WAU/MAU Cards */}
+      {dauData && (
+        <Row gutter={16} style={{ marginBottom: 24 }}>
+          <Col span={8}>
+            <Card
+              hoverable
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+              }}
+            >
+              <Statistic
+                title={
+                  <span style={{ color: '#fff', fontSize: '16px' }}>
+                    Daily Active Users
+                  </span>
+                }
+                value={dauData.dau || 0}
+                suffix={
+                  <span
+                    style={{ color: '#fff', fontSize: '14px', opacity: 0.9 }}
+                  >
+                    Today
+                  </span>
+                }
+                valueStyle={{
+                  color: '#fff',
+                  fontSize: '32px',
+                  fontWeight: 'bold',
+                }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card
+              hoverable
+              style={{
+                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                border: 'none',
+              }}
+            >
+              <Statistic
+                title={
+                  <span style={{ color: '#fff', fontSize: '16px' }}>
+                    Weekly Active Users
+                  </span>
+                }
+                value={dauData.wau || 0}
+                suffix={
+                  <span
+                    style={{ color: '#fff', fontSize: '14px', opacity: 0.9 }}
+                  >
+                    Last 7 days
+                  </span>
+                }
+                valueStyle={{
+                  color: '#fff',
+                  fontSize: '32px',
+                  fontWeight: 'bold',
+                }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card
+              hoverable
+              style={{
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                border: 'none',
+              }}
+            >
+              <Statistic
+                title={
+                  <span style={{ color: '#fff', fontSize: '16px' }}>
+                    Monthly Active Users
+                  </span>
+                }
+                value={dauData.mau || 0}
+                suffix={
+                  <span
+                    style={{ color: '#fff', fontSize: '14px', opacity: 0.9 }}
+                  >
+                    Last 30 days
+                  </span>
+                }
+                valueStyle={{
+                  color: '#fff',
+                  fontSize: '32px',
+                  fontWeight: 'bold',
+                }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+        </Row>
+      )}
+
+      {/* Hourly Activity Breakdown */}
+      {dauData &&
+        dauData.hourlyBreakdown &&
+        dauData.hourlyBreakdown.length > 0 && (
+          <Card title="Hourly Activity Breakdown" style={{ marginBottom: 24 }}>
+            <BarChart
+              data={dauData.hourlyBreakdown.map((item) => ({
+                name: `${item.hour}:00`,
+                activeUsers: item.activeUsers,
+                newUsers: item.newUsers,
+                readingSessions: item.readingSessions,
+              }))}
+              bars={[
+                {
+                  dataKey: 'activeUsers',
+                  fill: '#1890ff',
+                  name: 'Active Users',
+                },
+                { dataKey: 'newUsers', fill: '#52c41a', name: 'New Users' },
+                {
+                  dataKey: 'readingSessions',
+                  fill: '#722ed1',
+                  name: 'Reading Sessions',
+                },
+              ]}
+              height={300}
+              subtitle="Active users by hour"
+            />
+          </Card>
+        )}
 
       <Row gutter={24}>
         {/* Recent Users */}
@@ -283,22 +419,34 @@ const UsersOverview = () => {
           >
             <List
               dataSource={topReaders}
+              loading={loading}
               renderItem={(reader, index) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={
                       <Space>
-                        <Text strong style={{ color: '#faad14' }}>
+                        <Text
+                          strong
+                          style={{ color: '#faad14', fontSize: '16px' }}
+                        >
                           #{index + 1}
                         </Text>
-                        <Avatar src={reader.avatar} icon={<UserOutlined />} />
+                        <Avatar
+                          size={48}
+                          src={reader.avatarUrl}
+                          icon={<UserOutlined />}
+                        />
                       </Space>
                     }
-                    title={reader.name}
+                    title={<Text strong>{reader.username}</Text>}
                     description={
-                      <Space>
-                        <BookOutlined />
-                        <Text>{reader.booksRead} books read</Text>
+                      <Space direction="vertical" size={0}>
+                        <Text type="secondary">
+                          Level {reader.level} • {reader.exp} XP
+                        </Text>
+                        <Text type="secondary">
+                          <TrophyOutlined /> {reader.yuan} Yuan
+                        </Text>
                       </Space>
                     }
                   />
@@ -316,28 +464,37 @@ const UsersOverview = () => {
           >
             <List
               dataSource={topWriters}
+              loading={loading}
               renderItem={(writer, index) => (
                 <List.Item>
                   <List.Item.Meta
                     avatar={
                       <Space>
-                        <Text strong style={{ color: '#faad14' }}>
+                        <Text
+                          strong
+                          style={{ color: '#faad14', fontSize: '16px' }}
+                        >
                           #{index + 1}
                         </Text>
-                        <Avatar src={writer.avatar} icon={<EditOutlined />} />
+                        <Avatar
+                          size={48}
+                          src={writer.avatarUrl}
+                          icon={<EditOutlined />}
+                        />
                       </Space>
                     }
-                    title={writer.name}
+                    title={<Text strong>{writer.username}</Text>}
                     description={
-                      <Space direction="vertical" size="small">
-                        <Space>
-                          <DollarOutlined />
-                          <Text>${writer.earnings}</Text>
-                        </Space>
-                        <Space>
-                          <BookOutlined />
-                          <Text>{writer.novels} novels</Text>
-                        </Space>
+                      <Space direction="vertical" size={0}>
+                        <Text type="secondary">
+                          <BookOutlined /> {writer.novelNum || 0} novels
+                        </Text>
+                        <Text type="secondary">
+                          <TrophyOutlined /> {writer.totalVoteCnt || 0} votes
+                        </Text>
+                        <Text type="secondary">
+                          <RiseOutlined /> {writer.totalViewCnt || 0} views
+                        </Text>
                       </Space>
                     }
                   />
@@ -351,26 +508,6 @@ const UsersOverview = () => {
       {/* Quick Actions */}
       <Card title="Quick Actions" style={{ marginTop: 24 }}>
         <Row gutter={16}>
-          <Col span={6}>
-            <Button
-              block
-              size="large"
-              icon={<PlusOutlined />}
-              onClick={() => navigate('/admin/users/readers/new')}
-            >
-              Add New Reader
-            </Button>
-          </Col>
-          <Col span={6}>
-            <Button
-              block
-              size="large"
-              icon={<PlusOutlined />}
-              onClick={() => navigate('/admin/users/writers/new')}
-            >
-              Add New Writer
-            </Button>
-          </Col>
           <Col span={6}>
             <Button
               block
@@ -389,6 +526,26 @@ const UsersOverview = () => {
               onClick={() => navigate('/admin/users/writers')}
             >
               Manage Writers
+            </Button>
+          </Col>
+          <Col span={6}>
+            <Button
+              block
+              size="large"
+              icon={<RiseOutlined />}
+              onClick={() => navigate('/admin/users/change-status')}
+            >
+              Change User Status
+            </Button>
+          </Col>
+          <Col span={6}>
+            <Button
+              block
+              size="large"
+              icon={<TrophyOutlined />}
+              onClick={() => navigate('/admin/users/promote-admin')}
+            >
+              Promote to Admin
             </Button>
           </Col>
         </Row>

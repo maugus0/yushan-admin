@@ -8,6 +8,7 @@
     "url": "https://github.com/maugus0/yushan-admin.git"
   },
   "homepage": "https://maugus0.github.io/yushan-admin",
+  "proxy": "https://yushan-backend-staging.up.railway.app",
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
     "@testing-library/dom": "^10.4.1",

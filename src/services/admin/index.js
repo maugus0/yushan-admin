@@ -24,11 +24,13 @@ import libraryService from './libraryservice';
 import rankingService from './rankingservice';
 import settingsService from './settingsservice';
 import yuanService from './yuanservice';
+import analyticsService from './analyticsservice';
 
 // Re-export for named imports
 export { api, MockAPIClient };
 export { authService };
 export { dashboardService };
+export { analyticsService };
 export { categoryService };
 export { novelService };
 export { chapterService };
@@ -192,6 +194,7 @@ export const platformServices = {
   rankingService,
   settingsService,
   yuanService,
+  analyticsService,
 };
 
 // Default export for easy access to all services
@@ -202,6 +205,7 @@ export default {
 
   // Content
   dashboard: dashboardService,
+  analytics: analyticsService,
   categories: categoryService,
   novels: novelService,
   chapters: chapterService,
