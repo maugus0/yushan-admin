@@ -333,17 +333,35 @@ const UsersOverview = () => {
       )}
 
       {/* Hourly Activity Breakdown */}
-      {dauData && (
-        <Card title="Hourly Activity Breakdown" style={{ marginBottom: 24 }}>
-          <BarChart
-            data={dauData.hourlyActivity || []}
-            xKey="hour"
-            yKey="activeUsers"
-            title="Active users by hour"
-            height={300}
-          />
-        </Card>
-      )}
+      {dauData &&
+        dauData.hourlyBreakdown &&
+        dauData.hourlyBreakdown.length > 0 && (
+          <Card title="Hourly Activity Breakdown" style={{ marginBottom: 24 }}>
+            <BarChart
+              data={dauData.hourlyBreakdown.map((item) => ({
+                name: `${item.hour}:00`,
+                activeUsers: item.activeUsers,
+                newUsers: item.newUsers,
+                readingSessions: item.readingSessions,
+              }))}
+              bars={[
+                {
+                  dataKey: 'activeUsers',
+                  fill: '#1890ff',
+                  name: 'Active Users',
+                },
+                { dataKey: 'newUsers', fill: '#52c41a', name: 'New Users' },
+                {
+                  dataKey: 'readingSessions',
+                  fill: '#722ed1',
+                  name: 'Reading Sessions',
+                },
+              ]}
+              height={300}
+              subtitle="Active users by hour"
+            />
+          </Card>
+        )}
 
       <Row gutter={24}>
         {/* Recent Users */}
