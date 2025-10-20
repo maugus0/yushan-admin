@@ -259,17 +259,24 @@ const TableFilters = ({
         {showQuickFilters && quickFilters.length > 0 && (
           <>
             <Row gutter={[16, 16]}>
-              {quickFilters.map((filter) => (
-                <Col key={filter.key} span={filter.span || 6}>
-                  <Form.Item
-                    name={filter.key}
-                    label={filter.label}
-                    rules={filter.rules}
-                  >
-                    {renderFilter(filter)}
-                  </Form.Item>
-                </Col>
-              ))}
+              {quickFilters.map((filter) => {
+                // Support both number and object (responsive) span
+                const colProps = typeof filter.span === 'object' 
+                  ? filter.span 
+                  : { span: filter.span || 6 };
+                
+                return (
+                  <Col key={filter.key} {...colProps}>
+                    <Form.Item
+                      name={filter.key}
+                      label={filter.label}
+                      rules={filter.rules}
+                    >
+                      {renderFilter(filter)}
+                    </Form.Item>
+                  </Col>
+                );
+              })}
             </Row>
 
             {showAdvanced && advancedFilters.length > 0 && <Divider />}
@@ -297,17 +304,24 @@ const TableFilters = ({
               extra={collapsed ? <DownOutlined /> : <UpOutlined />}
             >
               <Row gutter={[16, 16]}>
-                {advancedFilters.map((filter) => (
-                  <Col key={filter.key} span={filter.span || 8}>
-                    <Form.Item
-                      name={filter.key}
-                      label={filter.label}
-                      rules={filter.rules}
-                    >
-                      {renderFilter(filter)}
-                    </Form.Item>
-                  </Col>
-                ))}
+                {advancedFilters.map((filter) => {
+                  // Support both number and object (responsive) span
+                  const colProps = typeof filter.span === 'object' 
+                    ? filter.span 
+                    : { span: filter.span || 8 };
+                  
+                  return (
+                    <Col key={filter.key} {...colProps}>
+                      <Form.Item
+                        name={filter.key}
+                        label={filter.label}
+                        rules={filter.rules}
+                      >
+                        {renderFilter(filter)}
+                      </Form.Item>
+                    </Col>
+                  );
+                })}
               </Row>
             </Panel>
           </Collapse>

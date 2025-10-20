@@ -251,7 +251,7 @@ const ChangeUserStatus = () => {
             <Input
               placeholder="Search by username or email"
               prefix={<SearchOutlined />}
-              style={{ width: 300 }}
+              style={{ width: '100%', minWidth: 200, maxWidth: 300 }}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               allowClear
