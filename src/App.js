@@ -14,6 +14,8 @@ import AdminProfile from './pages/admin/profile';
 import UsersOverview from './pages/admin/users/index';
 import Readers from './pages/admin/users/readers';
 import Writers from './pages/admin/users/writers';
+import ChangeUserStatus from './pages/admin/users/changestatus';
+import PromoteToAdmin from './pages/admin/users/promotetoadmin';
 
 // Novel Management
 import Novels from './pages/admin/novels';
@@ -54,6 +56,8 @@ function App() {
             <Route path="users" element={<UsersOverview />} />
             <Route path="users/readers" element={<Readers />} />
             <Route path="users/writers" element={<Writers />} />
+            <Route path="users/change-status" element={<ChangeUserStatus />} />
+            <Route path="users/promote-admin" element={<PromoteToAdmin />} />
 
             {/* Content Management */}
             <Route path="novels" element={<Novels />} />

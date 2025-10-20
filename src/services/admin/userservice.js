@@ -586,6 +586,63 @@ export const userService = {
       throw error;
     }
   },
+
+  // Promote user to admin
+  promoteToAdmin: async (email) => {
+    try {
+      const response = await apiClient.post('/admin/promote-to-admin', {
+        email: email,
+      });
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          message:
+            response.data.message || 'User promoted to admin successfully',
+          data: response.data.data,
+        };
+      } else {
+        throw new Error(
+          response.data?.message || 'Failed to promote user to admin'
+        );
+      }
+    } catch (error) {
+      console.error('Error promoting user to admin:', error);
+      throw error;
+    }
+  },
+
+  // Update user status
+  updateUserStatus: async (userId, status) => {
+    try {
+      // Map local status to API status
+      const statusMap = {
+        active: 'NORMAL',
+        suspended: 'SUSPENDED',
+        banned: 'BANNED',
+      };
+      const apiStatus = statusMap[status.toLowerCase()] || status.toUpperCase();
+
+      const response = await apiClient.put(`/admin/users/${userId}/status`, {
+        status: apiStatus,
+      });
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          message: response.data.message || 'User status updated successfully',
+          data: response.data.data,
+        };
+      } else {
+        throw new Error(
+          response.data?.message || 'Failed to update user status'
+        );
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      throw error;
+    }
+  },
 };
 
 // Add real API functions to userService for backward compatibility

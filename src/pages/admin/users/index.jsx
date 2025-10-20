@@ -515,7 +515,7 @@ const UsersOverview = () => {
               block
               size="large"
               icon={<RiseOutlined />}
-              onClick={() => navigate('/admin/users/readers')}
+              onClick={() => navigate('/admin/users/change-status')}
             >
               Change User Status
             </Button>
@@ -525,7 +525,7 @@ const UsersOverview = () => {
               block
               size="large"
               icon={<TrophyOutlined />}
-              onClick={() => navigate('/admin/users/readers')}
+              onClick={() => navigate('/admin/users/promote-admin')}
             >
               Promote to Admin
             </Button>

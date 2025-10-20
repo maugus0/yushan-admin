@@ -118,6 +118,11 @@ const Writers = () => {
   // Filter configuration
   const filterConfig = [
     {
+      ...commonFilters.search,
+      key: 'search',
+      placeholder: 'Search writers...',
+    },
+    {
       ...commonFilters.status,
       key: 'status',
       options: [
