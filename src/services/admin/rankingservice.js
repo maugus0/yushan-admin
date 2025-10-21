@@ -43,7 +43,7 @@ export const rankingService = {
       const {
         page = 0,
         size = 50,
-        sortType = 'view',
+        sortType = 'vote',
         timeRange = 'overall',
       } = params;
 

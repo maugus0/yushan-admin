@@ -138,11 +138,44 @@ const UsersOverview = () => {
     fetchOverviewData();
   }, []);
 
+  // Helper: normalize hourly breakdown
+  const normalizeHourlyData = (raw) => {
+    if (!raw) return [];
+    // If data is already an array of hourly items
+    if (Array.isArray(raw)) return raw;
+    // If API returns object with keys as hours, convert to array
+    if (typeof raw === 'object') {
+      return Object.keys(raw)
+        .map((hourKey) => {
+          const item = raw[hourKey];
+          // support { hour: '0', activeUsers: 10 } or just numbers
+          if (typeof item === 'number') {
+            return { hour: hourKey, activeUsers: item };
+          }
+          return { hour: hourKey, ...item };
+        })
+        .sort((a, b) => Number(a.hour) - Number(b.hour));
+    }
+    return [];
+  };
+
   const breadcrumbItems = [
     { title: 'Admin' },
     { title: 'User Management' },
     { title: 'Overview' },
   ];
+
+  // Prepare hourly chart data with fallback to 24-hour zeros
+  const normalizedHourly = normalizeHourlyData(dauData?.hourlyBreakdown);
+  const hasHourlyData = normalizedHourly.length > 0;
+  const displayHourlyData = hasHourlyData
+    ? normalizedHourly
+    : Array.from({ length: 24 }, (_, i) => ({
+        hour: i,
+        activeUsers: 0,
+        newUsers: 0,
+        readingSessions: 0,
+      }));
 
   return (
     <div>
@@ -335,35 +368,40 @@ const UsersOverview = () => {
       )}
 
       {/* Hourly Activity Breakdown */}
-      {dauData &&
-        dauData.hourlyBreakdown &&
-        dauData.hourlyBreakdown.length > 0 && (
-          <Card title="Hourly Activity Breakdown" style={{ marginBottom: 24 }}>
-            <BarChart
-              data={dauData.hourlyBreakdown.map((item) => ({
-                name: `${item.hour}:00`,
-                activeUsers: item.activeUsers,
-                newUsers: item.newUsers,
-                readingSessions: item.readingSessions,
-              }))}
-              bars={[
-                {
-                  dataKey: 'activeUsers',
-                  fill: '#1890ff',
-                  name: 'Active Users',
-                },
-                { dataKey: 'newUsers', fill: '#52c41a', name: 'New Users' },
-                {
-                  dataKey: 'readingSessions',
-                  fill: '#722ed1',
-                  name: 'Reading Sessions',
-                },
-              ]}
-              height={300}
-              subtitle="Active users by hour"
-            />
-          </Card>
-        )}
+      {dauData && (
+        <Card title="Hourly Activity Breakdown" style={{ marginBottom: 24 }}>
+          {!hasHourlyData && (
+            <div style={{ marginBottom: 8, color: '#8c8c8c' }}>
+              No hourly breakdown is available for {dauData.date || 'this date'}
+              . Showing an empty 24-hour chart.
+            </div>
+          )}
+          <BarChart
+            data={displayHourlyData.map((item) => ({
+              name: `${item.hour}:00`,
+              activeUsers: item.activeUsers || item.active || 0,
+              newUsers: item.newUsers || item.new_users || 0,
+              readingSessions:
+                item.readingSessions || item.reading_sessions || 0,
+            }))}
+            bars={[
+              {
+                dataKey: 'activeUsers',
+                fill: '#1890ff',
+                name: 'Active Users',
+              },
+              { dataKey: 'newUsers', fill: '#52c41a', name: 'New Users' },
+              {
+                dataKey: 'readingSessions',
+                fill: '#722ed1',
+                name: 'Reading Sessions',
+              },
+            ]}
+            height={300}
+            subtitle="Active users by hour"
+          />
+        </Card>
+      )}
 
       <Row gutter={[24, 24]}>
         {/* Recent Users */}
