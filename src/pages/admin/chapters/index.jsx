@@ -1,5 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Progress, Row, Col } from 'antd';
+import {
+  Button,
+  Space,
+  Table,
+  Tooltip,
+  Progress,
+  Row,
+  Col,
+  Grid,
+  Card,
+  Divider,
+  Typography,
+} from 'antd';
 import {
   FileTextOutlined,
   BookOutlined,
@@ -19,6 +31,9 @@ import {
 import { novelService } from '../../../services/admin/novelservice';
 import { chapterService } from '../../../services/admin/chapterservice';
 
+const { useBreakpoint } = Grid;
+const { Text } = Typography;
+
 const Chapters = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -33,6 +48,7 @@ const Chapters = () => {
   // Novels and selected novel for fetching chapters
   const [novels, setNovels] = useState([]);
   const [selectedNovel, setSelectedNovel] = useState(null);
+  const screens = useBreakpoint();
 
   // Fetch data
   const fetchData = useCallback(
@@ -278,6 +294,14 @@ const Chapters = () => {
     })();
   };
 
+  const handleView = (record) => {
+    console.log('View chapter:', record);
+  };
+
+  const handleEdit = (record) => {
+    console.log('Edit chapter:', record);
+  };
+
   const handleAddNew = () => {
     console.log('Add new chapter');
   };
@@ -387,7 +411,7 @@ const Chapters = () => {
           />
         ) : (
           <>
-            <Row>
+            <Row style={{ marginBottom: 16 }}>
               <Col
                 xs={24}
                 sm={24}
@@ -406,21 +430,179 @@ const Chapters = () => {
                 </Button>
               </Col>
             </Row>
-            <Table
-              columns={columns}
-              dataSource={data}
-              pagination={{
-                ...pagination,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} of ${total} chapters`,
-              }}
-              onChange={handleTableChange}
-              loading={loading}
-              rowKey="uuid"
-              scroll={{ x: 1100 }}
-            />
+
+            {screens.md ? (
+              // Desktop view - Table
+              <Table
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  ...pagination,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} of ${total} chapters`,
+                }}
+                onChange={handleTableChange}
+                loading={loading}
+                rowKey="uuid"
+                scroll={{ x: 1100 }}
+              />
+            ) : (
+              // Mobile view - Card
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="small"
+              >
+                {data.map((chapter) => (
+                  <Card key={chapter.uuid} style={{ marginBottom: 8 }}>
+                    <Space
+                      direction="vertical"
+                      style={{ width: '100%' }}
+                      size="small"
+                    >
+                      <div>
+                        <Text strong style={{ fontSize: '14px' }}>
+                          {chapter.title}
+                        </Text>
+                        <br />
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          <BookOutlined style={{ marginRight: 4 }} />
+                          Ch. {chapter.chapterNumber}
+                        </Text>
+                      </div>
+                      <Divider style={{ margin: '8px 0' }} />
+                      <div>
+                        <Row gutter={12}>
+                          <Col xs={12}>
+                            <Space direction="vertical" size={0}>
+                              <Text
+                                type="secondary"
+                                style={{ fontSize: '11px' }}
+                              >
+                                Status
+                              </Text>
+                              <StatusBadge status={chapter.status} />
+                            </Space>
+                          </Col>
+                          <Col xs={12}>
+                            <Space direction="vertical" size={0}>
+                              <Text
+                                type="secondary"
+                                style={{ fontSize: '11px' }}
+                              >
+                                <EyeOutlined style={{ marginRight: 4 }} />
+                                Views
+                              </Text>
+                              <Text strong style={{ fontSize: '12px' }}>
+                                {chapter.views || 0}
+                              </Text>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </div>
+                      <Divider style={{ margin: '8px 0' }} />
+                      <div>
+                        <Space
+                          direction="vertical"
+                          size={0}
+                          style={{ width: '100%' }}
+                        >
+                          <Text type="secondary" style={{ fontSize: '11px' }}>
+                            Progress
+                          </Text>
+                          <Progress
+                            percent={chapter.progress || 0}
+                            size="small"
+                            format={(percent) => `${percent}%`}
+                          />
+                        </Space>
+                      </div>
+                      <Divider style={{ margin: '8px 0' }} />
+                      <div>
+                        <Space
+                          direction="vertical"
+                          size={2}
+                          style={{ width: '100%', fontSize: '11px' }}
+                        >
+                          <Text type="secondary" style={{ fontSize: '11px' }}>
+                            <CalendarOutlined style={{ marginRight: 4 }} />
+                            {new Date(chapter.createdAt).toLocaleDateString()}
+                          </Text>
+                          {chapter.updatedAt && (
+                            <Text type="secondary" style={{ fontSize: '11px' }}>
+                              <ClockCircleOutlined style={{ marginRight: 4 }} />
+                              Updated:{' '}
+                              {new Date(chapter.updatedAt).toLocaleDateString()}
+                            </Text>
+                          )}
+                        </Space>
+                      </div>
+                      <Divider style={{ margin: '8px 0' }} />
+                      <div
+                        style={{ display: 'flex', justifyContent: 'flex-end' }}
+                      >
+                        <ActionButtons
+                          record={chapter}
+                          onView={handleView}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          showMore={true}
+                        />
+                      </div>
+                    </Space>
+                  </Card>
+                ))}
+                {/* Mobile Pagination */}
+                <Space
+                  direction="vertical"
+                  style={{ width: '100%', marginTop: 16, textAlign: 'center' }}
+                >
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    {pagination.current} of{' '}
+                    {Math.ceil(pagination.total / pagination.pageSize)} pages
+                  </Text>
+                  <Space justify="center" wrap>
+                    <Button
+                      size="small"
+                      disabled={pagination.current === 1}
+                      onClick={() =>
+                        handleTableChange(
+                          {
+                            current: pagination.current - 1,
+                            pageSize: pagination.pageSize,
+                          },
+                          {},
+                          {}
+                        )
+                      }
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      size="small"
+                      disabled={
+                        pagination.current >=
+                        Math.ceil(pagination.total / pagination.pageSize)
+                      }
+                      onClick={() =>
+                        handleTableChange(
+                          {
+                            current: pagination.current + 1,
+                            pageSize: pagination.pageSize,
+                          },
+                          {},
+                          {}
+                        )
+                      }
+                    >
+                      Next
+                    </Button>
+                  </Space>
+                </Space>
+              </Space>
+            )}
           </>
         )}
       </Space>

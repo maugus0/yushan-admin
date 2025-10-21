@@ -38,6 +38,7 @@ const AdminHeader = ({
   className = '',
   extra,
   isMobile = false,
+  _unreadCount,
   ...props
 }) => {
   const { admin, logout } = useAdminAuth();
