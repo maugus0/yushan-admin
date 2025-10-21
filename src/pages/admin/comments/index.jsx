@@ -1,192 +1,202 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Avatar, Typography } from 'antd';
+import {
+  Button,
+  Space,
+  Table,
+  Tooltip,
+  Typography,
+  message,
+  Modal,
+  Grid,
+  Card,
+  Divider,
+} from 'antd';
 import {
   MessageOutlined,
-  UserOutlined,
   BookOutlined,
   CalendarOutlined,
   LikeOutlined,
-  DislikeOutlined,
-  FlagOutlined,
+  DeleteOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
   SearchBar,
   FilterPanel,
   StatusBadge,
-  ActionButtons,
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
+import commentService from '../../../services/admin/commentservice';
 
 const { Text, Paragraph } = Typography;
+const { confirm } = Modal;
+const { useBreakpoint } = Grid;
 
 const Comments = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
+    totalPages: 0,
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState('createTime');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [statLoading, setStatLoading] = useState(false);
+  const screens = useBreakpoint();
 
-  // Mock data for comments
-  const mockComments = [
-    {
-      id: 1,
-      content:
-        "This chapter was absolutely amazing! The character development is incredible and I can't wait to see what happens next.",
-      author: 'john_reader',
-      novel: 'The Cultivation Path',
-      chapter: 'Chapter 5: The First Trial',
-      status: 'approved',
-      likes: 24,
-      dislikes: 2,
-      reports: 0,
-      createdAt: '2024-09-20T14:30:00Z',
-      updatedAt: '2024-09-20T14:30:00Z',
-    },
-    {
-      id: 2,
-      content:
-        'I disagree with the direction this story is taking. The protagonist seems too overpowered.',
-      author: 'critic_reader',
-      novel: 'The Cultivation Path',
-      chapter: 'Chapter 6: Power Unleashed',
-      status: 'approved',
-      likes: 8,
-      dislikes: 15,
-      reports: 1,
-      createdAt: '2024-09-19T16:45:00Z',
-      updatedAt: '2024-09-19T16:45:00Z',
-    },
-    {
-      id: 3,
-      content:
-        'This is spam content with inappropriate links and promotional material.',
-      author: 'spam_user',
-      novel: 'Dragon Emperor',
-      chapter: 'Chapter 1: The Beginning',
-      status: 'flagged',
-      likes: 0,
-      dislikes: 12,
-      reports: 8,
-      createdAt: '2024-09-18T10:20:00Z',
-      updatedAt: '2024-09-19T09:15:00Z',
-    },
-    {
-      id: 4,
-      content:
-        'Great world-building in this chapter! The author really knows how to paint a vivid picture.',
-      author: 'fantasy_lover',
-      novel: 'Mystic Journey',
-      chapter: 'Chapter 3: The Enchanted Forest',
-      status: 'approved',
-      likes: 31,
-      dislikes: 1,
-      reports: 0,
-      createdAt: '2024-09-17T12:10:00Z',
-      updatedAt: '2024-09-17T12:10:00Z',
-    },
-    {
-      id: 5,
-      content: 'Please check this comment for potential policy violations.',
-      author: 'review_needed',
-      novel: 'Immortal Realm',
-      chapter: 'Chapter 2: The Awakening',
-      status: 'pending',
-      likes: 3,
-      dislikes: 1,
-      reports: 2,
-      createdAt: '2024-09-16T08:30:00Z',
-      updatedAt: '2024-09-16T08:30:00Z',
-    },
-  ];
-
-  // Fetch data
+  // Fetch data from API
   const fetchData = useCallback(
-    async (params = {}) => {
+    async (paginationInfo = null) => {
       setLoading(true);
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const pageNum = paginationInfo?.current
+          ? paginationInfo.current - 1
+          : 0; // Convert to 0-based
+        const pageSize = paginationInfo?.pageSize || pagination.pageSize;
 
-        let filteredData = mockComments;
+        const response = await commentService.getAllComments({
+          page: pageNum,
+          pageSize,
+          sort: sortBy,
+          order: sortOrder,
+          search: searchValue,
+          ...(filters.isSpoiler !== undefined && {
+            isSpoiler: filters.isSpoiler,
+          }),
+        });
 
-        // Apply search filter
-        if (searchValue) {
-          filteredData = filteredData.filter(
-            (item) =>
-              item.content.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.author.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.novel.toLowerCase().includes(searchValue.toLowerCase())
-          );
+        if (response.success) {
+          setData(response.data);
+          setPagination((prev) => ({
+            ...prev,
+            current: pageNum + 1, // Convert back to 1-based for Ant Design
+            pageSize,
+            total: response.total,
+            totalPages: response.totalPages,
+          }));
+        } else {
+          message.error(response.error || 'Failed to fetch comments');
+          setData([]);
         }
-
-        // Apply filters
-        if (filters.status) {
-          filteredData = filteredData.filter(
-            (item) => item.status === filters.status
-          );
-        }
-
-        if (filters.hasReports) {
-          filteredData = filteredData.filter((item) => item.reports > 0);
-        }
-
-        const pageSize = params.pageSize || pagination.pageSize;
-        const current = params.current || pagination.current;
-        const startIndex = (current - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        setData(filteredData.slice(startIndex, endIndex));
-        setPagination((prev) => ({
-          ...prev,
-          current: current,
-          total: filteredData.length,
-        }));
       } catch (error) {
         console.error('Failed to fetch comments:', error);
+        message.error('Failed to fetch comments');
+        setData([]);
       } finally {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, filters, pagination.pageSize, pagination.current]
+    [sortBy, sortOrder, searchValue, filters, pagination.pageSize]
   );
 
+  // Initial fetch and refetch on filter/search change
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, filters]);
+  }, [searchValue, filters, sortBy, sortOrder]);
 
   // Filter configuration
   const filterConfig = [
     {
-      name: 'status',
-      label: 'Status',
+      name: 'isSpoiler',
+      label: 'Spoiler Status',
       type: 'select',
       options: [
-        { value: 'approved', label: 'Approved' },
-        { value: 'pending', label: 'Pending Review' },
-        { value: 'flagged', label: 'Flagged' },
-        { value: 'rejected', label: 'Rejected' },
+        { value: true, label: 'Spoiler' },
+        { value: false, label: 'Not Spoiler' },
       ],
     },
-    {
-      name: 'hasReports',
-      label: 'Has Reports',
-      type: 'checkbox',
-      options: [{ value: true, label: 'Show only comments with reports' }],
-    },
-    {
-      name: 'createdDateRange',
-      label: 'Created Date Range',
-      type: 'daterange',
-    },
   ];
+
+  // Handle View Statistics
+  const handleViewStatistics = async (record) => {
+    setStatLoading(true);
+    try {
+      const response = await commentService.getCommentStatistics(
+        record.chapterId
+      );
+
+      if (response.success) {
+        const stats = response.data;
+        Modal.info({
+          title: `Comment Statistics - ${stats.chapterTitle}`,
+          width: 500,
+          content: (
+            <div style={{ marginTop: 16 }}>
+              <p>
+                <strong>Chapter ID:</strong> {stats.chapterId}
+              </p>
+              <p>
+                <strong>Total Comments:</strong> {stats.totalComments}
+              </p>
+              <p>
+                <strong>Spoiler Comments:</strong> {stats.spoilerComments}
+              </p>
+              <p>
+                <strong>Non-Spoiler Comments:</strong>{' '}
+                {stats.nonSpoilerComments}
+              </p>
+              <p>
+                <strong>Average Likes per Comment:</strong>{' '}
+                {stats.avgLikesPerComment}
+              </p>
+              <p>
+                <strong>Most Liked Comment ID:</strong>{' '}
+                {stats.mostLikedCommentId}
+              </p>
+            </div>
+          ),
+          okText: 'Close',
+        });
+      } else {
+        message.error(response.error || 'Failed to fetch statistics');
+      }
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+      message.error('Failed to fetch comment statistics');
+    } finally {
+      setStatLoading(false);
+    }
+  };
+
+  // Handle Delete Comment
+  const handleDeleteComment = (record) => {
+    confirm({
+      title: 'Delete Comment',
+      content: `Are you sure you want to delete this comment? This action cannot be undone.`,
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk() {
+        return deleteCommentAsync(record.id);
+      },
+    });
+  };
+
+  const deleteCommentAsync = async (commentId) => {
+    try {
+      const response = await commentService.deleteCommentAdmin(commentId);
+
+      if (response.success) {
+        message.success('Comment deleted successfully');
+        // Refresh the data
+        fetchData({
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+        });
+      } else {
+        message.error(response.error || 'Failed to delete comment');
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+      message.error('Failed to delete comment');
+    }
+  };
 
   // Table columns
   const columns = [
@@ -197,10 +207,9 @@ const Comments = () => {
       render: (text, record) => (
         <Space direction="vertical" size={4} style={{ width: '100%' }}>
           <Space>
-            <Avatar size="small" icon={<UserOutlined />} />
-            <Text strong>{record.author}</Text>
+            <Text strong>{record.username}</Text>
             <Text type="secondary" style={{ fontSize: '12px' }}>
-              on {record.novel}
+              {record.chapterTitle && `on ${record.chapterTitle}`}
             </Text>
           </Space>
           <Paragraph
@@ -209,18 +218,23 @@ const Comments = () => {
           >
             {text}
           </Paragraph>
-          <Text type="secondary" style={{ fontSize: '12px' }}>
-            <BookOutlined style={{ marginRight: 4 }} />
-            {record.chapter}
-          </Text>
+          {record.chapterId && (
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              <BookOutlined style={{ marginRight: 4 }} />
+              Chapter ID: {record.chapterId}
+            </Text>
+          )}
         </Space>
       ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => <StatusBadge status={status} />,
+      title: 'Spoiler',
+      dataIndex: 'isSpoiler',
+      key: 'isSpoiler',
+      width: 100,
+      render: (isSpoiler) => (
+        <StatusBadge status={isSpoiler ? 'flagged' : 'approved'} />
+      ),
     },
     {
       title: 'Engagement',
@@ -230,15 +244,7 @@ const Comments = () => {
           <Space>
             <LikeOutlined style={{ color: '#52c41a' }} />
             <span>{record.likes}</span>
-            <DislikeOutlined style={{ color: '#ff4d4f' }} />
-            <span>{record.dislikes}</span>
           </Space>
-          {record.reports > 0 && (
-            <Space>
-              <FlagOutlined style={{ color: '#faad14' }} />
-              <span style={{ color: '#faad14' }}>{record.reports} reports</span>
-            </Space>
-          )}
         </Space>
       ),
     },
@@ -258,28 +264,28 @@ const Comments = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 150,
       render: (_, record) => (
-        <ActionButtons
-          record={record}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          showMore={true}
-          customActions={[
-            {
-              key: 'approve',
-              icon: <MessageOutlined />,
-              label: record.status === 'approved' ? 'Unapprove' : 'Approve',
-            },
-            {
-              key: 'flag',
-              icon: <FlagOutlined />,
-              label: 'Flag as Inappropriate',
-              danger: true,
-            },
-          ]}
-        />
+        <Space>
+          <Button
+            type="primary"
+            size="small"
+            icon={<BarChartOutlined />}
+            onClick={() => handleViewStatistics(record)}
+            loading={statLoading}
+          >
+            Statistics
+          </Button>
+          <Button
+            type="primary"
+            danger
+            size="small"
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteComment(record)}
+          >
+            Delete
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -298,21 +304,13 @@ const Comments = () => {
     setSearchValue('');
   };
 
-  const handleView = (record) => {
-    console.log('View comment:', record);
-  };
-
-  const handleEdit = (record) => {
-    console.log('Edit comment:', record);
-  };
-
-  const handleDelete = (record) => {
-    console.log('Delete comment:', record);
-  };
-
-  // Handlers removed: _handleAddNew (unused)
-
-  const handleTableChange = (paginationInfo) => {
+  const handleTableChange = (paginationInfo, filters, sorter) => {
+    // Handle sorting
+    if (sorter.field) {
+      setSortBy(sorter.field);
+      setSortOrder(sorter.order === 'descend' ? 'desc' : 'asc');
+    }
+    // Fetch with new pagination
     fetchData(paginationInfo);
   };
 
@@ -326,20 +324,15 @@ const Comments = () => {
           { title: 'Comments' },
         ]}
         actions={[
-          <Button key="flagged" type="default" icon={<FlagOutlined />}>
-            View Flagged (
-            {data.filter((item) => item.status === 'flagged').length})
-          </Button>,
-          <Button key="pending" type="primary" icon={<MessageOutlined />}>
-            Review Pending (
-            {data.filter((item) => item.status === 'pending').length})
+          <Button key="spoiler" type="default" icon={<MessageOutlined />}>
+            Spoiler Comments ({data.filter((item) => item.isSpoiler).length})
           </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         <SearchBar
-          placeholder="Search comments by content, author, or novel..."
+          placeholder="Search comments by content or author..."
           onSearch={handleSearch}
           onClear={() => setSearchValue('')}
           searchValue={searchValue}
@@ -368,12 +361,16 @@ const Comments = () => {
               },
             ]}
           />
-        ) : (
+        ) : screens.md ? (
+          // Desktop view - Table
           <Table
             columns={columns}
             dataSource={data}
             pagination={{
-              ...pagination,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+              totalPages: pagination.totalPages,
               showSizeChanger: true,
               showQuickJumper: true,
               showTotal: (total, range) =>
@@ -384,6 +381,111 @@ const Comments = () => {
             rowKey="id"
             scroll={{ x: 1000 }}
           />
+        ) : (
+          // Mobile view - Card
+          <Space direction="vertical" style={{ width: '100%' }} size="small">
+            {data.map((comment) => (
+              <Card key={comment.id} style={{ marginBottom: 8 }}>
+                <Space
+                  direction="vertical"
+                  style={{ width: '100%' }}
+                  size="small"
+                >
+                  <div>
+                    <Text strong>{comment.username}</Text>
+                    {comment.chapterTitle && (
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: '12px', marginLeft: 8 }}
+                      >
+                        on {comment.chapterTitle}
+                      </Text>
+                    )}
+                  </div>
+                  <Paragraph
+                    ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
+                    style={{ margin: 0 }}
+                  >
+                    {comment.content}
+                  </Paragraph>
+                  <Divider style={{ margin: '8px 0' }} />
+                  <div>
+                    <Space size="small" wrap>
+                      <Space size={4}>
+                        <LikeOutlined style={{ color: '#52c41a' }} />
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          {comment.likes}
+                        </Text>
+                      </Space>
+                      <StatusBadge
+                        status={comment.isSpoiler ? 'flagged' : 'approved'}
+                      />
+                    </Space>
+                  </div>
+                  <Text type="secondary" style={{ fontSize: '11px' }}>
+                    <CalendarOutlined style={{ marginRight: 4 }} />
+                    {new Date(comment.createdAt).toLocaleDateString()}
+                  </Text>
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                    <Button
+                      type="primary"
+                      size="small"
+                      icon={<BarChartOutlined />}
+                      onClick={() => handleViewStatistics(comment)}
+                      loading={statLoading}
+                    >
+                      Stats
+                    </Button>
+                    <Button
+                      type="primary"
+                      danger
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteComment(comment)}
+                    >
+                      Delete
+                    </Button>
+                  </Space>
+                </Space>
+              </Card>
+            ))}
+            {/* Mobile Pagination */}
+            <Space
+              direction="vertical"
+              style={{ width: '100%', marginTop: 16, textAlign: 'center' }}
+            >
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                {pagination.current} of {pagination.totalPages} pages
+              </Text>
+              <Space justify="center">
+                <Button
+                  size="small"
+                  disabled={pagination.current === 1}
+                  onClick={() =>
+                    fetchData({
+                      current: pagination.current - 1,
+                      pageSize: pagination.pageSize,
+                    })
+                  }
+                >
+                  Previous
+                </Button>
+                <Button
+                  size="small"
+                  disabled={pagination.current === pagination.totalPages}
+                  onClick={() =>
+                    fetchData({
+                      current: pagination.current + 1,
+                      pageSize: pagination.pageSize,
+                    })
+                  }
+                >
+                  Next
+                </Button>
+              </Space>
+            </Space>
+          </Space>
         )}
       </Space>
     </div>
