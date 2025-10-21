@@ -4,254 +4,159 @@ import {
   Space,
   Table,
   Tooltip,
-  Avatar,
   Typography,
   Rate,
-  Progress,
+  message,
+  Modal,
+  Grid,
+  Card,
+  Divider,
 } from 'antd';
 import {
-  StarOutlined,
-  UserOutlined,
   BookOutlined,
   CalendarOutlined,
   LikeOutlined,
-  DislikeOutlined,
-  FlagOutlined,
-  CheckOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
   SearchBar,
   FilterPanel,
   StatusBadge,
-  ActionButtons,
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
+import reviewService from '../../../services/admin/reviewservice';
 
 const { Text, Paragraph } = Typography;
+const { confirm } = Modal;
+const { useBreakpoint } = Grid;
 
 const Reviews = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
+    totalPages: 0,
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState('createTime');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const screens = useBreakpoint();
 
-  // Mock data for reviews
-  const mockReviews = [
-    {
-      id: 1,
-      title: 'An Epic Journey Worth Reading',
-      content:
-        'This novel has captivated me from the very first chapter. The world-building is extraordinary, and the character development is top-notch. The cultivation system is well thought out and the progression feels natural. I particularly love how the author handles the relationship between the protagonist and supporting characters.',
-      rating: 5,
-      reviewer: 'epic_reader_99',
-      novel: 'The Cultivation Path',
-      status: 'approved',
-      likes: 42,
-      dislikes: 3,
-      helpful: 38,
-      reports: 0,
-      spoilerFree: true,
-      wordCount: 156,
-      createdAt: '2024-09-20T14:30:00Z',
-      updatedAt: '2024-09-20T14:30:00Z',
-    },
-    {
-      id: 2,
-      title: 'Disappointing After Great Start',
-      content:
-        'The first few chapters were promising, but the story quickly derailed. The pacing became too fast and character motivations became unclear. The author seems to have lost direction.',
-      rating: 2,
-      reviewer: 'honest_critic',
-      novel: 'Dragon Emperor',
-      status: 'approved',
-      likes: 18,
-      dislikes: 24,
-      helpful: 12,
-      reports: 2,
-      spoilerFree: true,
-      wordCount: 89,
-      createdAt: '2024-09-19T16:45:00Z',
-      updatedAt: '2024-09-19T16:45:00Z',
-    },
-    {
-      id: 3,
-      title: 'Contains Spoilers - Amazing Plot Twist',
-      content:
-        'I cannot believe the author killed off the main character in chapter 50! This was completely unexpected and changes everything about the story. The way they handled the resurrection was brilliant.',
-      rating: 4,
-      reviewer: 'spoiler_king',
-      novel: 'Mystic Journey',
-      status: 'flagged',
-      likes: 5,
-      dislikes: 28,
-      helpful: 2,
-      reports: 15,
-      spoilerFree: false,
-      wordCount: 134,
-      createdAt: '2024-09-18T10:20:00Z',
-      updatedAt: '2024-09-19T09:15:00Z',
-    },
-    {
-      id: 4,
-      title: 'Masterpiece of Modern Fantasy',
-      content:
-        'Every aspect of this novel is perfection. From the intricate magic system to the complex political intrigue, everything is masterfully crafted. This is definitely a must-read for any fantasy lover.',
-      rating: 5,
-      reviewer: 'fantasy_master',
-      novel: 'Immortal Realm',
-      status: 'approved',
-      likes: 67,
-      dislikes: 1,
-      helpful: 58,
-      reports: 0,
-      spoilerFree: true,
-      wordCount: 112,
-      createdAt: '2024-09-17T12:10:00Z',
-      updatedAt: '2024-09-17T12:10:00Z',
-    },
-    {
-      id: 5,
-      title: 'Needs Review - Potentially Inappropriate',
-      content:
-        'This review contains content that may violate our community guidelines and needs manual review before approval.',
-      rating: 3,
-      reviewer: 'review_needed',
-      novel: 'Celestial Warrior',
-      status: 'pending',
-      likes: 1,
-      dislikes: 0,
-      helpful: 0,
-      reports: 3,
-      spoilerFree: true,
-      wordCount: 67,
-      createdAt: '2024-09-16T08:30:00Z',
-      updatedAt: '2024-09-16T08:30:00Z',
-    },
-  ];
-
-  // Fetch data
+  // Fetch data from API
   const fetchData = useCallback(
-    async (params = {}) => {
+    async (paginationInfo = null) => {
       setLoading(true);
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const pageNum = paginationInfo?.current
+          ? paginationInfo.current - 1
+          : 0; // Convert to 0-based
+        const pageSize = paginationInfo?.pageSize || pagination.pageSize;
 
-        let filteredData = mockReviews;
+        const response = await reviewService.getAllReviews({
+          page: pageNum,
+          pageSize,
+          sort: sortBy,
+          order: sortOrder,
+          search: searchValue,
+          ...(filters.rating && { rating: parseInt(filters.rating) }),
+          ...(filters.isSpoiler !== undefined && {
+            isSpoiler: filters.isSpoiler,
+          }),
+        });
 
-        // Apply search filter
-        if (searchValue) {
-          filteredData = filteredData.filter(
-            (item) =>
-              item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.content.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.reviewer.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.novel.toLowerCase().includes(searchValue.toLowerCase())
-          );
+        if (response.success) {
+          setData(response.data);
+          setPagination((prev) => ({
+            ...prev,
+            current: pageNum + 1, // Convert back to 1-based for Ant Design
+            pageSize,
+            total: response.total,
+            totalPages: response.totalPages,
+          }));
+        } else {
+          message.error(response.error || 'Failed to fetch reviews');
+          setData([]);
         }
-
-        // Apply filters
-        if (filters.status) {
-          filteredData = filteredData.filter(
-            (item) => item.status === filters.status
-          );
-        }
-
-        if (filters.rating) {
-          filteredData = filteredData.filter(
-            (item) => item.rating === filters.rating
-          );
-        }
-
-        if (filters.spoilerFree !== undefined) {
-          filteredData = filteredData.filter(
-            (item) => item.spoilerFree === filters.spoilerFree
-          );
-        }
-
-        if (filters.hasReports) {
-          filteredData = filteredData.filter((item) => item.reports > 0);
-        }
-
-        const pageSize = params.pageSize || pagination.pageSize;
-        const current = params.current || pagination.current;
-        const startIndex = (current - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        setData(filteredData.slice(startIndex, endIndex));
-        setPagination((prev) => ({
-          ...prev,
-          current: current,
-          total: filteredData.length,
-        }));
       } catch (error) {
         console.error('Failed to fetch reviews:', error);
+        message.error('Failed to fetch reviews');
+        setData([]);
       } finally {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, filters, pagination.pageSize, pagination.current]
+    [sortBy, sortOrder, searchValue, filters, pagination.pageSize]
   );
 
+  // Initial fetch and refetch on filter/search change
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue, filters]);
+  }, [searchValue, filters, sortBy, sortOrder]);
 
   // Filter configuration
   const filterConfig = [
-    {
-      name: 'status',
-      label: 'Status',
-      type: 'select',
-      options: [
-        { value: 'approved', label: 'Approved' },
-        { value: 'pending', label: 'Pending Review' },
-        { value: 'flagged', label: 'Flagged' },
-        { value: 'rejected', label: 'Rejected' },
-      ],
-    },
     {
       name: 'rating',
       label: 'Rating',
       type: 'select',
       options: [
-        { value: 5, label: '5 Stars' },
-        { value: 4, label: '4 Stars' },
-        { value: 3, label: '3 Stars' },
-        { value: 2, label: '2 Stars' },
-        { value: 1, label: '1 Star' },
+        { value: '1', label: '1 Star' },
+        { value: '2', label: '2 Stars' },
+        { value: '3', label: '3 Stars' },
+        { value: '4', label: '4 Stars' },
+        { value: '5', label: '5 Stars' },
       ],
     },
     {
-      name: 'spoilerFree',
+      name: 'isSpoiler',
       label: 'Spoiler Status',
       type: 'select',
       options: [
-        { value: true, label: 'Spoiler Free' },
-        { value: false, label: 'Contains Spoilers' },
+        { value: true, label: 'Spoiler' },
+        { value: false, label: 'Not Spoiler' },
       ],
     },
-    {
-      name: 'hasReports',
-      label: 'Has Reports',
-      type: 'checkbox',
-      options: [{ value: true, label: 'Show only reviews with reports' }],
-    },
-    {
-      name: 'createdDateRange',
-      label: 'Created Date Range',
-      type: 'daterange',
-    },
   ];
+
+  // Handle Delete Review
+  const handleDeleteReview = (record) => {
+    confirm({
+      title: 'Delete Review',
+      content: `Are you sure you want to delete this review? This action cannot be undone.`,
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk() {
+        return deleteReviewAsync(record.id);
+      },
+    });
+  };
+
+  const deleteReviewAsync = async (reviewId) => {
+    try {
+      const response = await reviewService.deleteReviewAdmin(reviewId);
+
+      if (response.success) {
+        message.success('Review deleted successfully');
+        // Refresh the data
+        fetchData({
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+        });
+      } else {
+        message.error(response.error || 'Failed to delete review');
+      }
+    } catch (error) {
+      console.error('Failed to delete review:', error);
+      message.error('Failed to delete review');
+    }
+  };
 
   // Table columns
   const columns = [
@@ -262,73 +167,54 @@ const Reviews = () => {
       render: (text, record) => (
         <Space direction="vertical" size={4} style={{ width: '100%' }}>
           <Space>
-            <Avatar size="small" icon={<UserOutlined />} />
-            <Text strong>{record.reviewer}</Text>
-            <Rate disabled value={record.rating} style={{ fontSize: '14px' }} />
-            {!record.spoilerFree && (
-              <Text
-                type="warning"
-                style={{
-                  fontSize: '11px',
-                  background: '#fff1b8',
-                  padding: '0 4px',
-                }}
-              >
-                SPOILERS
-              </Text>
-            )}
+            <Text strong>{record.username}</Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              on {record.novelTitle}
+            </Text>
           </Space>
-          <Text strong style={{ fontSize: '15px' }}>
-            {text}
-          </Text>
+          <div>
+            <Text strong>{text}</Text>
+          </div>
           <Paragraph
             ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
             style={{ margin: 0, maxWidth: 400 }}
           >
             {record.content}
           </Paragraph>
-          <Text type="secondary" style={{ fontSize: '12px' }}>
-            <BookOutlined style={{ marginRight: 4 }} />
-            {record.novel} • {record.wordCount} words
-          </Text>
+          {record.chapterId && (
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              <BookOutlined style={{ marginRight: 4 }} />
+              Novel ID: {record.novelId}
+            </Text>
+          )}
         </Space>
       ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => <StatusBadge status={status} />,
+      title: 'Rating',
+      dataIndex: 'rating',
+      key: 'rating',
+      width: 100,
+      render: (rating) => <Rate disabled value={rating} />,
+    },
+    {
+      title: 'Spoiler',
+      dataIndex: 'isSpoiler',
+      key: 'isSpoiler',
+      width: 100,
+      render: (isSpoiler) => (
+        <StatusBadge status={isSpoiler ? 'flagged' : 'approved'} />
+      ),
     },
     {
       title: 'Engagement',
       key: 'engagement',
       render: (_, record) => (
-        <Space direction="vertical" size={4}>
+        <Space direction="vertical" size={0}>
           <Space>
             <LikeOutlined style={{ color: '#52c41a' }} />
             <span>{record.likes}</span>
-            <DislikeOutlined style={{ color: '#ff4d4f' }} />
-            <span>{record.dislikes}</span>
           </Space>
-          <Space>
-            <CheckOutlined style={{ color: '#1890ff' }} />
-            <span>{record.helpful} helpful</span>
-          </Space>
-          {record.reports > 0 && (
-            <Space>
-              <FlagOutlined style={{ color: '#faad14' }} />
-              <span style={{ color: '#faad14' }}>{record.reports} reports</span>
-            </Space>
-          )}
-          <Progress
-            percent={Math.round(
-              (record.helpful / (record.likes + record.dislikes)) * 100
-            )}
-            size="small"
-            format={() => 'Helpful'}
-            strokeColor="#52c41a"
-          />
         </Space>
       ),
     },
@@ -350,33 +236,15 @@ const Reviews = () => {
       key: 'actions',
       width: 120,
       render: (_, record) => (
-        <ActionButtons
-          record={record}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          showMore={true}
-          customActions={[
-            {
-              key: 'approve',
-              icon: <CheckOutlined />,
-              label: record.status === 'approved' ? 'Unapprove' : 'Approve',
-            },
-            {
-              key: 'flag',
-              icon: <FlagOutlined />,
-              label: 'Flag as Inappropriate',
-              danger: true,
-            },
-            {
-              key: 'spoiler',
-              icon: <StarOutlined />,
-              label: record.spoilerFree
-                ? 'Mark as Spoiler'
-                : 'Mark as Spoiler-Free',
-            },
-          ]}
-        />
+        <Button
+          type="primary"
+          danger
+          size="small"
+          icon={<DeleteOutlined />}
+          onClick={() => handleDeleteReview(record)}
+        >
+          Delete
+        </Button>
       ),
     },
   ];
@@ -395,21 +263,13 @@ const Reviews = () => {
     setSearchValue('');
   };
 
-  const handleView = (record) => {
-    console.log('View review:', record);
-  };
-
-  const handleEdit = (record) => {
-    console.log('Edit review:', record);
-  };
-
-  const handleDelete = (record) => {
-    console.log('Delete review:', record);
-  };
-
-  // Handlers removed: _handleAddNew (unused)
-
-  const handleTableChange = (paginationInfo) => {
+  const handleTableChange = (paginationInfo, filters, sorter) => {
+    // Handle sorting
+    if (sorter.field) {
+      setSortBy(sorter.field);
+      setSortOrder(sorter.order === 'descend' ? 'desc' : 'asc');
+    }
+    // Fetch with new pagination
     fetchData(paginationInfo);
   };
 
@@ -423,18 +283,15 @@ const Reviews = () => {
           { title: 'Reviews' },
         ]}
         actions={[
-          <Button key="flagged" type="default" icon={<FlagOutlined />}>
-            Flagged ({data.filter((item) => item.status === 'flagged').length})
-          </Button>,
-          <Button key="pending" type="primary" icon={<StarOutlined />}>
-            Pending ({data.filter((item) => item.status === 'pending').length})
+          <Button key="spoiler" type="default" icon={<BookOutlined />}>
+            Spoiler Reviews ({data.filter((item) => item.isSpoiler).length})
           </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         <SearchBar
-          placeholder="Search reviews by title, content, reviewer, or novel..."
+          placeholder="Search reviews by title, content, or author..."
           onSearch={handleSearch}
           onClear={() => setSearchValue('')}
           searchValue={searchValue}
@@ -463,12 +320,16 @@ const Reviews = () => {
               },
             ]}
           />
-        ) : (
+        ) : screens.md ? (
+          // Desktop view - Table
           <Table
             columns={columns}
             dataSource={data}
             pagination={{
-              ...pagination,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+              totalPages: pagination.totalPages,
               showSizeChanger: true,
               showQuickJumper: true,
               showTotal: (total, range) =>
@@ -477,8 +338,106 @@ const Reviews = () => {
             onChange={handleTableChange}
             loading={loading}
             rowKey="id"
-            scroll={{ x: 1200 }}
+            scroll={{ x: 1000 }}
           />
+        ) : (
+          // Mobile view - Card
+          <Space direction="vertical" style={{ width: '100%' }} size="small">
+            {data.map((review) => (
+              <Card key={review.id} style={{ marginBottom: 8 }}>
+                <Space
+                  direction="vertical"
+                  style={{ width: '100%' }}
+                  size="small"
+                >
+                  <div>
+                    <Text strong style={{ fontSize: '14px' }}>
+                      {review.title}
+                    </Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                      by {review.username} on {review.novelTitle}
+                    </Text>
+                  </div>
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Paragraph
+                    ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
+                    style={{ margin: 0, fontSize: '13px' }}
+                  >
+                    {review.content}
+                  </Paragraph>
+                  <Divider style={{ margin: '8px 0' }} />
+                  <div>
+                    <Rate disabled value={review.rating} />
+                  </div>
+                  <Divider style={{ margin: '8px 0' }} />
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <Space size="small">
+                      <Space size={4}>
+                        <LikeOutlined style={{ color: '#52c41a' }} />
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          {review.likes}
+                        </Text>
+                      </Space>
+                      <StatusBadge
+                        status={review.isSpoiler ? 'flagged' : 'approved'}
+                      />
+                    </Space>
+                    <Button
+                      type="primary"
+                      danger
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteReview(review)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                  <Text type="secondary" style={{ fontSize: '11px' }}>
+                    <CalendarOutlined style={{ marginRight: 4 }} />
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </Text>
+                </Space>
+              </Card>
+            ))}
+            {/* Mobile Pagination */}
+            <Space
+              direction="vertical"
+              style={{ width: '100%', marginTop: 16, textAlign: 'center' }}
+            >
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                {pagination.current} of {pagination.totalPages} pages
+              </Text>
+              <Space justify="center" wrap>
+                <Button
+                  size="small"
+                  disabled={pagination.current === 1}
+                  onClick={() =>
+                    fetchData({
+                      current: pagination.current - 1,
+                      pageSize: pagination.pageSize,
+                    })
+                  }
+                >
+                  Previous
+                </Button>
+                <Button
+                  size="small"
+                  disabled={pagination.current === pagination.totalPages}
+                  onClick={() =>
+                    fetchData({
+                      current: pagination.current + 1,
+                      pageSize: pagination.pageSize,
+                    })
+                  }
+                >
+                  Next
+                </Button>
+              </Space>
+            </Space>
+          </Space>
         )}
       </Space>
     </div>
