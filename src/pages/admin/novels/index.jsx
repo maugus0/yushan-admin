@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Badge, Rate, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Space, Table, Badge, Rate, message, Row, Col } from 'antd';
 import {
-  PlusOutlined,
-  BookOutlined,
   UserOutlined,
-  CalendarOutlined,
   EyeOutlined,
   FileTextOutlined,
   TagsOutlined,
@@ -15,14 +11,16 @@ import {
   SearchBar,
   FilterPanel,
   StatusBadge,
-  ActionButtons,
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
+import { LineChart, PieChart } from '../../../components/admin/charts';
 import { novelService } from '../../../services/admin/novelservice';
+import dashboardService from '../../../services/admin/dashboardservice';
+import { categoryService } from '../../../services/admin/categoryservice';
+import defaultNovelImage from '../../../assets/images/novel_default.png';
 
 const Novels = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -32,6 +30,63 @@ const Novels = () => {
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
+  const [chartLoading, setChartLoading] = useState(true);
+  const [novelTrends, setNovelTrends] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  // Fetch categories
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await categoryService.getAllCategories({
+        includeInactive: false,
+      });
+      if (response.success) {
+        // Transform categories to the format needed for dropdowns
+        const categoryOptions = response.data.map((cat) => ({
+          value: cat.id,
+          label: cat.name,
+        }));
+        setCategories(categoryOptions);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  // Fetch chart data
+  const fetchChartData = useCallback(async () => {
+    setChartLoading(true);
+    try {
+      const [novelTrendsResponse, topContentResponse] = await Promise.all([
+        dashboardService.getNovelTrends('daily'),
+        dashboardService.getTopContent(10),
+      ]);
+
+      setNovelTrends(novelTrendsResponse.data.dataPoints || []);
+
+      const categories =
+        topContentResponse.data?.topCategories?.slice(0, 5).map((cat) => ({
+          name: cat.categoryName,
+          value: cat.novelCount,
+          views: cat.totalViews,
+        })) || [];
+
+      setCategoryData(categories);
+    } catch (error) {
+      console.error('Failed to fetch chart data:', error);
+    } finally {
+      setChartLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchChartData();
+  }, [fetchChartData]);
 
   // Fetch data
   const fetchData = useCallback(
@@ -42,10 +97,15 @@ const Novels = () => {
         const currentPageSize = params.pageSize || 10;
 
         const response = await novelService.getAllNovels({
-          page: currentPage,
-          pageSize: currentPageSize,
+          page: currentPage - 1, // Convert to 0-indexed
+          size: currentPageSize,
           search: searchValue,
-          ...filters,
+          sort: params.sortBy || 'createTime',
+          order: params.sortOrder || 'desc',
+          category: filters.category || '',
+          status: filters.status || '',
+          authorName: filters.authorName || '',
+          authorId: filters.authorId || '',
         });
 
         setData(response.data);
@@ -69,53 +129,35 @@ const Novels = () => {
     fetchData();
   }, [fetchData]);
 
-  // Filter configuration
+  // Filter configuration - using dynamic categories
   const filterConfig = [
     {
       name: 'status',
       label: 'Status',
       type: 'select',
       options: [
-        { value: 'published', label: 'Published' },
-        { value: 'draft', label: 'Draft' },
-        { value: 'reviewing', label: 'Reviewing' },
-        { value: 'completed', label: 'Completed' },
-        { value: 'suspended', label: 'Suspended' },
+        { value: 'DRAFT', label: 'Draft' },
+        { value: 'UNDER_REVIEW', label: 'Under Review' },
+        { value: 'PUBLISHED', label: 'Published' },
       ],
     },
     {
       name: 'category',
       label: 'Category',
       type: 'select',
-      options: [
-        { value: 'Fantasy', label: 'Fantasy' },
-        { value: 'Romance', label: 'Romance' },
-        { value: 'Action', label: 'Action' },
-        { value: 'Sci-Fi', label: 'Science Fiction' },
-        { value: 'Mystery', label: 'Mystery' },
-        { value: 'Horror', label: 'Horror' },
-      ],
+      options: categories, // Use dynamic categories from API
     },
     {
-      name: 'language',
-      label: 'Language',
-      type: 'select',
-      options: [
-        { value: 'English', label: 'English' },
-        { value: 'Chinese', label: 'Chinese' },
-        { value: 'Japanese', label: 'Japanese' },
-        { value: 'Korean', label: 'Korean' },
-        { value: 'Spanish', label: 'Spanish' },
-      ],
+      name: 'authorName',
+      label: 'Author Name',
+      type: 'text',
+      placeholder: 'Search by author name...',
     },
     {
-      name: 'isOriginal',
-      label: 'Type',
-      type: 'select',
-      options: [
-        { value: true, label: 'Original' },
-        { value: false, label: 'Translation' },
-      ],
+      name: 'authorId',
+      label: 'Author ID',
+      type: 'text',
+      placeholder: 'Enter author ID...',
     },
   ];
 
@@ -129,8 +171,16 @@ const Novels = () => {
       render: (text, record) => (
         <Space>
           <img
-            src={record.coverImage}
-            alt={text}
+            src={
+              record.coverImgUrl && record.coverImgUrl.startsWith('data:image')
+                ? record.coverImgUrl
+                : defaultNovelImage
+            }
+            alt={text || 'Novel'}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = defaultNovelImage;
+            }}
             style={{
               width: 40,
               height: 60,
@@ -140,14 +190,15 @@ const Novels = () => {
             }}
           />
           <div>
-            <div style={{ fontWeight: 500, marginBottom: 2 }}>{text}</div>
+            <div style={{ fontWeight: 500, marginBottom: 2 }}>
+              {text || 'Untitled'}
+            </div>
             <div style={{ fontSize: '12px', color: '#666' }}>
               <UserOutlined style={{ marginRight: 4 }} />
-              by {record.author}
+              by {record.authorUsername || 'Unknown'}
             </div>
             <div style={{ fontSize: '11px', color: '#999' }}>
-              {record.language} •{' '}
-              {record.isOriginal ? 'Original' : 'Translation'}
+              ID: {record.authorId ? record.authorId.substring(0, 8) : 'N/A'}
             </div>
           </div>
         </Space>
@@ -157,25 +208,33 @@ const Novels = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: 100,
-      render: (status) => <StatusBadge status={status} />,
+      width: 120,
+      render: (status) => {
+        // Map API status to StatusBadge format
+        const statusMap = {
+          DRAFT: 'draft',
+          UNDER_REVIEW: 'reviewing',
+          PUBLISHED: 'published',
+        };
+        return <StatusBadge status={statusMap[status] || 'draft'} />;
+      },
     },
     {
       title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
+      dataIndex: 'categoryName',
+      key: 'categoryName',
       width: 120,
       render: (category) => (
         <Space>
           <TagsOutlined />
-          {category}
+          {category || 'Uncategorized'}
         </Space>
       ),
     },
     {
       title: 'Stats',
       key: 'stats',
-      width: 200,
+      width: 220,
       render: (_, record) => (
         <div>
           <div
@@ -187,7 +246,7 @@ const Novels = () => {
           >
             <span style={{ fontSize: '12px' }}>
               <FileTextOutlined style={{ marginRight: 4 }} />
-              {record.chaptersCount} chapters
+              {record.chapterCnt || 0} chapters
             </span>
           </div>
           <div
@@ -199,13 +258,28 @@ const Novels = () => {
           >
             <span style={{ fontSize: '12px' }}>
               <EyeOutlined style={{ marginRight: 4 }} />
-              {record.views.toLocaleString()} views
+              {(record.viewCnt || 0).toLocaleString()} views
+            </span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 4,
+            }}
+          >
+            <span style={{ fontSize: '12px' }}>
+              📝 {(record.wordCnt || 0).toLocaleString()} words
             </span>
           </div>
           <div>
-            <Rate disabled value={parseFloat(record.rating)} size="small" />
+            <Rate
+              disabled
+              value={parseFloat(record.avgRating || 0)}
+              size="small"
+            />
             <span style={{ fontSize: '11px', color: '#666', marginLeft: 4 }}>
-              ({record.rating})
+              ({record.avgRating ? record.avgRating.toFixed(2) : '0.00'})
             </span>
           </div>
         </div>
@@ -219,88 +293,69 @@ const Novels = () => {
         <div>
           <div style={{ fontSize: '12px', marginBottom: 2 }}>
             <span style={{ color: '#1890ff' }}>
-              {record.likes.toLocaleString()}
+              {(record.voteCnt || 0).toLocaleString()}
             </span>{' '}
-            likes
+            votes
           </div>
           <div style={{ fontSize: '12px', marginBottom: 2 }}>
             <span style={{ color: '#52c41a' }}>
-              {record.bookmarks.toLocaleString()}
+              {(record.reviewCnt || 0).toLocaleString()}
             </span>{' '}
-            bookmarks
+            reviews
           </div>
           <div style={{ fontSize: '12px' }}>
             <span style={{ color: '#fa8c16' }}>
-              {record.comments.toLocaleString()}
-            </span>{' '}
-            comments
+              {record.isCompleted ? '✅ Complete' : '📝 Ongoing'}
+            </span>
           </div>
         </div>
       ),
     },
     {
       title: 'Revenue',
-      dataIndex: 'revenue',
-      key: 'revenue',
-      width: 100,
-      render: (revenue, record) => (
+      dataIndex: 'yuanCnt',
+      key: 'yuanCnt',
+      width: 120,
+      render: (yuanCnt) => (
         <div>
-          {record.isPremium && (
-            <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />
-          )}
-          {revenue > 0 ? (
-            <div
-              style={{ fontSize: '12px', fontWeight: 500, color: '#52c41a' }}
-            >
-              ${revenue.toLocaleString()}
+          {(yuanCnt || 0) > 0 ? (
+            <div>
+              <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />
+              <div
+                style={{ fontSize: '12px', fontWeight: 500, color: '#52c41a' }}
+              >
+                ¥{(yuanCnt || 0).toFixed(2)}
+              </div>
             </div>
           ) : (
-            <div style={{ fontSize: '12px', color: '#999' }}>Free</div>
+            <div>
+              <div style={{ fontSize: '12px', color: '#999' }}>Free</div>
+            </div>
           )}
         </div>
       ),
     },
     {
-      title: 'Updated',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      width: 120,
-      render: (date) => (
-        <Tooltip title={new Date(date).toLocaleString()}>
-          <div style={{ fontSize: '12px' }}>
-            <CalendarOutlined style={{ marginRight: 4 }} />
-            {new Date(date).toLocaleDateString()}
-          </div>
-        </Tooltip>
-      ),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      width: 120,
-      fixed: 'right',
+      title: 'Dates',
+      key: 'dates',
+      width: 150,
       render: (_, record) => (
-        <ActionButtons
-          record={record}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          showMore={true}
-          customActions={[
-            {
-              key: 'chapters',
-              icon: <FileTextOutlined />,
-              label: 'View Chapters',
-              onClick: () => handleViewChapters(record),
-            },
-            {
-              key: 'feature',
-              icon: <BookOutlined />,
-              label: record.isFeatured ? 'Unfeature' : 'Feature',
-              onClick: () => handleToggleFeature(record),
-            },
-          ]}
-        />
+        <div>
+          <div style={{ fontSize: '11px', marginBottom: 4 }}>
+            <div style={{ color: '#666' }}>Created:</div>
+            <div>{new Date(record.createTime).toLocaleDateString()}</div>
+          </div>
+          <div style={{ fontSize: '11px' }}>
+            <div style={{ color: '#666' }}>Updated:</div>
+            <div>{new Date(record.updateTime).toLocaleDateString()}</div>
+          </div>
+          {record.publishTime && (
+            <div style={{ fontSize: '11px', marginTop: 4 }}>
+              <div style={{ color: '#666' }}>Published:</div>
+              <div>{new Date(record.publishTime).toLocaleDateString()}</div>
+            </div>
+          )}
+        </div>
       ),
     },
   ];
@@ -308,6 +363,14 @@ const Novels = () => {
   // Handlers
   const handleSearch = (value) => {
     setSearchValue(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
+  const handleCategoryChange = (categoryId) => {
+    setFilters((prev) => ({
+      ...prev,
+      category: categoryId === 'all' ? '' : categoryId,
+    }));
     setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
@@ -322,47 +385,16 @@ const Novels = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
-  const handleView = (record) => {
-    navigate(`/admin/novels/${record.id}`);
-  };
-
-  const handleEdit = (record) => {
-    navigate(`/admin/novels/${record.id}/edit`);
-  };
-
-  const handleDelete = async (record) => {
-    try {
-      await novelService.deleteNovel(record.id);
-      message.success('Novel deleted successfully');
-      fetchData();
-    } catch (error) {
-      console.error('Failed to delete novel:', error);
-      message.error('Failed to delete novel');
-    }
-  };
-
-  const handleViewChapters = (record) => {
-    navigate(`/admin/novels/${record.id}/chapters`);
-  };
-
-  const handleToggleFeature = async (record) => {
-    try {
-      const response = await novelService.toggleFeatureNovel(record.id);
-      message.success(response.message);
-      fetchData();
-    } catch (error) {
-      console.error('Failed to toggle feature:', error);
-      message.error('Failed to update feature status');
-    }
-  };
-
-  const handleAddNew = () => {
-    navigate('/admin/novels/new');
-  };
-
   const handleTableChange = (paginationInfo) => {
     fetchData(paginationInfo);
   };
+
+  // Transform data for charts
+  const novelGrowthData = novelTrends.map((point) => ({
+    name: point.periodLabel,
+    novels: point.count,
+    date: point.date,
+  }));
 
   return (
     <div>
@@ -373,34 +405,51 @@ const Novels = () => {
           { title: 'Dashboard', href: '/admin/dashboard' },
           { title: 'Novels' },
         ]}
-        actions={[
-          <Button
-            key="add"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddNew}
-          >
-            Add Novel
-          </Button>,
-        ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        {/* Charts Row - Novel Creation Trend and Categories */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            {chartLoading ? (
+              <LoadingSpinner tip="Loading chart..." />
+            ) : (
+              <LineChart
+                title="Novel Creation Trend"
+                subtitle="New novels over time"
+                data={novelGrowthData}
+                lines={[
+                  { dataKey: 'novels', stroke: '#52c41a', name: 'New Novels' },
+                ]}
+                height={350}
+              />
+            )}
+          </Col>
+
+          <Col xs={24} lg={12}>
+            {chartLoading ? (
+              <LoadingSpinner tip="Loading chart..." />
+            ) : (
+              <PieChart
+                title="Novel Categories"
+                subtitle="Distribution by genre"
+                data={categoryData}
+                height={350}
+              />
+            )}
+          </Col>
+        </Row>
+
         <SearchBar
           placeholder="Search novels by title, author, or description..."
           onSearch={handleSearch}
           onClear={() => setSearchValue('')}
           searchValue={searchValue}
-          showFilter={true}
+          showFilter={false}
           showCategoryFilter={true}
-          categories={[
-            { value: 'Fantasy', label: 'Fantasy' },
-            { value: 'Romance', label: 'Romance' },
-            { value: 'Action', label: 'Action' },
-            { value: 'Sci-Fi', label: 'Science Fiction' },
-            { value: 'Mystery', label: 'Mystery' },
-            { value: 'Horror', label: 'Horror' },
-          ]}
+          categories={categories} // Use dynamic categories from API
+          selectedCategory={filters.category || 'all'}
+          onCategoryChange={handleCategoryChange}
           loading={loading}
         />
 
@@ -419,8 +468,6 @@ const Novels = () => {
             type="novels"
             title="No Novels Found"
             description="No novels match your current search and filter criteria."
-            onDefaultAction={handleAddNew}
-            defaultActionText="Add First Novel"
             actions={[
               {
                 children: 'Clear Filters',

@@ -261,10 +261,11 @@ const TableFilters = ({
             <Row gutter={[16, 16]}>
               {quickFilters.map((filter) => {
                 // Support both number and object (responsive) span
-                const colProps = typeof filter.span === 'object' 
-                  ? filter.span 
-                  : { span: filter.span || 6 };
-                
+                const colProps =
+                  typeof filter.span === 'object'
+                    ? filter.span
+                    : { span: filter.span || 6 };
+
                 return (
                   <Col key={filter.key} {...colProps}>
                     <Form.Item
@@ -306,10 +307,11 @@ const TableFilters = ({
               <Row gutter={[16, 16]}>
                 {advancedFilters.map((filter) => {
                   // Support both number and object (responsive) span
-                  const colProps = typeof filter.span === 'object' 
-                    ? filter.span 
-                    : { span: filter.span || 8 };
-                  
+                  const colProps =
+                    typeof filter.span === 'object'
+                      ? filter.span
+                      : { span: filter.span || 8 };
+
                   return (
                     <Col key={filter.key} {...colProps}>
                       <Form.Item
