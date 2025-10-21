@@ -1,13 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Space, Table, Badge, Rate, message, Row, Col, Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import {
-  UserOutlined,
+  Space,
+  Table,
+  Badge,
+  Rate,
+  message,
+  Button,
+  Popconfirm,
+  Tag,
+} from 'antd';
+import {
+  EyeInvisibleOutlined,
   EyeOutlined,
+  InboxOutlined,
+  UserOutlined,
   FileTextOutlined,
   TagsOutlined,
-  FileSearchOutlined,
-  CheckCircleOutlined,
 } from '@ant-design/icons';
 import {
   PageHeader,
@@ -17,14 +25,11 @@ import {
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
-import { LineChart, PieChart } from '../../../components/admin/charts';
 import { novelService } from '../../../services/admin/novelservice';
-import dashboardService from '../../../services/admin/dashboardservice';
 import { categoryService } from '../../../services/admin/categoryservice';
 import defaultNovelImage from '../../../assets/images/novel_default.png';
 
-const Novels = () => {
-  const navigate = useNavigate();
+const ModerateNovels = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -34,9 +39,7 @@ const Novels = () => {
   });
   const [searchValue, setSearchValue] = useState('');
   const [filters, setFilters] = useState({});
-  const [chartLoading, setChartLoading] = useState(true);
-  const [novelTrends, setNovelTrends] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
+  const [actionLoading, setActionLoading] = useState({});
   const [categories, setCategories] = useState([]);
 
   // Fetch categories
@@ -46,7 +49,6 @@ const Novels = () => {
         includeInactive: false,
       });
       if (response.success) {
-        // Transform categories to the format needed for dropdowns
         const categoryOptions = response.data.map((cat) => ({
           value: cat.id,
           label: cat.name,
@@ -62,37 +64,7 @@ const Novels = () => {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Fetch chart data
-  const fetchChartData = useCallback(async () => {
-    setChartLoading(true);
-    try {
-      const [novelTrendsResponse, topContentResponse] = await Promise.all([
-        dashboardService.getNovelTrends('daily'),
-        dashboardService.getTopContent(10),
-      ]);
-
-      setNovelTrends(novelTrendsResponse.data.dataPoints || []);
-
-      const categories =
-        topContentResponse.data?.topCategories?.slice(0, 5).map((cat) => ({
-          name: cat.categoryName,
-          value: cat.novelCount,
-          views: cat.totalViews,
-        })) || [];
-
-      setCategoryData(categories);
-    } catch (error) {
-      console.error('Failed to fetch chart data:', error);
-    } finally {
-      setChartLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchChartData();
-  }, [fetchChartData]);
-
-  // Fetch data
+  // Fetch all novels (all statuses)
   const fetchData = useCallback(
     async (params = {}) => {
       setLoading(true);
@@ -101,7 +73,7 @@ const Novels = () => {
         const currentPageSize = params.pageSize || 10;
 
         const response = await novelService.getAllNovels({
-          page: currentPage - 1, // Convert to 0-indexed
+          page: currentPage - 1,
           size: currentPageSize,
           search: searchValue,
           sort: params.sortBy || 'createTime',
@@ -133,7 +105,7 @@ const Novels = () => {
     fetchData();
   }, [fetchData]);
 
-  // Filter configuration - using dynamic categories
+  // Filter configuration
   const filterConfig = [
     {
       name: 'status',
@@ -150,7 +122,7 @@ const Novels = () => {
       name: 'category',
       label: 'Category',
       type: 'select',
-      options: categories, // Use dynamic categories from API
+      options: categories,
     },
     {
       name: 'authorName',
@@ -166,10 +138,55 @@ const Novels = () => {
     },
   ];
 
+  // Handle hide novel
+  const handleHide = async (record) => {
+    setActionLoading((prev) => ({ ...prev, [record.id]: 'hiding' }));
+    try {
+      const response = await novelService.hideNovel(record.id);
+      message.success(response.message || 'Novel hidden successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Failed to hide novel:', error);
+      message.error(error.message || 'Failed to hide novel');
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [record.id]: null }));
+    }
+  };
+
+  // Handle unhide novel
+  const handleUnhide = async (record) => {
+    setActionLoading((prev) => ({ ...prev, [record.id]: 'unhiding' }));
+    try {
+      const response = await novelService.unhideNovel(record.id);
+      message.success(response.message || 'Novel unhidden successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Failed to unhide novel:', error);
+      message.error(error.message || 'Failed to unhide novel');
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [record.id]: null }));
+    }
+  };
+
+  // Handle archive novel
+  const handleArchive = async (record) => {
+    setActionLoading((prev) => ({ ...prev, [record.id]: 'archiving' }));
+    try {
+      const response = await novelService.archiveNovel(record.id);
+      message.success(response.message || 'Novel archived successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Failed to archive novel:', error);
+      message.error(error.message || 'Failed to archive novel');
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [record.id]: null }));
+    }
+  };
+
   // Table columns
   const columns = [
     {
-      title: 'Novel',
+      title: 'Novel Info',
       dataIndex: 'title',
       key: 'title',
       width: 300,
@@ -203,7 +220,8 @@ const Novels = () => {
               by {record.authorUsername || 'Unknown'}
             </div>
             <div style={{ fontSize: '11px', color: '#999' }}>
-              ID: {record.authorId ? record.authorId.substring(0, 8) : 'N/A'}
+              Author ID:{' '}
+              {record.authorId ? record.authorId.substring(0, 8) : 'N/A'}
             </div>
           </div>
         </Space>
@@ -215,7 +233,6 @@ const Novels = () => {
       key: 'status',
       width: 120,
       render: (status) => {
-        // Map API status to StatusBadge format
         const statusMap = {
           DRAFT: 'draft',
           UNDER_REVIEW: 'reviewing',
@@ -231,52 +248,51 @@ const Novels = () => {
       key: 'categoryName',
       width: 120,
       render: (category) => (
-        <Space>
-          <TagsOutlined />
+        <Tag color="blue">
+          <TagsOutlined style={{ marginRight: 4 }} />
           {category || 'Uncategorized'}
-        </Space>
+        </Tag>
       ),
     },
     {
-      title: 'Stats',
-      key: 'stats',
-      width: 220,
+      title: 'Content Stats',
+      key: 'content',
+      width: 180,
       render: (_, record) => (
         <div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: 4,
-            }}
-          >
-            <span style={{ fontSize: '12px' }}>
-              <FileTextOutlined style={{ marginRight: 4 }} />
-              {record.chapterCnt || 0} chapters
-            </span>
+          <div style={{ fontSize: '12px', marginBottom: 4 }}>
+            <FileTextOutlined style={{ marginRight: 4 }} />
+            <strong>{record.chapterCnt || 0}</strong> chapters
           </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: 4,
-            }}
-          >
-            <span style={{ fontSize: '12px' }}>
-              <EyeOutlined style={{ marginRight: 4 }} />
-              {(record.viewCnt || 0).toLocaleString()} views
-            </span>
+          <div style={{ fontSize: '12px', marginBottom: 4 }}>
+            📝 <strong>{(record.wordCnt || 0).toLocaleString()}</strong> words
           </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: 4,
-            }}
-          >
-            <span style={{ fontSize: '12px' }}>
-              📝 {(record.wordCnt || 0).toLocaleString()} words
-            </span>
+          <div style={{ fontSize: '12px' }}>
+            {record.isCompleted ? (
+              <Tag color="success">✅ Complete</Tag>
+            ) : (
+              <Tag color="processing">📝 Ongoing</Tag>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Engagement',
+      key: 'engagement',
+      width: 150,
+      render: (_, record) => (
+        <div>
+          <div style={{ fontSize: '12px', marginBottom: 2 }}>
+            <EyeOutlined style={{ marginRight: 4, color: '#1890ff' }} />
+            <strong>{(record.viewCnt || 0).toLocaleString()}</strong> views
+          </div>
+          <div style={{ fontSize: '12px', marginBottom: 2 }}>
+            👍 <strong>{(record.voteCnt || 0).toLocaleString()}</strong> votes
+          </div>
+          <div style={{ fontSize: '12px', marginBottom: 2 }}>
+            💬 <strong>{(record.reviewCnt || 0).toLocaleString()}</strong>{' '}
+            reviews
           </div>
           <div>
             <Rate
@@ -292,77 +308,111 @@ const Novels = () => {
       ),
     },
     {
-      title: 'Engagement',
-      key: 'engagement',
-      width: 150,
-      render: (_, record) => (
-        <div>
-          <div style={{ fontSize: '12px', marginBottom: 2 }}>
-            <span style={{ color: '#1890ff' }}>
-              {(record.voteCnt || 0).toLocaleString()}
-            </span>{' '}
-            votes
-          </div>
-          <div style={{ fontSize: '12px', marginBottom: 2 }}>
-            <span style={{ color: '#52c41a' }}>
-              {(record.reviewCnt || 0).toLocaleString()}
-            </span>{' '}
-            reviews
-          </div>
-          <div style={{ fontSize: '12px' }}>
-            <span style={{ color: '#fa8c16' }}>
-              {record.isCompleted ? '✅ Complete' : '📝 Ongoing'}
-            </span>
-          </div>
-        </div>
-      ),
-    },
-    {
       title: 'Revenue',
       dataIndex: 'yuanCnt',
       key: 'yuanCnt',
-      width: 120,
+      width: 100,
       render: (yuanCnt) => (
         <div>
           {(yuanCnt || 0) > 0 ? (
             <div>
               <Badge color="gold" text="Premium" style={{ marginBottom: 4 }} />
               <div
-                style={{ fontSize: '12px', fontWeight: 500, color: '#52c41a' }}
+                style={{ fontSize: '13px', fontWeight: 500, color: '#52c41a' }}
               >
                 ¥{(yuanCnt || 0).toFixed(2)}
               </div>
             </div>
           ) : (
-            <div>
-              <div style={{ fontSize: '12px', color: '#999' }}>Free</div>
-            </div>
+            <Tag>Free</Tag>
           )}
         </div>
       ),
     },
     {
-      title: 'Dates',
-      key: 'dates',
-      width: 150,
-      render: (_, record) => (
-        <div>
-          <div style={{ fontSize: '11px', marginBottom: 4 }}>
-            <div style={{ color: '#666' }}>Created:</div>
-            <div>{new Date(record.createTime).toLocaleDateString()}</div>
-          </div>
-          <div style={{ fontSize: '11px' }}>
-            <div style={{ color: '#666' }}>Updated:</div>
-            <div>{new Date(record.updateTime).toLocaleDateString()}</div>
-          </div>
-          {record.publishTime && (
-            <div style={{ fontSize: '11px', marginTop: 4 }}>
-              <div style={{ color: '#666' }}>Published:</div>
-              <div>{new Date(record.publishTime).toLocaleDateString()}</div>
-            </div>
-          )}
-        </div>
-      ),
+      title: 'Actions',
+      key: 'actions',
+      width: 250,
+      fixed: 'right',
+      render: (_, record) => {
+        const isArchived = record.status === 'ARCHIVED';
+        return (
+          <Space direction="vertical" size="small">
+            <Space>
+              {!isArchived && (
+                <>
+                  <Popconfirm
+                    title="Hide Novel"
+                    description="Are you sure you want to hide this novel?"
+                    onConfirm={() => handleHide(record)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button
+                      size="small"
+                      icon={<EyeInvisibleOutlined />}
+                      loading={actionLoading[record.id] === 'hiding'}
+                      disabled={
+                        actionLoading[record.id] &&
+                        actionLoading[record.id] !== 'hiding'
+                      }
+                    >
+                      Hide
+                    </Button>
+                  </Popconfirm>
+                  <Popconfirm
+                    title="Unhide Novel"
+                    description="Are you sure you want to unhide this novel?"
+                    onConfirm={() => handleUnhide(record)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button
+                      size="small"
+                      icon={<EyeOutlined />}
+                      loading={actionLoading[record.id] === 'unhiding'}
+                      disabled={
+                        actionLoading[record.id] &&
+                        actionLoading[record.id] !== 'unhiding'
+                      }
+                    >
+                      Unhide
+                    </Button>
+                  </Popconfirm>
+                </>
+              )}
+            </Space>
+            {!isArchived && (
+              <Popconfirm
+                title="Archive Novel"
+                description="Are you sure you want to archive this novel? This action may be irreversible."
+                onConfirm={() => handleArchive(record)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  size="small"
+                  danger
+                  icon={<InboxOutlined />}
+                  loading={actionLoading[record.id] === 'archiving'}
+                  disabled={
+                    actionLoading[record.id] &&
+                    actionLoading[record.id] !== 'archiving'
+                  }
+                  block
+                >
+                  Archive
+                </Button>
+              </Popconfirm>
+            )}
+            {isArchived && (
+              <Tag color="red" style={{ margin: 0 }}>
+                Archived
+              </Tag>
+            )}
+          </Space>
+        );
+      },
     },
   ];
 
@@ -395,74 +445,19 @@ const Novels = () => {
     fetchData(paginationInfo);
   };
 
-  // Transform data for charts
-  const novelGrowthData = novelTrends.map((point) => ({
-    name: point.periodLabel,
-    novels: point.count,
-    date: point.date,
-  }));
-
   return (
     <div>
       <PageHeader
-        title="Novels Management"
-        subtitle="Manage and monitor novels on the platform"
+        title="Moderate Novels"
+        subtitle="Review and moderate all novels on the platform"
         breadcrumbs={[
           { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Novels' },
-        ]}
-        actions={[
-          <Button
-            key="review"
-            type="primary"
-            icon={<CheckCircleOutlined />}
-            onClick={() => navigate('/admin/novels/review')}
-          >
-            Review Novels
-          </Button>,
-          <Button
-            key="moderate"
-            icon={<FileSearchOutlined />}
-            onClick={() => navigate('/admin/novels/moderate')}
-          >
-            Moderate Novels
-          </Button>,
+          { title: 'Novels', href: '/admin/novels' },
+          { title: 'Moderate' },
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
-        {/* Charts Row - Novel Creation Trend and Categories */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={12}>
-            {chartLoading ? (
-              <LoadingSpinner tip="Loading chart..." />
-            ) : (
-              <LineChart
-                title="Novel Creation Trend"
-                subtitle="New novels over time"
-                data={novelGrowthData}
-                lines={[
-                  { dataKey: 'novels', stroke: '#52c41a', name: 'New Novels' },
-                ]}
-                height={350}
-              />
-            )}
-          </Col>
-
-          <Col xs={24} lg={12}>
-            {chartLoading ? (
-              <LoadingSpinner tip="Loading chart..." />
-            ) : (
-              <PieChart
-                title="Novel Categories"
-                subtitle="Distribution by genre"
-                data={categoryData}
-                height={350}
-              />
-            )}
-          </Col>
-        </Row>
-
         <SearchBar
           placeholder="Search novels by title, author, or description..."
           onSearch={handleSearch}
@@ -470,7 +465,7 @@ const Novels = () => {
           searchValue={searchValue}
           showFilter={false}
           showCategoryFilter={true}
-          categories={categories} // Use dynamic categories from API
+          categories={categories}
           selectedCategory={filters.category || 'all'}
           onCategoryChange={handleCategoryChange}
           loading={loading}
@@ -512,7 +507,7 @@ const Novels = () => {
             onChange={handleTableChange}
             loading={loading}
             rowKey="id"
-            scroll={{ x: 1200 }}
+            scroll={{ x: 1500 }}
           />
         )}
       </Space>
@@ -520,4 +515,4 @@ const Novels = () => {
   );
 };
 
-export default Novels;
+export default ModerateNovels;

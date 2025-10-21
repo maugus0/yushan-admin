@@ -19,7 +19,8 @@ import PromoteToAdmin from './pages/admin/users/promotetoadmin';
 
 // Novel Management
 import Novels from './pages/admin/novels';
-import NovelDetail from './pages/admin/novels/noveldetail';
+import ReviewNovels from './pages/admin/novels/review';
+import ModerateNovels from './pages/admin/novels/moderate';
 
 // Yuan Management
 import Yuan from './pages/admin/yuan';
@@ -61,7 +62,8 @@ function App() {
 
             {/* Content Management */}
             <Route path="novels" element={<Novels />} />
-            <Route path="novels/:id" element={<NovelDetail />} />
+            <Route path="novels/review" element={<ReviewNovels />} />
+            <Route path="novels/moderate" element={<ModerateNovels />} />
             <Route path="categories" element={<Categories />} />
             <Route path="chapters" element={<Chapters />} />
 

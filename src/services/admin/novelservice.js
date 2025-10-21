@@ -537,6 +537,108 @@ export const novelService = {
       throw new Error('Failed to fetch novels by author');
     }
   },
+
+  // Approve novel (changes status to PUBLISHED)
+  approveNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/approve`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message:
+            response.data.message ||
+            'Novel approved and published successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to approve novel');
+      }
+    } catch (error) {
+      console.error('Error approving novel:', error);
+      throw new Error(error.message || 'Failed to approve novel');
+    }
+  },
+
+  // Reject novel (changes status to DRAFT)
+  rejectNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/reject`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel rejected successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to reject novel');
+      }
+    } catch (error) {
+      console.error('Error rejecting novel:', error);
+      throw new Error(error.message || 'Failed to reject novel');
+    }
+  },
+
+  // Hide novel
+  hideNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/hide`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel hidden successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to hide novel');
+      }
+    } catch (error) {
+      console.error('Error hiding novel:', error);
+      throw new Error(error.message || 'Failed to hide novel');
+    }
+  },
+
+  // Unhide novel
+  unhideNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/unhide`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel unhidden successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to unhide novel');
+      }
+    } catch (error) {
+      console.error('Error unhiding novel:', error);
+      throw new Error(error.message || 'Failed to unhide novel');
+    }
+  },
+
+  // Archive novel
+  archiveNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/archive`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel archived successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to archive novel');
+      }
+    } catch (error) {
+      console.error('Error archiving novel:', error);
+      throw new Error(error.message || 'Failed to archive novel');
+    }
+  },
 };
 
 export default novelService;
