@@ -686,7 +686,7 @@ const Rankings = () => {
           </span>
         }
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Rankings' },
         ]}
       />

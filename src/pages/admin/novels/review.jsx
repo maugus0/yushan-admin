@@ -346,8 +346,8 @@ const ReviewNovels = () => {
         title="Review Novels"
         subtitle="Review and approve novels submitted by authors"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Novels', href: '/admin/novels' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
+          { title: 'Novels', href: '/yushan-admin/admin/novels' },
           { title: 'Review' },
         ]}
       />

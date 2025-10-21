@@ -204,7 +204,7 @@ const Yuan = () => {
         title="Yuan Management"
         subtitle="Manage platform currency, transactions, and rewards"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Yuan' },
         ]}
         actions={[

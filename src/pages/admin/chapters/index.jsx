@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Table, Tooltip, Progress } from 'antd';
+import { Button, Space, Table, Tooltip, Progress, Row, Col } from 'antd';
 import {
-  PlusOutlined,
   FileTextOutlined,
   BookOutlined,
   UserOutlined,
@@ -12,12 +11,13 @@ import {
 import {
   PageHeader,
   SearchBar,
-  FilterPanel,
   StatusBadge,
   ActionButtons,
   EmptyState,
   LoadingSpinner,
 } from '../../../components/admin/common';
+import { novelService } from '../../../services/admin/novelservice';
+import { chapterService } from '../../../services/admin/chapterservice';
 
 const Chapters = () => {
   const [loading, setLoading] = useState(true);
@@ -28,123 +28,68 @@ const Chapters = () => {
     total: 0,
   });
   const [searchValue, setSearchValue] = useState('');
+  const [allChapters, setAllChapters] = useState([]);
   const [filters, setFilters] = useState({});
-
-  // Mock data for chapters
-  const mockChapters = [
-    {
-      id: 1,
-      title: 'The Beginning of the Journey',
-      chapterNumber: 1,
-      novel: 'The Cultivation Path',
-      author: 'author_jane',
-      status: 'published',
-      wordCount: 2500,
-      views: 15420,
-      publishedAt: '2024-09-01T10:30:00Z',
-      createdAt: '2024-08-28T14:20:00Z',
-      readingTime: 12,
-    },
-    {
-      id: 2,
-      title: 'First Steps into the Unknown',
-      chapterNumber: 2,
-      novel: 'The Cultivation Path',
-      author: 'author_jane',
-      status: 'published',
-      wordCount: 3200,
-      views: 12800,
-      publishedAt: '2024-09-03T09:15:00Z',
-      createdAt: '2024-08-30T16:45:00Z',
-      readingTime: 15,
-    },
-    {
-      id: 3,
-      title: 'The Immortal Realm Awakens',
-      chapterNumber: 1,
-      novel: 'Immortal Realm',
-      author: 'writer_bob',
-      status: 'draft',
-      wordCount: 1800,
-      views: 0,
-      publishedAt: null,
-      createdAt: '2024-09-20T11:30:00Z',
-      readingTime: 8,
-    },
-    {
-      id: 4,
-      title: "Dragon's First Flight",
-      chapterNumber: 1,
-      novel: 'Dragon Emperor',
-      author: 'dragon_writer',
-      status: 'reviewing',
-      wordCount: 2800,
-      views: 0,
-      publishedAt: null,
-      createdAt: '2024-09-18T13:25:00Z',
-      readingTime: 13,
-    },
-    {
-      id: 5,
-      title: 'The Mystic Gateway Opens',
-      chapterNumber: 1,
-      novel: 'Mystic Journey',
-      author: 'mystic_author',
-      status: 'published',
-      wordCount: 2200,
-      views: 8900,
-      publishedAt: '2024-09-15T15:40:00Z',
-      createdAt: '2024-09-12T10:15:00Z',
-      readingTime: 10,
-    },
-  ];
+  // Novels and selected novel for fetching chapters
+  const [novels, setNovels] = useState([]);
+  const [selectedNovel, setSelectedNovel] = useState(null);
 
   // Fetch data
   const fetchData = useCallback(
     async (params = {}) => {
       setLoading(true);
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const novelToUse = params.novel || selectedNovel;
+        if (!novelToUse) {
+          setData([]);
+          setAllChapters([]);
+          setPagination((prev) => ({ ...prev, total: 0 }));
+          return;
+        }
 
-        let filteredData = mockChapters;
+        // Always fetch chapters for the selected novel
+        const resp = await chapterService.getChaptersByNovel(novelToUse.id, {
+          page: params.current || pagination.current,
+          pageSize: params.pageSize || pagination.pageSize,
+          publishedOnly: false, // show all chapters
+        });
 
-        // Apply search filter
+        // Map BE fields to FE for table (robust mapping)
+        const chapters = (resp.data || []).map((ch) => ({
+          uuid: ch.uuid,
+          id: ch.chapterId || ch.id || ch.uuid, // fallback for AntD
+          chapterNumber: ch.chapterNumber,
+          title: ch.title,
+          wordCount: ch.wordCount ?? ch.wordCnt ?? 0,
+          views: ch.views ?? ch.viewCnt ?? 0,
+          publishedAt: ch.publishedAt ?? ch.publishTime ?? null,
+          novel: novelToUse.title,
+          author: novelToUse.authorUsername || novelToUse.author || '',
+          status: ch.status || (ch.isPremium ? 'published' : 'draft'),
+          readingTime:
+            (ch.wordCount ?? ch.wordCnt)
+              ? Math.ceil((ch.wordCount ?? ch.wordCnt) / 200)
+              : 0,
+        }));
+
+        setAllChapters(chapters);
+        // Apply client-side search if searchValue is set
+        let filtered = chapters;
         if (searchValue) {
-          filteredData = filteredData.filter(
-            (item) =>
-              item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.novel.toLowerCase().includes(searchValue.toLowerCase()) ||
-              item.author.toLowerCase().includes(searchValue.toLowerCase())
+          const q = searchValue.toLowerCase();
+          filtered = chapters.filter(
+            (ch) =>
+              (ch.title && ch.title.toLowerCase().includes(q)) ||
+              (ch.novel && ch.novel.toLowerCase().includes(q)) ||
+              (ch.author && ch.author.toLowerCase().includes(q))
           );
         }
-
-        // Apply filters
-        if (filters.status) {
-          filteredData = filteredData.filter(
-            (item) => item.status === filters.status
-          );
-        }
-
-        if (filters.wordCountRange) {
-          const [min, max] = filters.wordCountRange;
-          filteredData = filteredData.filter(
-            (item) =>
-              item.wordCount >= (min || 0) &&
-              item.wordCount <= (max || Infinity)
-          );
-        }
-
-        const pageSize = params.pageSize || pagination.pageSize;
-        const current = params.current || pagination.current;
-        const startIndex = (current - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        setData(filteredData.slice(startIndex, endIndex));
+        setData(filtered);
         setPagination((prev) => ({
           ...prev,
-          current: current,
-          total: filteredData.length,
+          current: resp.page || params.current || prev.current,
+          total: filtered.length,
+          pageSize: resp.pageSize || prev.pageSize,
         }));
       } catch (error) {
         console.error('Failed to fetch chapters:', error);
@@ -152,8 +97,7 @@ const Chapters = () => {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchValue, filters, pagination.pageSize, pagination.current]
+    [selectedNovel, searchValue, pagination]
   );
 
   useEffect(() => {
@@ -161,32 +105,29 @@ const Chapters = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, filters]);
 
-  // Filter configuration
-  const filterConfig = [
-    {
-      name: 'status',
-      label: 'Status',
-      type: 'select',
-      options: [
-        { value: 'published', label: 'Published' },
-        { value: 'draft', label: 'Draft' },
-        { value: 'reviewing', label: 'Reviewing' },
-        { value: 'rejected', label: 'Rejected' },
-      ],
-    },
-    {
-      name: 'wordCountRange',
-      label: 'Word Count Range',
-      type: 'numberrange',
-      min: { placeholder: 'Min words' },
-      max: { placeholder: 'Max words' },
-    },
-    {
-      name: 'publishedDateRange',
-      label: 'Published Date Range',
-      type: 'daterange',
-    },
-  ];
+  // Fetch novels list for selection
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await novelService.getAllNovels({ page: 0, size: 200 });
+        if (resp && resp.data) {
+          setNovels(resp.data);
+          // Do not select first novel by default
+        }
+      } catch (err) {
+        console.error('Failed to fetch novels:', err);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When selectedNovel changes, load chapters for it
+  useEffect(() => {
+    if (selectedNovel) {
+      fetchData({ current: 1, pageSize: pagination.pageSize });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedNovel]);
 
   // Table columns
   const columns = [
@@ -280,22 +221,10 @@ const Chapters = () => {
       render: (_, record) => (
         <ActionButtons
           record={record}
-          onView={handleView}
-          onEdit={handleEdit}
           onDelete={handleDelete}
-          showMore={true}
-          customActions={[
-            {
-              key: 'publish',
-              icon: <FileTextOutlined />,
-              label: record.status === 'published' ? 'Unpublish' : 'Publish',
-            },
-            {
-              key: 'preview',
-              icon: <EyeOutlined />,
-              label: 'Preview',
-            },
-          ]}
+          showEdit={false}
+          showView={false}
+          showMore={false}
         />
       ),
     },
@@ -304,10 +233,21 @@ const Chapters = () => {
   // Handlers
   const handleSearch = (value) => {
     setSearchValue(value);
-  };
-
-  const handleFilter = (filterValues) => {
-    setFilters(filterValues);
+    // Client-side search: filter allChapters
+    if (!value) {
+      setData(allChapters);
+      setPagination((prev) => ({ ...prev, total: allChapters.length }));
+    } else {
+      const q = value.toLowerCase();
+      const filtered = allChapters.filter(
+        (ch) =>
+          (ch.title && ch.title.toLowerCase().includes(q)) ||
+          (ch.novel && ch.novel.toLowerCase().includes(q)) ||
+          (ch.author && ch.author.toLowerCase().includes(q))
+      );
+      setData(filtered);
+      setPagination((prev) => ({ ...prev, total: filtered.length }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -315,20 +255,47 @@ const Chapters = () => {
     setSearchValue('');
   };
 
-  const handleView = (record) => {
-    console.log('View chapter:', record);
-  };
-
-  const handleEdit = (record) => {
-    console.log('Edit chapter:', record);
-  };
-
   const handleDelete = (record) => {
-    console.log('Delete chapter:', record);
+    // Delete a single chapter via API
+    (async () => {
+      try {
+        setLoading(true);
+        const resp = await chapterService.deleteChapter(
+          record.uuid || record.id
+        );
+        if (resp.success) {
+          // refresh list
+          fetchData({
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to delete chapter:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
   };
 
   const handleAddNew = () => {
     console.log('Add new chapter');
+  };
+
+  const handleDeleteAll = async () => {
+    if (!selectedNovel) return;
+    try {
+      setLoading(true);
+      const resp = await chapterService.deleteChaptersByNovel(selectedNovel.id);
+      if (resp.success) {
+        // refresh
+        fetchData({ current: 1, pageSize: pagination.pageSize });
+      }
+    } catch (err) {
+      console.error('Failed to delete all chapters for novel:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTableChange = (paginationInfo) => {
@@ -341,70 +308,120 @@ const Chapters = () => {
         title="Chapters Management"
         subtitle="Manage and monitor novel chapters"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Chapters' },
-        ]}
-        actions={[
-          <Button
-            key="add"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddNew}
-          >
-            Add Chapter
-          </Button>,
         ]}
       />
 
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
-        <SearchBar
-          placeholder="Search chapters by title, novel, or author..."
-          onSearch={handleSearch}
-          onClear={() => setSearchValue('')}
-          searchValue={searchValue}
-          showFilter={true}
-          loading={loading}
-        />
-
-        <FilterPanel
-          filters={filterConfig}
-          onFilter={handleFilter}
-          onClear={handleClearFilters}
-          collapsed={true}
-          showToggle={true}
-        />
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={24}>
+            <div style={{ width: '100%', marginBottom: 12 }}>
+              <label
+                htmlFor="novel-select"
+                style={{ marginRight: 8, fontWeight: 500 }}
+              >
+                Novel:
+              </label>
+              <select
+                id="novel-select"
+                value={selectedNovel ? selectedNovel.id : ''}
+                onChange={(e) => {
+                  const novel = novels.find(
+                    (n) => String(n.id) === e.target.value
+                  );
+                  setSelectedNovel(novel || null);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  fontSize: 16,
+                  marginTop: 4,
+                }}
+                disabled={novels.length === 0}
+              >
+                <option value="">Select a novel...</option>
+                {novels.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Col>
+          <Col xs={24} sm={24}>
+            <SearchBar
+              placeholder="Search chapters by title, novel, or author..."
+              onSearch={handleSearch}
+              onClear={() => setSearchValue('')}
+              searchValue={searchValue}
+              showFilter={false}
+              loading={loading}
+            />
+          </Col>
+        </Row>
 
         {loading ? (
           <LoadingSpinner tip="Loading chapters..." />
         ) : data.length === 0 ? (
           <EmptyState
-            title="No Chapters Found"
-            description="No chapters match your current search and filter criteria."
-            onDefaultAction={handleAddNew}
-            defaultActionText="Add First Chapter"
-            actions={[
-              {
-                children: 'Clear Filters',
-                onClick: handleClearFilters,
-              },
-            ]}
+            title={!selectedNovel ? 'Select a Novel' : 'No Chapters Found'}
+            description={
+              !selectedNovel
+                ? 'Please select a novel from the dropdown above to view its chapters.'
+                : 'No chapters match your current search and filter criteria.'
+            }
+            onDefaultAction={!selectedNovel ? undefined : handleAddNew}
+            defaultActionText={!selectedNovel ? undefined : 'Add First Chapter'}
+            actions={
+              !selectedNovel
+                ? []
+                : [
+                    {
+                      children: 'Clear Filters',
+                      onClick: handleClearFilters,
+                    },
+                  ]
+            }
           />
         ) : (
-          <Table
-            columns={columns}
-            dataSource={data}
-            pagination={{
-              ...pagination,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} chapters`,
-            }}
-            onChange={handleTableChange}
-            loading={loading}
-            rowKey="id"
-            scroll={{ x: 1100 }}
-          />
+          <>
+            <Row>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={8}
+                xl={6}
+                style={{ display: 'flex', justifyContent: 'flex-start' }}
+              >
+                <Button
+                  danger
+                  size="small"
+                  onClick={handleDeleteAll}
+                  disabled={!selectedNovel || data.length === 0}
+                >
+                  Delete All Chapters
+                </Button>
+              </Col>
+            </Row>
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={{
+                ...pagination,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} chapters`,
+              }}
+              onChange={handleTableChange}
+              loading={loading}
+              rowKey="uuid"
+              scroll={{ x: 1100 }}
+            />
+          </>
         )}
       </Space>
     </div>

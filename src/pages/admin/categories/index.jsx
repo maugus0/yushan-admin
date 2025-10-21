@@ -712,7 +712,7 @@ const Categories = () => {
         title="Categories Management"
         subtitle="Manage novel categories and genres"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Categories' },
         ]}
         actions={[

@@ -419,7 +419,7 @@ const Reviews = () => {
         title="Reviews Management"
         subtitle="Moderate and manage user reviews"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Reviews' },
         ]}
         actions={[
