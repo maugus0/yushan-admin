@@ -188,97 +188,54 @@ export const novelService = {
   // Get all novels with filtering and pagination
   getAllNovels: async (params = {}) => {
     try {
-      await api.delay(500);
-
       const {
-        page = 1,
-        pageSize = 20,
-        search = '',
-        status = '',
+        page = 0,
+        size = 10,
+        sort = 'createTime',
+        order = 'desc',
         category = '',
-        author = '',
-        language = '',
-        isOriginal = null,
-        sortBy = 'updatedAt',
-        sortOrder = 'desc',
-        featured = null,
-        premium = null,
+        status = '',
+        search = '',
+        authorName = '',
+        authorId = '',
       } = params;
 
-      let novels = [...mockNovels];
-
-      // Apply filters
-      if (search) {
-        const searchLower = search.toLowerCase();
-        novels = novels.filter(
-          (novel) =>
-            novel.title.toLowerCase().includes(searchLower) ||
-            novel.author.toLowerCase().includes(searchLower) ||
-            novel.description.toLowerCase().includes(searchLower)
-        );
-      }
-
-      if (status) {
-        novels = novels.filter((novel) => novel.status === status);
-      }
-
-      if (category) {
-        novels = novels.filter((novel) => novel.category === category);
-      }
-
-      if (author) {
-        novels = novels.filter((novel) =>
-          novel.author.toLowerCase().includes(author.toLowerCase())
-        );
-      }
-
-      if (language) {
-        novels = novels.filter((novel) => novel.language === language);
-      }
-
-      if (isOriginal !== null) {
-        novels = novels.filter((novel) => novel.isOriginal === isOriginal);
-      }
-
-      if (featured !== null) {
-        novels = novels.filter((novel) => novel.isFeatured === featured);
-      }
-
-      if (premium !== null) {
-        novels = novels.filter((novel) => novel.isPremium === premium);
-      }
-
-      // Apply sorting
-      novels.sort((a, b) => {
-        let aValue = a[sortBy];
-        let bValue = b[sortBy];
-
-        if (sortBy === 'rating') {
-          aValue = parseFloat(aValue);
-          bValue = parseFloat(bValue);
-        }
-
-        if (sortOrder === 'asc') {
-          return aValue > bValue ? 1 : -1;
-        } else {
-          return aValue < bValue ? 1 : -1;
-        }
+      // Build query parameters
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        size: size.toString(),
+        sort,
+        order,
       });
 
-      // Apply pagination
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize;
-      const paginatedNovels = novels.slice(start, end);
+      // Add optional filters
+      if (category) queryParams.append('category', category);
+      if (status) queryParams.append('status', status);
+      if (search) queryParams.append('search', search);
+      if (authorName) queryParams.append('authorName', authorName);
+      if (authorId) queryParams.append('authorId', authorId);
 
-      return {
-        success: true,
-        data: paginatedNovels,
-        total: novels.length,
-        page,
-        pageSize,
-        totalPages: Math.ceil(novels.length / pageSize),
-      };
+      const response = await api.get(
+        `/novels/admin/all?${queryParams.toString()}`
+      );
+
+      if (response.data && response.data.code === 200) {
+        const apiData = response.data.data;
+        return {
+          success: true,
+          data: apiData.content || [],
+          total: apiData.totalElements || 0,
+          page: apiData.currentPage + 1, // Convert to 1-based
+          pageSize: apiData.size || size,
+          totalPages: apiData.totalPages || 0,
+          hasNext: apiData.hasNext || false,
+          hasPrevious: apiData.hasPrevious || false,
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch novels');
+      }
     } catch (error) {
+      console.error('Error fetching novels:', error);
       throw new Error('Failed to fetch novels');
     }
   },
@@ -578,6 +535,108 @@ export const novelService = {
       };
     } catch (error) {
       throw new Error('Failed to fetch novels by author');
+    }
+  },
+
+  // Approve novel (changes status to PUBLISHED)
+  approveNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/approve`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message:
+            response.data.message ||
+            'Novel approved and published successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to approve novel');
+      }
+    } catch (error) {
+      console.error('Error approving novel:', error);
+      throw new Error(error.message || 'Failed to approve novel');
+    }
+  },
+
+  // Reject novel (changes status to DRAFT)
+  rejectNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/reject`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel rejected successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to reject novel');
+      }
+    } catch (error) {
+      console.error('Error rejecting novel:', error);
+      throw new Error(error.message || 'Failed to reject novel');
+    }
+  },
+
+  // Hide novel
+  hideNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/hide`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel hidden successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to hide novel');
+      }
+    } catch (error) {
+      console.error('Error hiding novel:', error);
+      throw new Error(error.message || 'Failed to hide novel');
+    }
+  },
+
+  // Unhide novel
+  unhideNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/unhide`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel unhidden successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to unhide novel');
+      }
+    } catch (error) {
+      console.error('Error unhiding novel:', error);
+      throw new Error(error.message || 'Failed to unhide novel');
+    }
+  },
+
+  // Archive novel
+  archiveNovel: async (id) => {
+    try {
+      const response = await api.post(`/novels/${id}/archive`);
+
+      if (response.data && response.data.code === 200) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Novel archived successfully',
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to archive novel');
+      }
+    } catch (error) {
+      console.error('Error archiving novel:', error);
+      throw new Error(error.message || 'Failed to archive novel');
     }
   },
 };

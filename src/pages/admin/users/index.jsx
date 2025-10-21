@@ -151,27 +151,29 @@ const UsersOverview = () => {
       <PageHeader
         title="User Management"
         subtitle="Overview of readers and writers on the platform"
-        extra={[
-          <Button
-            key="readers"
-            icon={<UserOutlined />}
-            onClick={() => navigate('/admin/users/readers')}
-          >
-            Manage Readers
-          </Button>,
-          <Button
-            key="writers"
-            icon={<EditOutlined />}
-            onClick={() => navigate('/admin/users/writers')}
-          >
-            Manage Writers
-          </Button>,
-        ]}
+        extra={
+          <Space wrap>
+            <Button
+              key="readers"
+              icon={<UserOutlined />}
+              onClick={() => navigate('/admin/users/readers')}
+            >
+              Manage Readers
+            </Button>
+            <Button
+              key="writers"
+              icon={<EditOutlined />}
+              onClick={() => navigate('/admin/users/writers')}
+            >
+              Manage Writers
+            </Button>
+          </Space>
+        }
       />
 
       {/* Total Users Statistics */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card hoverable>
             <Statistic
               title="Total Users"
@@ -186,7 +188,7 @@ const UsersOverview = () => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card hoverable>
             <Statistic
               title="Readers"
@@ -201,7 +203,7 @@ const UsersOverview = () => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card hoverable>
             <Statistic
               title="Writers"
@@ -216,7 +218,7 @@ const UsersOverview = () => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card hoverable>
             <Statistic
               title="Active Users"
@@ -235,8 +237,8 @@ const UsersOverview = () => {
 
       {/* DAU/WAU/MAU Cards */}
       {dauData && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col span={8}>
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24} sm={24} md={8}>
             <Card
               hoverable
               style={{
@@ -267,7 +269,7 @@ const UsersOverview = () => {
               />
             </Card>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={8}>
             <Card
               hoverable
               style={{
@@ -298,7 +300,7 @@ const UsersOverview = () => {
               />
             </Card>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={8}>
             <Card
               hoverable
               style={{
@@ -363,9 +365,9 @@ const UsersOverview = () => {
           </Card>
         )}
 
-      <Row gutter={24}>
+      <Row gutter={[24, 24]}>
         {/* Recent Users */}
-        <Col span={8}>
+        <Col xs={24} sm={24} md={24} lg={8}>
           <Card
             title="Recent Users"
             extra={
@@ -412,7 +414,7 @@ const UsersOverview = () => {
         </Col>
 
         {/* Top Readers */}
-        <Col span={8}>
+        <Col xs={24} sm={24} md={12} lg={8}>
           <Card
             title="Top Readers"
             extra={<TrophyOutlined style={{ color: '#faad14' }} />}
@@ -457,7 +459,7 @@ const UsersOverview = () => {
         </Col>
 
         {/* Top Writers */}
-        <Col span={8}>
+        <Col xs={24} sm={24} md={12} lg={8}>
           <Card
             title="Top Writers"
             extra={<TrophyOutlined style={{ color: '#faad14' }} />}
@@ -507,8 +509,8 @@ const UsersOverview = () => {
 
       {/* Quick Actions */}
       <Card title="Quick Actions" style={{ marginTop: 24 }}>
-        <Row gutter={16}>
-          <Col span={6}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={12} lg={6}>
             <Button
               block
               size="large"
@@ -518,7 +520,7 @@ const UsersOverview = () => {
               Manage Readers
             </Button>
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={12} md={12} lg={6}>
             <Button
               block
               size="large"
@@ -528,7 +530,7 @@ const UsersOverview = () => {
               Manage Writers
             </Button>
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={12} md={12} lg={6}>
             <Button
               block
               size="large"
@@ -538,7 +540,7 @@ const UsersOverview = () => {
               Change User Status
             </Button>
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={12} md={12} lg={6}>
             <Button
               block
               size="large"

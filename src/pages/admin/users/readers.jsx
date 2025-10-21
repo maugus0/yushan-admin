@@ -121,6 +121,7 @@ const Readers = () => {
       ...commonFilters.search,
       key: 'search',
       placeholder: 'Search readers...',
+      span: { xs: 24, sm: 12, md: 8, lg: 8 },
     },
     {
       ...commonFilters.status,
@@ -130,13 +131,14 @@ const Readers = () => {
         { label: 'Suspended', value: 'suspended' },
         { label: 'Banned', value: 'banned' },
       ],
+      span: { xs: 24, sm: 12, md: 6, lg: 6 },
     },
     {
       key: 'joinDateRange',
       label: 'Join Date Range',
       type: 'daterange',
       quickFilter: false,
-      span: 8,
+      span: { xs: 24, sm: 24, md: 8, lg: 8 },
     },
   ];
 
