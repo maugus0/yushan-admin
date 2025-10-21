@@ -5,7 +5,8 @@
 import api, { MockAPIClient } from './api';
 import authService from './authservice';
 
-// Content management services
+// import yuanService from './yuanservice';
+import analyticsService from './analyticsservice';
 import dashboardService from './dashboardservice';
 import categoryService from './categoryservice';
 import novelService from './novelservice';
@@ -23,8 +24,6 @@ import libraryService from './libraryservice';
 // Platform services
 import rankingService from './rankingservice';
 import settingsService from './settingsservice';
-import yuanService from './yuanservice';
-import analyticsService from './analyticsservice';
 
 // Re-export for named imports
 export { api, MockAPIClient };
@@ -41,7 +40,7 @@ export { userService };
 export { libraryService };
 export { rankingService };
 export { settingsService };
-export { yuanService };
+// yuan: true, // Already removed yuan reference
 
 // Service availability check
 export const checkServiceAvailability = async () => {
@@ -59,7 +58,7 @@ export const checkServiceAvailability = async () => {
     library: true,
     ranking: true,
     settings: true,
-    yuan: true,
+    // yuan: true, // Removed yuan reference
   };
 
   // In a real application, you would check actual service health here
@@ -78,7 +77,7 @@ export const checkServiceAvailability = async () => {
 // Service configuration
 export const serviceConfig = {
   baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api',
-  timeout: 30000, // 30 seconds
+  // yuan: '/api/v1/yuan', // Removed yuan endpoint
   retryAttempts: 3,
   retryDelay: 1000, // 1 second
   mockMode: process.env.REACT_APP_MOCK_MODE === 'true' || true, // Default to mock mode
@@ -96,7 +95,7 @@ export const serviceConfig = {
     library: '/api/v1/library',
     rankings: '/api/v1/rankings',
     settings: '/api/v1/settings',
-    yuan: '/api/v1/yuan',
+    // yuan: '/api/v1/yuan', // Removed yuan endpoint
   },
 };
 
@@ -109,7 +108,7 @@ export const initializeServices = async () => {
     const availability = await checkServiceAvailability();
     console.log('✅ Service availability check completed');
 
-    // Initialize mock data if in mock mode
+    // yuanService, // Removed yuanService reference
     if (serviceConfig.mockMode) {
       console.log('🔧 Running in mock mode - using generated data');
     } else {
@@ -138,11 +137,11 @@ export const getServiceStats = () => {
   return {
     totalServices: 14,
     serviceCategories: {
-      core: ['api', 'auth'],
+      // yuan: yuanService, // Removed yuan reference
       content: ['dashboard', 'category', 'novel', 'chapter'],
       interaction: ['comment', 'review', 'report'],
       user: ['user', 'library'],
-      platform: ['ranking', 'settings', 'yuan'],
+      platform: ['ranking', 'settings'], // Removed yuan from platform services
     },
     features: {
       authentication: 'Multi-role admin authentication system',
@@ -193,7 +192,7 @@ export const userServices = {
 export const platformServices = {
   rankingService,
   settingsService,
-  yuanService,
+  // yuanService, // Removed yuanService from platform services
   analyticsService,
 };
 
@@ -222,7 +221,7 @@ export default {
   // Platform
   rankings: rankingService,
   settings: settingsService,
-  yuan: yuanService,
+  // yuan: yuanService, // Removed yuan from default export
 
   // Utilities
   config: serviceConfig,
