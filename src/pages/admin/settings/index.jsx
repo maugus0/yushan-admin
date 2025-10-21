@@ -704,7 +704,7 @@ const Settings = () => {
         title="Platform Settings"
         subtitle="Configure and manage platform settings"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Settings' },
         ]}
         actions={[

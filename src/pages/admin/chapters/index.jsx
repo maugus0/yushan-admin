@@ -341,7 +341,7 @@ const Chapters = () => {
         title="Chapters Management"
         subtitle="Manage and monitor novel chapters"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Chapters' },
         ]}
         actions={[

@@ -560,7 +560,7 @@ Note: This is a basic summary. Full analytics dashboard would be implemented her
         title="User Libraries"
         subtitle="View and manage user reading libraries (Read-only for administrators)"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'User Libraries' },
         ]}
         actions={[

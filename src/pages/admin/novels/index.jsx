@@ -408,7 +408,7 @@ const Novels = () => {
         title="Novels Management"
         subtitle="Manage and monitor novels on the platform"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Novels' },
         ]}
         actions={[

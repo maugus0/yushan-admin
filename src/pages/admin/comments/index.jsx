@@ -322,7 +322,7 @@ const Comments = () => {
         title="Comments Management"
         subtitle="Moderate and manage user comments"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Comments' },
         ]}
         actions={[

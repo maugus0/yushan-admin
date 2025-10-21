@@ -451,8 +451,8 @@ const ModerateNovels = () => {
         title="Moderate Novels"
         subtitle="Review and moderate all novels on the platform"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Novels', href: '/admin/novels' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
+          { title: 'Novels', href: '/yushan-admin/admin/novels' },
           { title: 'Moderate' },
         ]}
       />

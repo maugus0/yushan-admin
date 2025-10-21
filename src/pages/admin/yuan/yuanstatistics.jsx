@@ -130,8 +130,8 @@ const YuanStatistics = () => {
         subtitle="Analytics and insights for platform currency"
         onBack={handleBack}
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
-          { title: 'Yuan', href: '/admin/yuan' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
+          { title: 'Yuan', href: '/yushan-admin/admin/yuan' },
           { title: 'Statistics' },
         ]}
       />

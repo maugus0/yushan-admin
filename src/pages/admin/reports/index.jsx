@@ -485,7 +485,7 @@ const Reports = () => {
         title="Reports Management"
         subtitle="Review and resolve user reports and violations"
         breadcrumbs={[
-          { title: 'Dashboard', href: '/admin/dashboard' },
+          { title: 'Dashboard', href: '/yushan-admin/admin/dashboard' },
           { title: 'Reports' },
         ]}
         actions={[
