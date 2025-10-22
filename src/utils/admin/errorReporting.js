@@ -114,6 +114,9 @@ const errorReporter = new ErrorReporter();
 
 export default errorReporter;
 
+// Export ErrorReporter class
+export { ErrorReporter };
+
 // Export convenience methods
 export const logError = (error, context) =>
   errorReporter.logError(error, context);
@@ -121,3 +124,4 @@ export const logApiError = (error, endpoint, requestData) =>
   errorReporter.logApiError(error, endpoint, requestData);
 export const logComponentError = (error, componentName, props) =>
   errorReporter.logComponentError(error, componentName, props);
+export const clearErrors = () => errorReporter.clearStoredErrors();

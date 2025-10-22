@@ -115,9 +115,9 @@ const AdminSidebar = ({
 
   // Calculate openKeys based on current route
   const openKeysFromPath = useMemo(() => {
-    const path = location.pathname;
+    const path = location?.pathname || '';
     return path.includes('/users') ? ['users'] : [];
-  }, [location.pathname]);
+  }, [location?.pathname]);
 
   // Update openKeys when path changes
   useEffect(() => {
