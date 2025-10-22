@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { ErrorReporter } from './errorReporting';
 
 global.fetch = jest.fn();

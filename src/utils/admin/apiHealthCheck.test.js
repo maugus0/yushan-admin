@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 jest.mock('../../services/admin/api', () => ({
   get: jest.fn(),
 }));

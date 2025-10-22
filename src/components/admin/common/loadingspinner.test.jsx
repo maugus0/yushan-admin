@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import LoadingSpinner, {
   PageLoader,
@@ -102,7 +101,7 @@ describe('LoadingSpinner Component', () => {
     });
 
     test('does not show overlay when spinning is false', () => {
-      const { container } = render(
+      render(
         <LoadingSpinner overlay={true} spinning={false}>
           <div data-testid="content">Content</div>
         </LoadingSpinner>

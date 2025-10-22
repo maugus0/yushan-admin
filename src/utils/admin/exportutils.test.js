@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { exportToCSV, exportToExcel, exportToJSON } from './exportutils';
 
 // Mock URL methods

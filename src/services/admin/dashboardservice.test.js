@@ -1,6 +1,3 @@
-import axios from 'axios';
-import { dashboardService } from './dashboardservice';
-
 jest.mock('axios');
 jest.mock('./api');
 

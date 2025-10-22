@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as chapterService from './chapterservice';
 
 jest.mock('./api');

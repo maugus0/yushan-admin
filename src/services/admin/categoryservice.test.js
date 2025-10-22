@@ -1,6 +1,3 @@
-import axios from 'axios';
-import * as categoryService from './categoryservice';
-
 jest.mock('axios');
 jest.mock('./api');
 

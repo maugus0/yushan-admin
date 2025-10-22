@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as reviewService from './reviewservice';
 
 jest.mock('./api');

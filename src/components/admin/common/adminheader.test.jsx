@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AdminHeader from './adminheader';
 import { useAdminAuth } from '../../../contexts/admin/adminauthcontext';

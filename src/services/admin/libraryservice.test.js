@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as libraryService from './libraryservice';
 
 jest.mock('./api');

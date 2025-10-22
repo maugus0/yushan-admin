@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import AdminSidebar from './adminsidebar';
@@ -186,7 +185,7 @@ describe('AdminSidebar Component', () => {
 
     test('highlights Novels when on novels path', () => {
       mockUseLocation.mockReturnValue({ pathname: '/admin/novels' });
-      const { container } = renderWithRouter(<AdminSidebar />);
+      renderWithRouter(<AdminSidebar />);
 
       expect(screen.getByText('Novels')).toBeInTheDocument();
     });

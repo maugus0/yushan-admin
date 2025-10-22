@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as settingsService from './settingsservice';
 
 jest.mock('./api');

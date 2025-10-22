@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as mockapi from './mockapi';
 
 jest.mock('./api');

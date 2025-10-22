@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import FilterPanel from './filterpanel';
 
@@ -573,7 +572,7 @@ describe('FilterPanel Component', () => {
           label: 'Name',
         },
       ];
-      const { container } = render(<FilterPanel filters={filters} />);
+      render(<FilterPanel filters={filters} />);
 
       const input = screen.getByPlaceholderText('Enter Name');
 

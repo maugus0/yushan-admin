@@ -1,6 +1,3 @@
-import axios from 'axios';
-import * as novelService from './novelservice';
-
 jest.mock('axios');
 
 describe('Novel Service', () => {
