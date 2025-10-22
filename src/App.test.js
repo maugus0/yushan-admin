@@ -1,6 +1,3 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-
 describe('App Component', () => {
   test('component module exists', () => {
     // Simple test to verify setup

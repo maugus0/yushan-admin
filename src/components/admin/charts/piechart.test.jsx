@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import CustomPieChart from './piechart';
 
@@ -22,14 +21,14 @@ jest.mock('./chartwrapper', () => {
 // Mock recharts
 jest.mock('recharts', () => ({
   PieChart: ({ children }) => <div data-testid="pie-chart">{children}</div>,
-  Pie: ({ dataKey, innerRadius, outerRadius, children, data }) => (
+  Pie: ({ dataKey, _innerRadius, _outerRadius, children, data }) => (
     <div data-testid="pie" data-key={dataKey} data-items={data?.length || 0}>
       {children}
     </div>
   ),
   Cell: ({ fill }) => <div data-testid="pie-cell" data-fill={fill} />,
   Tooltip: () => <div data-testid="tooltip" />,
-  Legend: ({ formatter }) => <div data-testid="legend" />,
+  Legend: ({ _formatter }) => <div data-testid="legend" />,
   ResponsiveContainer: ({ children }) => (
     <div data-testid="responsive-container">{children}</div>
   ),

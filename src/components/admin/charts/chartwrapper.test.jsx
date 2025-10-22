@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ChartWrapper from './chartwrapper';
 
 // Mock Ant Design components
@@ -41,7 +40,7 @@ jest.mock('antd', () => ({
       {children}
     </button>
   ),
-  Dropdown: ({ children, menu, ...props }) => (
+  Dropdown: ({ children, _menu, ...props }) => (
     <div data-testid="dropdown" {...props}>
       {children}
     </div>
@@ -111,14 +110,14 @@ describe('ChartWrapper Component', () => {
     expect(card).toHaveAttribute('data-loading', 'false');
   });
 
-  test('renders without more menu by default', () => {
+  test('hides dropdown menu when showMoreMenu is false or not provided', () => {
     render(
       <ChartWrapper>
         <div>Content</div>
       </ChartWrapper>
     );
-    const dropdown = screen.queryByTestId('dropdown');
     // Should not have dropdown if showMoreMenu is false
+    expect(screen.queryByTestId('dropdown')).not.toBeInTheDocument();
   });
 
   test('renders with more menu when showMoreMenu is true', () => {
@@ -153,7 +152,7 @@ describe('ChartWrapper Component', () => {
   });
 
   test('renders custom height', () => {
-    const { container } = render(
+    render(
       <ChartWrapper height={500}>
         <div>Content</div>
       </ChartWrapper>
