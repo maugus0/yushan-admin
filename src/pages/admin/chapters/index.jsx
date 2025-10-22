@@ -431,7 +431,7 @@ const Chapters = () => {
               </Col>
             </Row>
 
-            {screens.md ? (
+            {(screens?.md ?? true) ? (
               // Desktop view - Table
               <Table
                 columns={columns}

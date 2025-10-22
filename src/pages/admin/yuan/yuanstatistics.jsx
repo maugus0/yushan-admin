@@ -195,7 +195,7 @@ const YuanStatistics = () => {
                 responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
               },
             ]}
-            rowKey={(r, idx) => r.novelId || r.id || idx}
+            rowKey={(r) => r.novelId || r.id || `novel-${Math.random()}`}
             pagination={{ pageSize: 10 }}
             scroll={{ x: 400 }}
             className="responsive-table"
@@ -240,7 +240,7 @@ const YuanStatistics = () => {
                 responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
               },
             ]}
-            rowKey={(r, idx) => r.authorId || r.id || idx}
+            rowKey={(r) => r.authorId || r.id || `author-${Math.random()}`}
             pagination={{ pageSize: 10 }}
             scroll={{ x: 400 }}
             className="responsive-table"
@@ -285,7 +285,7 @@ const YuanStatistics = () => {
                 responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
               },
             ]}
-            rowKey={(r, idx) => r.userId || r.id || idx}
+            rowKey={(r) => r.userId || r.id || `user-${Math.random()}`}
             pagination={{ pageSize: 10 }}
             scroll={{ x: 400 }}
             className="responsive-table"
