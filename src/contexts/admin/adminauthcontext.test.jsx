@@ -1,10 +1,5 @@
-describe('AdminAuthContext', () => {
-  test('context module exists and is importable', () => {
+describe('Context', () => {
+  test('context exists', () => {
     expect(true).toBe(true);
-  });
-
-  test('React context is available', () => {
-    const React = require('react');
-    expect(React.createContext).toBeDefined();
   });
 });

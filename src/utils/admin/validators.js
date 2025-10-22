@@ -333,16 +333,16 @@ export const validateRequired = (value, fieldName = 'Field') => {
 /**
  * String length validation
  * @param {string} value - String value to validate
+ * @param {string} fieldName - Name of the field
  * @param {number} min - Minimum length
  * @param {number} max - Maximum length
- * @param {string} fieldName - Name of the field
  * @returns {object} - Validation result
  */
 export const validateStringLength = (
   value,
+  fieldName = 'Field',
   min = 0,
-  max = Infinity,
-  fieldName = 'Field'
+  max = Infinity
 ) => {
   const errors = [];
 
@@ -368,16 +368,16 @@ export const validateStringLength = (
 /**
  * Number range validation
  * @param {number} value - Number value to validate
+ * @param {string} fieldName - Name of the field
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
- * @param {string} fieldName - Name of the field
  * @returns {object} - Validation result
  */
 export const validateNumberRange = (
   value,
+  fieldName = 'Field',
   min = -Infinity,
-  max = Infinity,
-  fieldName = 'Field'
+  max = Infinity
 ) => {
   const errors = [];
   const numValue = parseFloat(value);
@@ -437,10 +437,20 @@ export const validateForm = (formData, validationRules) => {
     const value = formData[field];
     const fieldErrors = [];
 
-    rules.forEach((rule) => {
+    // Handle both single function and array of functions
+    const ruleArray = Array.isArray(rules) ? rules : [rules];
+
+    ruleArray.forEach((rule) => {
       const result = rule(value, field);
-      if (!result.isValid) {
-        fieldErrors.push(...result.errors);
+      // Handle both boolean results and object results with isValid property
+      if (typeof result === 'boolean') {
+        if (!result) {
+          fieldErrors.push(`${field} validation failed`);
+        }
+      } else if (result && typeof result === 'object' && 'isValid' in result) {
+        if (!result.isValid) {
+          fieldErrors.push(...(result.errors || []));
+        }
       }
     });
 
@@ -462,7 +472,7 @@ export const validateForm = (formData, validationRules) => {
  * @returns {string} - Cleaned string
  */
 export const cleanString = (value) => {
-  if (typeof value !== 'string') return value;
+  if (typeof value !== 'string') return '';
   return value.trim().replace(/\s+/g, ' ');
 };
 
@@ -472,7 +482,7 @@ export const cleanString = (value) => {
  * @returns {string} - Sanitized content
  */
 export const sanitizeHTML = (content) => {
-  if (typeof content !== 'string') return content;
+  if (typeof content !== 'string') return '';
 
   // Basic HTML sanitization - remove script tags and dangerous attributes
   return content

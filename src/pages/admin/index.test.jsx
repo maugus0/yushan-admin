@@ -1,5 +1,5 @@
 describe('Page Component', () => {
-  test('module exists', () => {
+  test('page exists', () => {
     expect(true).toBe(true);
   });
 });

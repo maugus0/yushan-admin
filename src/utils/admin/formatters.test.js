@@ -93,3 +93,25 @@ describe('Formatters Utility', () => {
     });
   });
 });
+
+test('formatCurrency with zero', () => {
+  expect(formatCurrency(0)).toContain('0');
+});
+
+test('formatNumber handles large numbers', () => {
+  expect(formatNumber(1000000)).toBeTruthy();
+});
+
+test('formatPercentage with edge cases', () => {
+  expect(formatPercentage(1)).toBeTruthy();
+});
+
+test('formatFileSize with GB', () => {
+  expect(formatFileSize(1024 * 1024 * 1024)).toContain('GB');
+});
+
+test('formatDate with different formats', () => {
+  const date = new Date('2024-01-15');
+  expect(formatDate(date, 'long')).toBeTruthy();
+  expect(formatDate(date, 'datetime')).toBeTruthy();
+});

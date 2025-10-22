@@ -1,32 +1,15 @@
-import { render } from '@testing-library/react';
+import EditModal from './editmodal';
 
-jest.mock('antd', () => ({
-  Modal: ({ visible, open, children, ...props }) => (
-    <div data-testid="modal" {...props}>
-      {(visible !== undefined ? visible : open) && children}
-    </div>
-  ),
-  Form: ({ children, ...props }) => (
-    <form data-testid="form" {...props}>
-      {children}
-    </form>
-  ),
-  Input: ({ ...props }) => <input data-testid="input" {...props} />,
-  Button: ({ children, ...props }) => (
-    <button data-testid="button" {...props}>
-      {children}
-    </button>
-  ),
-}));
+describe('EditModal', () => {
+  test('module can be imported', () => {
+    expect(EditModal).toBeDefined();
+  });
 
-jest.mock('@ant-design/icons', () => ({
-  EditOutlined: () => <span />,
-  DeleteOutlined: () => <span />,
-}));
+  test('is a valid React component', () => {
+    expect(typeof EditModal).toBe('function');
+  });
 
-describe('Modal Component', () => {
-  test('renders without crashing', () => {
-    render(<div>Test</div>);
-    expect(document.body).toBeInTheDocument();
+  test('component is exported correctly', () => {
+    expect(EditModal).not.toBeNull();
   });
 });

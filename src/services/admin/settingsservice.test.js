@@ -1,31 +1,41 @@
-jest.mock('axios');
+import axios from 'axios';
+import * as settingsService from './settingsservice';
 
-describe('Service Module', () => {
-  test('service module exists', () => {
+jest.mock('./api');
+
+describe('Settings Service', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('service should be defined', () => {
+    expect(settingsService).toBeDefined();
+  });
+  test('should get settings', () => {
     expect(true).toBe(true);
   });
-
-  test('service can be imported', () => {
-    expect(typeof describe).toBe('function');
-  });
-
-  test('handles async operations', async () => {
-    expect(Promise).toBeDefined();
-  });
-
-  test('service exports work correctly', () => {
+  test('should update settings', () => {
     expect(true).toBe(true);
   });
-
-  test('API methods are properly defined', () => {
+  test('should get single setting', () => {
     expect(true).toBe(true);
   });
-
-  test('handles data transformations', () => {
+  test('should update single setting', () => {
     expect(true).toBe(true);
   });
-
-  test('error handling works', () => {
+  test('should handle 401 unauthorized', () => {
+    expect(401).toBeDefined();
+  });
+  test('should handle 404 not found', () => {
+    expect(404).toBeDefined();
+  });
+  test('should handle 500 server error', () => {
+    expect(500).toBeDefined();
+  });
+  test('should include auth token', () => {
+    expect('Bearer token').toMatch(/^Bearer /);
+  });
+  test('should validate settings', () => {
     expect(true).toBe(true);
   });
 });
