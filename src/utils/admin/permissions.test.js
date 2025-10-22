@@ -4,6 +4,17 @@ import {
   PERMISSION_ACTIONS,
   ROLE_HIERARCHY,
   DEFAULT_PERMISSIONS,
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+  canPerformAction,
+  hasHigherRole,
+  canManageUser,
+  getFilteredMenuItems,
+  getAvailableActions,
+  canAccessAdmin,
+  getRoleDisplayName,
+  getPermissionDisplayName,
 } from './permissions';
 
 describe('Permission Utilities', () => {
@@ -160,6 +171,222 @@ describe('Permission Utilities', () => {
       expect(superAdminPerms.some((p) => p.startsWith('dashboard.'))).toBe(
         true
       );
+    });
+  });
+
+  describe('Permission Functions', () => {
+    const adminUser = {
+      id: 'u1',
+      role: USER_ROLES.ADMIN,
+      permissions: [],
+    };
+    const superAdmin = {
+      id: 's1',
+      role: USER_ROLES.SUPER_ADMIN,
+      permissions: [],
+    };
+    const normalUser = { id: 'u2', role: USER_ROLES.USER, permissions: [] };
+
+    describe('hasPermission', () => {
+      test('super admin always has permission', () => {
+        expect(hasPermission(superAdmin, 'any.category.action')).toBe(true);
+      });
+
+      test('matches exact permission or manage permission', () => {
+        const user = {
+          id: 'u3',
+          role: USER_ROLES.MODERATOR,
+          permissions: [
+            `${PERMISSION_CATEGORIES.NOVELS}.${PERMISSION_ACTIONS.MANAGE}`,
+          ],
+        };
+        expect(hasPermission(user, 'novels.update')).toBe(true);
+        expect(hasPermission(user, 'reports.update')).toBe(true);
+      });
+
+      test('honors custom permissions', () => {
+        const user = {
+          id: 'u4',
+          role: USER_ROLES.USER,
+          permissions: ['comments.create'],
+        };
+        expect(hasPermission(user, 'comments.create')).toBe(true);
+        expect(hasPermission(user, 'comments.delete')).toBe(false);
+      });
+
+      test('returns false for invalid inputs', () => {
+        expect(hasPermission(null, 'x.y')).toBe(false);
+        expect(hasPermission(adminUser, null)).toBe(false);
+      });
+    });
+
+    describe('hasAnyPermission / hasAllPermissions', () => {
+      test('hasAnyPermission returns true if any permission allowed', () => {
+        const perms = ['users.read', 'novels.update'];
+        expect(hasAnyPermission(adminUser, perms)).toBe(true);
+      });
+
+      test('hasAllPermissions returns true only when all allowed', () => {
+        const permsOk = ['novels.read', 'chapters.read'];
+        const permsNo = ['novels.read', 'yuan.manage'];
+        expect(hasAllPermissions(adminUser, permsOk)).toBe(true);
+        expect(hasAllPermissions(adminUser, permsNo)).toBe(false);
+      });
+
+      test('invalid inputs return false', () => {
+        expect(hasAnyPermission(adminUser, 'not-array')).toBe(false);
+        expect(hasAllPermissions(adminUser, 'not-array')).toBe(false);
+      });
+    });
+
+    describe('canPerformAction', () => {
+      test('returns true when has direct permission', () => {
+        expect(
+          canPerformAction(
+            adminUser,
+            PERMISSION_ACTIONS.UPDATE,
+            PERMISSION_CATEGORIES.NOVELS
+          )
+        ).toBe(true);
+      });
+
+      test('ownership allows certain actions even without explicit permission', () => {
+        const user = { id: 'owner', role: USER_ROLES.USER, permissions: [] };
+        const resource = { userId: 'owner' };
+        expect(
+          canPerformAction(
+            user,
+            PERMISSION_ACTIONS.UPDATE,
+            PERMISSION_CATEGORIES.NOVELS,
+            resource
+          )
+        ).toBe(true);
+        expect(
+          canPerformAction(
+            user,
+            PERMISSION_ACTIONS.APPROVE,
+            PERMISSION_CATEGORIES.NOVELS,
+            resource
+          )
+        ).toBe(false);
+      });
+    });
+
+    describe('hasHigherRole', () => {
+      test('compares role hierarchy correctly', () => {
+        expect(hasHigherRole(USER_ROLES.ADMIN, USER_ROLES.MODERATOR)).toBe(
+          true
+        );
+        expect(hasHigherRole(USER_ROLES.USER, USER_ROLES.AUTHOR)).toBe(false);
+        expect(hasHigherRole(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN)).toBe(
+          false
+        );
+      });
+    });
+
+    describe('canManageUser', () => {
+      test('cannot manage self', () => {
+        const u = {
+          id: 'same',
+          role: USER_ROLES.ADMIN,
+          permissions: DEFAULT_PERMISSIONS[USER_ROLES.ADMIN],
+        };
+        expect(canManageUser(u, u)).toBe(false);
+      });
+
+      test('requires update permission and higher role', () => {
+        const admin = {
+          id: 'a',
+          role: USER_ROLES.ADMIN,
+          permissions: DEFAULT_PERMISSIONS[USER_ROLES.ADMIN],
+        };
+        const moderator = {
+          id: 'm',
+          role: USER_ROLES.MODERATOR,
+          permissions: DEFAULT_PERMISSIONS[USER_ROLES.MODERATOR],
+        };
+        expect(canManageUser(admin, moderator)).toBe(true);
+        // lower role managing higher role -> false
+        expect(canManageUser(moderator, admin)).toBe(false);
+        // missing update permission -> false
+        const noUpdate = {
+          id: 'x',
+          role: USER_ROLES.MODERATOR,
+          permissions: [],
+        };
+        expect(canManageUser(noUpdate, normalUser)).toBe(false);
+      });
+    });
+
+    describe('getFilteredMenuItems', () => {
+      const menu = [
+        { key: 'dashboard' },
+        { key: 'users', permission: 'users.read' },
+        { key: 'yuan', permission: 'yuan.manage' },
+        {
+          key: 'nested',
+          children: [
+            { key: 'reports', permission: 'reports.read' },
+            { key: 'settings', permission: 'settings.manage' },
+          ],
+        },
+      ];
+
+      test('filters items based on permission, keeps unprotected items', () => {
+        const filtered = getFilteredMenuItems(adminUser, menu);
+        const keys = filtered.map((m) => m.key);
+        expect(keys).toContain('dashboard');
+        expect(keys).toContain('users');
+        expect(keys).toContain('nested');
+
+        expect(keys).not.toContain('yuan');
+
+        const nested = filtered.find((m) => m.key === 'nested');
+        const nestedKeys = nested.children.map((c) => c.key);
+        expect(nestedKeys).toContain('reports');
+        expect(nestedKeys).not.toContain('settings');
+      });
+
+      test('handles invalid menu input', () => {
+        expect(getFilteredMenuItems(adminUser, null)).toEqual([]);
+      });
+    });
+
+    describe('getAvailableActions', () => {
+      test('returns actions allowed by canPerformAction', () => {
+        const actions = getAvailableActions(
+          adminUser,
+          PERMISSION_CATEGORIES.NOVELS,
+          { userId: 'not-admin' }
+        );
+        expect(Array.isArray(actions)).toBe(true);
+        expect(actions).toContain(PERMISSION_ACTIONS.READ);
+        expect(actions).toContain(PERMISSION_ACTIONS.UPDATE);
+      });
+    });
+
+    describe('canAccessAdmin', () => {
+      test('editor and above can access admin', () => {
+        expect(canAccessAdmin({ role: USER_ROLES.EDITOR })).toBe(true);
+        expect(canAccessAdmin({ role: USER_ROLES.MODERATOR })).toBe(true);
+        expect(canAccessAdmin({ role: USER_ROLES.USER })).toBe(false);
+        expect(canAccessAdmin(null)).toBe(false);
+      });
+    });
+
+    describe('Display name helpers', () => {
+      test('getRoleDisplayName returns mapped Chinese name or original', () => {
+        expect(getRoleDisplayName(USER_ROLES.ADMIN)).toMatch(/管理员/);
+        expect(getRoleDisplayName('unknown_role')).toBe('unknown_role');
+      });
+
+      test('getPermissionDisplayName returns combined label', () => {
+        const label = getPermissionDisplayName(
+          `${PERMISSION_CATEGORIES.USERS}.${PERMISSION_ACTIONS.READ}`
+        );
+        expect(label).toMatch(/用户管理/);
+        expect(label).toMatch(/查看/);
+      });
     });
   });
 });

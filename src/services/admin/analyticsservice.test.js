@@ -211,4 +211,185 @@ describe('Analytics Service - Pure Functions', () => {
       expect(displayTexts).toEqual(['Daily', 'Weekly', 'Monthly']);
     });
   });
+
+  describe('Analytics Service - API calls (axios instance)', () => {
+    let axiosInstance;
+    let mod; // re-imported analyticsservice module with mocked axios
+
+    const setupAxiosMockAndImport = () => {
+      jest.resetModules();
+      jest.isolateModules(() => {
+        jest.doMock('axios', () => {
+          const instance = {
+            get: jest.fn(),
+            interceptors: {
+              request: { use: jest.fn() },
+              response: { use: jest.fn() },
+            },
+          };
+          instance.interceptors.request.use.mockImplementation((succ) => {
+            globalThis.__axiosReqSucc_Analytics = succ;
+          });
+          instance.interceptors.response.use.mockImplementation((succ, err) => {
+            globalThis.__axiosRespSucc_Analytics = succ;
+            globalThis.__axiosRespErr_Analytics = err;
+          });
+          const create = jest.fn(() => instance);
+          globalThis.__axiosMockAnalytics = { instance, create };
+          return { __esModule: true, default: { create }, create };
+        });
+        // re-require after mocking axios
+        // eslint-disable-next-line global-require
+        mod = require('./analyticsservice');
+      });
+      axiosInstance = globalThis.__axiosMockAnalytics.instance;
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      localStorage.clear();
+      setupAxiosMockAndImport();
+    });
+
+    describe('getAnalyticsSummary', () => {
+      test('returns success on code 200 and forwards period param', async () => {
+        axiosInstance.get.mockResolvedValueOnce({
+          data: { code: 200, data: { a: 1 }, timestamp: 't' },
+        });
+        const res = await mod.getAnalyticsSummary('weekly');
+        expect(res.success).toBe(true);
+        expect(res.data).toEqual({ a: 1 });
+        const [url, cfg] = axiosInstance.get.mock.calls[0];
+        expect(url).toBe('/admin/analytics/summary');
+        expect(cfg.params).toEqual({ period: 'weekly' });
+      });
+
+      test('returns success=false with error message on non-200', async () => {
+        axiosInstance.get.mockResolvedValueOnce({
+          data: { code: 400, message: 'bad' },
+        });
+        const res = await mod.getAnalyticsSummary('daily');
+        expect(res.success).toBe(false);
+        expect(res.error).toMatch(/bad|Failed to fetch analytics summary/i);
+      });
+
+      test('returns success=false on network error', async () => {
+        axiosInstance.get.mockRejectedValueOnce(new Error('net'));
+        const res = await mod.getAnalyticsSummary();
+        expect(res.success).toBe(false);
+        expect(res.error).toMatch(/net|Failed to fetch analytics summary/i);
+      });
+    });
+
+    describe('getUserTrends', () => {
+      test('returns success and forwards params', async () => {
+        axiosInstance.get.mockResolvedValueOnce({
+          data: { code: 200, data: [{ x: 1 }], timestamp: 't' },
+        });
+        const res = await mod.getUserTrends({
+          period: 'monthly',
+          startDate: '2024-01-01',
+          endDate: '2024-01-31',
+        });
+        expect(res.success).toBe(true);
+        expect(res.data).toEqual([{ x: 1 }]);
+        const [url, cfg] = axiosInstance.get.mock.calls[0];
+        expect(url).toBe('/admin/analytics/users/trends');
+        expect(cfg.params).toEqual({
+          period: 'monthly',
+          startDate: '2024-01-01',
+          endDate: '2024-01-31',
+        });
+      });
+
+      test('returns success=false on non-200', async () => {
+        axiosInstance.get.mockResolvedValueOnce({
+          data: { code: 500, message: 'fail' },
+        });
+        const res = await mod.getUserTrends();
+        expect(res.success).toBe(false);
+        expect(res.error).toMatch(/fail|Failed to fetch user trends/i);
+      });
+
+      test('returns success=false on network error', async () => {
+        axiosInstance.get.mockRejectedValueOnce(new Error('boom'));
+        const res = await mod.getUserTrends();
+        expect(res.success).toBe(false);
+        expect(res.error).toMatch(/boom|Failed to fetch user trends/i);
+      });
+    });
+
+    describe('getPlatformDAU', () => {
+      test('returns success and forwards date param', async () => {
+        axiosInstance.get.mockResolvedValueOnce({
+          data: { code: 200, data: { dau: [] } },
+        });
+        const res = await mod.getPlatformDAU('2024-03-01');
+        expect(res.success).toBe(true);
+        const [url, cfg] = axiosInstance.get.mock.calls[0];
+        expect(url).toBe('/admin/analytics/platform/dau');
+        expect(cfg.params).toEqual({ date: '2024-03-01' });
+      });
+
+      test('returns success=false on non-200', async () => {
+        axiosInstance.get.mockResolvedValueOnce({
+          data: { code: 400, message: 'no' },
+        });
+        const res = await mod.getPlatformDAU();
+        expect(res.success).toBe(false);
+        expect(res.error).toMatch(/no|Failed to fetch DAU data/i);
+      });
+
+      test('returns success=false on network error', async () => {
+        axiosInstance.get.mockRejectedValueOnce(new Error('err'));
+        const res = await mod.getPlatformDAU();
+        expect(res.success).toBe(false);
+        expect(res.error).toMatch(/err|Failed to fetch DAU data/i);
+      });
+    });
+
+    describe('interceptors', () => {
+      test('request interceptor attaches Authorization header from localStorage', async () => {
+        localStorage.setItem('accessToken', 'tok-xyz');
+        const succ = globalThis.__axiosReqSucc_Analytics;
+        const cfg = await succ({ headers: {} });
+        expect(cfg.headers.Authorization).toBe('Bearer tok-xyz');
+      });
+
+      test('response interceptor 401 clears tokens and redirects to /admin/login', async () => {
+        localStorage.setItem('accessToken', 'a');
+        localStorage.setItem('refreshToken', 'r');
+        localStorage.setItem('tokenType', 'Bearer');
+        localStorage.setItem('expiresIn', '3600');
+
+        const originalLocation = window.location;
+        // @ts-ignore
+        delete window.location;
+        // @ts-ignore
+        window.location = { href: '' };
+
+        const errHandler = globalThis.__axiosRespErr_Analytics;
+        await expect(
+          errHandler({ response: { status: 401 } })
+        ).rejects.toBeDefined();
+
+        expect(localStorage.getItem('accessToken')).toBeNull();
+        expect(localStorage.getItem('refreshToken')).toBeNull();
+        expect(localStorage.getItem('tokenType')).toBeNull();
+        expect(localStorage.getItem('expiresIn')).toBeNull();
+        expect(window.location.href).toBe('/admin/login');
+
+        window.location = originalLocation;
+      });
+
+      test('response interceptor non-401 rejects and does not clear tokens', async () => {
+        localStorage.setItem('accessToken', 'keep');
+        const errHandler = globalThis.__axiosRespErr_Analytics;
+        await expect(
+          errHandler({ response: { status: 500 } })
+        ).rejects.toBeDefined();
+        expect(localStorage.getItem('accessToken')).toBe('keep');
+      });
+    });
+  });
 });

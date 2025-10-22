@@ -1,372 +1,208 @@
+jest.mock('axios', () => {
+  const callable = jest.fn((config) =>
+    Promise.resolve({ data: { retried: true, config } })
+  );
+  callable.post = jest.fn();
+  callable.get = jest.fn();
+  callable.interceptors = {
+    request: { use: jest.fn() },
+    response: { use: jest.fn() },
+  };
+
+  callable.interceptors.request.use.mockImplementation((succ) => {
+    globalThis.__axiosReqSucc_Auth = succ;
+  });
+  callable.interceptors.response.use.mockImplementation((succ, err) => {
+    globalThis.__axiosRespSucc_Auth = succ;
+    globalThis.__axiosRespErr_Auth = err;
+  });
+  const create = jest.fn(() => callable);
+  globalThis.__axiosMockAuth = { instance: callable, create };
+  return { __esModule: true, default: { create }, create };
+});
+
 import authService from './authservice';
 
-describe('Auth Service', () => {
+let axiosInstance;
+
+describe('authservice', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
-  });
-
-  describe('Auth Service Structure', () => {
-    test('should export auth service object', () => {
-      expect(authService).toBeDefined();
-      expect(typeof authService).toBe('object');
+    axiosInstance = globalThis.__axiosMockAuth.instance;
+    axiosInstance.interceptors.request.use.mockImplementation((succ) => {
+      globalThis.__axiosReqSucc_Auth = succ;
     });
-
-    test('should have login method', () => {
-      expect(authService.login).toBeDefined();
-      expect(typeof authService.login).toBe('function');
-    });
-
-    test('should have logout method', () => {
-      expect(authService.logout).toBeDefined();
-      expect(typeof authService.logout).toBe('function');
-    });
-
-    test('should have isAuthenticated method', () => {
-      expect(authService.isAuthenticated).toBeDefined();
-      expect(typeof authService.isAuthenticated).toBe('function');
-    });
-
-    test('should have refreshToken method', () => {
-      expect(authService.refreshToken).toBeDefined();
-      expect(typeof authService.refreshToken).toBe('function');
-    });
-
-    test('should have getCurrentUser method', () => {
-      expect(authService.getCurrentUser).toBeDefined();
-      expect(typeof authService.getCurrentUser).toBe('function');
-    });
-
-    test('should have setupTokenRefresh method', () => {
-      expect(authService.setupTokenRefresh).toBeDefined();
-      expect(typeof authService.setupTokenRefresh).toBe('function');
-    });
-
-    test('should have initializeAuth method', () => {
-      expect(authService.initializeAuth).toBeDefined();
-      expect(typeof authService.initializeAuth).toBe('function');
-    });
-
-    test('should have refreshTimer property', () => {
-      expect(authService.refreshTimer !== undefined).toBe(true);
+    axiosInstance.interceptors.response.use.mockImplementation((succ, err) => {
+      globalThis.__axiosRespSucc_Auth = succ;
+      globalThis.__axiosRespErr_Auth = err;
     });
   });
 
-  describe('getCurrentUser', () => {
-    test('should return user data when stored in localStorage', () => {
-      const userData = { uuid: '123', username: 'admin', isAdmin: true };
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      const user = authService.getCurrentUser();
-      expect(user).toEqual(userData);
+  describe('login', () => {
+    test('rejects when user is not admin', async () => {
+      axiosInstance.post.mockResolvedValueOnce({
+        data: {
+          code: 200,
+          data: {
+            isAdmin: false,
+            accessToken: 'a',
+            refreshToken: 'r',
+            tokenType: 'Bearer',
+            expiresIn: 3600,
+            uuid: 'u',
+            email: 'e',
+            username: 'n',
+            avatarUrl: '',
+            isAuthor: false,
+            level: 1,
+            status: 'NORMAL',
+            lastActive: '',
+            createTime: '',
+          },
+        },
+      });
+      await expect(
+        authService.login({ username: 'u', password: 'p' })
+      ).rejects.toThrow(/Admin privileges required/i);
     });
 
-    test('should return null when no user data in localStorage', () => {
-      const user = authService.getCurrentUser();
-      expect(user).toBeNull();
-    });
-
-    test('should return null on invalid JSON in localStorage', () => {
-      localStorage.setItem('admin_user', 'invalid json');
-      const user = authService.getCurrentUser();
-      expect(user).toBeNull();
-    });
-
-    test('should parse user object correctly', () => {
-      const userData = {
-        uuid: 'user-123',
-        email: 'admin@example.com',
-        username: 'testadmin',
-        isAdmin: true,
-      };
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      const user = authService.getCurrentUser();
-      expect(user.uuid).toBe('user-123');
-      expect(user.email).toBe('admin@example.com');
-    });
-  });
-
-  describe('isAuthenticated', () => {
-    test('should return true when both token and admin user exist', () => {
-      const userData = { isAdmin: true };
-      localStorage.setItem('accessToken', 'test-token');
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      expect(authService.isAuthenticated()).toBe(true);
-    });
-
-    test('should return false when no token exists', () => {
-      const userData = { isAdmin: true };
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      expect(authService.isAuthenticated()).toBe(false);
-    });
-
-    test('should return false when no user data exists', () => {
-      localStorage.setItem('accessToken', 'test-token');
-      expect(authService.isAuthenticated()).toBe(false);
-    });
-
-    test('should return false when user is not admin', () => {
-      const userData = { isAdmin: false };
-      localStorage.setItem('accessToken', 'test-token');
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      expect(authService.isAuthenticated()).toBe(false);
-    });
-
-    test('should return false when token is empty', () => {
-      const userData = { isAdmin: true };
-      localStorage.setItem('accessToken', '');
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      expect(authService.isAuthenticated()).toBe(false);
+    test('rejects on backend error code', async () => {
+      axiosInstance.post.mockResolvedValueOnce({
+        data: { code: 400, message: 'bad' },
+      });
+      await expect(
+        authService.login({ username: 'x', password: 'y' })
+      ).rejects.toThrow(/bad|Login failed/i);
     });
   });
 
-  describe('Logout', () => {
-    test('should remove accessToken from localStorage', async () => {
-      localStorage.setItem('accessToken', 'token');
+  describe('refreshToken', () => {
+    test('success: updates tokens and calls setupTokenRefresh', async () => {
+      localStorage.setItem('refreshToken', 'rtk');
+      axiosInstance.post.mockResolvedValueOnce({
+        data: {
+          code: 200,
+          data: { accessToken: 'atk2', refreshToken: 'rtk2', expiresIn: 1800 },
+        },
+      });
+      const spySetup = jest
+        .spyOn(authService, 'setupTokenRefresh')
+        .mockImplementation(() => {});
+      const res = await authService.refreshToken();
+      expect(res.success).toBe(true);
+      expect(localStorage.getItem('accessToken')).toBe('atk2');
+      expect(localStorage.getItem('refreshToken')).toBe('rtk2');
+      expect(spySetup).toHaveBeenCalledWith(1800);
+      spySetup.mockRestore();
+    });
+
+    test('throws when no refresh token available', async () => {
+      await expect(authService.refreshToken()).rejects.toThrow(
+        /No refresh token/i
+      );
+    });
+  });
+
+  describe('logout', () => {
+    test('clears storage and timer even if API call succeeds', async () => {
+      localStorage.setItem('accessToken', 'tok');
+      authService.refreshTimer = setTimeout(() => {}, 1000);
+      axiosInstance.post.mockResolvedValueOnce({ data: { code: 200 } });
+      const res = await authService.logout();
+      expect(res.success).toBe(true);
+      expect(localStorage.getItem('accessToken')).toBeNull();
+      expect(authService.refreshTimer).toBeNull();
+    });
+
+    test('clears storage even if API call fails', async () => {
+      localStorage.setItem('accessToken', 'tok');
+      axiosInstance.post.mockRejectedValueOnce(new Error('net'));
       await authService.logout();
       expect(localStorage.getItem('accessToken')).toBeNull();
     });
+  });
 
-    test('should remove refreshToken from localStorage', async () => {
-      localStorage.setItem('refreshToken', 'token');
-      await authService.logout();
-      expect(localStorage.getItem('refreshToken')).toBeNull();
-    });
-
-    test('should remove admin_user from localStorage', async () => {
-      localStorage.setItem('admin_user', JSON.stringify({}));
-      await authService.logout();
-      expect(localStorage.getItem('admin_user')).toBeNull();
-    });
-
-    test('should remove tokenType from localStorage', async () => {
-      localStorage.setItem('tokenType', 'Bearer');
-      await authService.logout();
-      expect(localStorage.getItem('tokenType')).toBeNull();
-    });
-
-    test('should remove expiresIn from localStorage', async () => {
-      localStorage.setItem('expiresIn', '3600');
-      await authService.logout();
-      expect(localStorage.getItem('expiresIn')).toBeNull();
-    });
-
-    test('should return success response', async () => {
-      const result = await authService.logout();
-      expect(result.success).toBe(true);
-    });
-
-    test('should clear refresh timer', async () => {
-      authService.refreshTimer = setTimeout(() => {}, 1000);
-      await authService.logout();
-      expect(authService.refreshTimer).toBeNull();
+  describe('interceptors', () => {
+    test('request interceptor attaches Authorization header from localStorage', async () => {
+      localStorage.setItem('accessToken', 'tok-xyz');
+      const succ = globalThis.__axiosReqSucc_Auth;
+      const cfg = await succ({ headers: {} });
+      expect(cfg.headers.Authorization).toBe('Bearer tok-xyz');
     });
   });
 
-  describe('Token Refresh Setup', () => {
-    test('should store tokens in correct localStorage keys', () => {
-      const tokens = {
-        accessToken: 'access-token-value',
-        refreshToken: 'refresh-token-value',
-        tokenType: 'Bearer',
-        expiresIn: '3600',
-      };
+  describe('isAuthenticated and getCurrentUser', () => {
+    test('isAuthenticated true only when token exists and user is admin', () => {
+      localStorage.setItem('accessToken', 'tok');
+      localStorage.setItem('admin_user', JSON.stringify({ isAdmin: true }));
+      expect(authService.isAuthenticated()).toBe(true);
 
-      Object.entries(tokens).forEach(([key, value]) => {
-        localStorage.setItem(key, value);
-      });
+      localStorage.setItem('admin_user', JSON.stringify({ isAdmin: false }));
+      expect(authService.isAuthenticated()).toBe(false);
 
-      expect(localStorage.getItem('accessToken')).toBe('access-token-value');
-      expect(localStorage.getItem('refreshToken')).toBe('refresh-token-value');
-      expect(localStorage.getItem('tokenType')).toBe('Bearer');
+      localStorage.removeItem('admin_user');
+      expect(authService.isAuthenticated()).toBe(false);
     });
 
-    test('setupTokenRefresh should accept expiresIn duration', () => {
-      expect(() => authService.setupTokenRefresh(3600)).not.toThrow();
-    });
+    test('getCurrentUser parses stored JSON and handles invalid JSON gracefully', () => {
+      const user = { uuid: 'u', isAdmin: true };
+      localStorage.setItem('admin_user', JSON.stringify(user));
+      expect(authService.getCurrentUser()).toEqual(user);
 
-    test('setupTokenRefresh should clear existing timer', () => {
-      authService.refreshTimer = setTimeout(() => {}, 1000);
-      authService.setupTokenRefresh(3600);
-      expect(authService.refreshTimer).toBeDefined();
-    });
-
-    test('should not create timer for negative refresh time', () => {
-      authService.refreshTimer = null;
-      authService.setupTokenRefresh(-100);
-      expect(authService.refreshTimer).toBeNull();
-    });
-  });
-
-  describe('Credentials Validation', () => {
-    test('should accept email as username in credentials', () => {
-      const credentials = {
-        username: 'admin@example.com',
-        password: 'password123',
-      };
-      expect(credentials.username).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-    });
-
-    test('should validate email format', () => {
-      const email = 'test@example.com';
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      expect(emailRegex.test(email)).toBe(true);
-    });
-
-    test('should reject invalid email format', () => {
-      const email = 'invalid-email';
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      expect(emailRegex.test(email)).toBe(false);
-    });
-
-    test('should validate password minimum length', () => {
-      const password = 'pass123';
-      expect(password.length >= 6).toBe(true);
-    });
-
-    test('should reject short password', () => {
-      const password = 'pass';
-      expect(password.length >= 6).toBe(false);
-    });
-  });
-
-  describe('Authorization Headers', () => {
-    test('should format Bearer token correctly', () => {
-      const token = 'abc123xyz';
-      const bearerToken = `Bearer ${token}`;
-      expect(bearerToken).toMatch(/^Bearer /);
-    });
-
-    test('should include token in Authorization header', () => {
-      const token = 'test-token';
-      const headers = { Authorization: `Bearer ${token}` };
-      expect(headers.Authorization).toBe('Bearer test-token');
-    });
-
-    test('should set content-type header', () => {
-      const headers = { 'Content-Type': 'application/json' };
-      expect(headers['Content-Type']).toBe('application/json');
-    });
-  });
-
-  describe('Error Handling', () => {
-    test('should handle 401 unauthorized error', () => {
-      const error = { response: { status: 401 } };
-      expect(error.response.status).toBe(401);
-    });
-
-    test('should handle 403 forbidden error', () => {
-      const error = { response: { status: 403 } };
-      expect(error.response.status).toBe(403);
-    });
-
-    test('should handle network errors', () => {
-      const error = new Error('Network failed');
-      expect(error.message).toBe('Network failed');
-    });
-
-    test('should handle admin privilege check failure', () => {
-      const userData = { isAdmin: false };
-      expect(userData.isAdmin).toBe(false);
-    });
-  });
-
-  describe('API Endpoints', () => {
-    test('should use login endpoint', () => {
-      const endpoint = '/auth/login';
-      expect(endpoint).toMatch(/^\/auth/);
-    });
-
-    test('should use logout endpoint', () => {
-      const endpoint = '/auth/logout';
-      expect(endpoint).toMatch(/^\/auth/);
-    });
-
-    test('should use refresh endpoint', () => {
-      const endpoint = '/auth/refresh';
-      expect(endpoint).toMatch(/^\/auth/);
-    });
-
-    test('should use correct base URL', () => {
-      const baseUrl = 'https://yushan-backend-staging.up.railway.app/api';
-      expect(baseUrl).toContain('api');
-    });
-  });
-
-  describe('User Data Storage', () => {
-    test('should store admin_user in localStorage', () => {
-      const userData = { uuid: '123', isAdmin: true };
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      expect(localStorage.getItem('admin_user')).toBeDefined();
-    });
-
-    test('should preserve user permissions on storage', () => {
-      const userData = {
-        isAdmin: true,
-        permissions: ['read', 'write', 'delete'],
-      };
-      localStorage.setItem('admin_user', JSON.stringify(userData));
-      const stored = JSON.parse(localStorage.getItem('admin_user'));
-      expect(stored.permissions).toHaveLength(3);
-    });
-
-    test('should extract user role from isAdmin flag', () => {
-      const isAdmin = true;
-      const role = isAdmin ? 'admin' : 'user';
-      expect(role).toBe('admin');
-    });
-
-    test('should set user role to user when not admin', () => {
-      const isAdmin = false;
-      const role = isAdmin ? 'admin' : 'user';
-      expect(role).toBe('user');
-    });
-  });
-
-  describe('Auth Response Processing', () => {
-    test('should extract user data from successful login response', () => {
-      const response = {
-        code: 200,
-        data: {
-          uuid: '123',
-          email: 'admin@example.com',
-          isAdmin: true,
-          accessToken: 'token',
-        },
-      };
-      expect(response.code).toBe(200);
-      expect(response.data.isAdmin).toBe(true);
-    });
-
-    test('should verify success response code is 200', () => {
-      const response = { code: 200 };
-      expect(response.code).toBe(200);
-    });
-
-    test('should verify error response code is not 200', () => {
-      const response = { code: 401 };
-      expect(response.code).not.toBe(200);
-    });
-
-    test('should extract error message from response', () => {
-      const response = { code: 401, message: 'Unauthorized' };
-      expect(response.message).toBeDefined();
+      localStorage.setItem('admin_user', 'invalid');
+      expect(authService.getCurrentUser()).toBeNull();
     });
   });
 
   describe('initializeAuth', () => {
-    test('should return false when no token exists', async () => {
-      const result = await authService.initializeAuth();
-      expect(result).toBe(false);
+    test('returns false when no token exists', async () => {
+      const res = await authService.initializeAuth();
+      expect(res).toBe(false);
     });
 
-    test('should verify token structure requirements', () => {
-      const token = 'valid-token-string';
-      const expiresIn = '3600';
-      localStorage.setItem('accessToken', token);
-      localStorage.setItem('expiresIn', expiresIn);
+    test('returns true and sets refresh when token not expired', async () => {
+      const now = Math.floor(Date.now() / 1000);
+      localStorage.setItem('accessToken', 'tok');
+      localStorage.setItem('expiresIn', String(now + 3600));
+      const spy = jest
+        .spyOn(authService, 'setupTokenRefresh')
+        .mockImplementation(() => {});
+      const res = await authService.initializeAuth();
+      expect(res).toBe(true);
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
 
-      expect(localStorage.getItem('accessToken')).toBeDefined();
-      expect(localStorage.getItem('expiresIn')).toBeDefined();
+    test('expired token tries to refresh: success -> true', async () => {
+      const now = Math.floor(Date.now() / 1000);
+      localStorage.setItem('accessToken', 'tok');
+      localStorage.setItem('expiresIn', String(now - 10));
+      const spyRefresh = jest
+        .spyOn(authService, 'refreshToken')
+        .mockResolvedValue({ success: true });
+      const res = await authService.initializeAuth();
+      expect(res).toBe(true);
+      expect(spyRefresh).toHaveBeenCalled();
+      spyRefresh.mockRestore();
+    });
+
+    test('expired token refresh fails -> logout and false', async () => {
+      const now = Math.floor(Date.now() / 1000);
+      localStorage.setItem('accessToken', 'tok');
+      localStorage.setItem('expiresIn', String(now - 10));
+      const spyRefresh = jest
+        .spyOn(authService, 'refreshToken')
+        .mockRejectedValue(new Error('no'));
+      const spyLogout = jest
+        .spyOn(authService, 'logout')
+        .mockResolvedValue({ success: true });
+      const res = await authService.initializeAuth();
+      expect(res).toBe(false);
+      expect(spyRefresh).toHaveBeenCalled();
+      expect(spyLogout).toHaveBeenCalled();
+      spyRefresh.mockRestore();
+      spyLogout.mockRestore();
     });
   });
 });

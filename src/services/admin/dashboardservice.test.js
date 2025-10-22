@@ -1,181 +1,253 @@
 jest.mock('axios');
-jest.mock('./api');
+// Mock ./api with controllable get()
+jest.mock('./api', () => ({
+  __esModule: true,
+  default: { get: jest.fn() },
+}));
 
-describe('Dashboard Service', () => {
+import dashboardService from './dashboardservice';
+
+const api = require('./api').default;
+
+describe('dashboardService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    localStorage.setItem('accessToken', 'test-token');
   });
 
-  describe('Service Purpose and API Structure', () => {
-    test('service should provide dashboard endpoints', () => {
-      const endpoints = {
-        getDashboardStats: '/admin/analytics/platform/overview',
-        getRecentActivity: '/admin/activity/recent',
-        getAnalyticsSummary: '/admin/analytics/summary',
+  describe('getDashboardStats', () => {
+    test('returns mapped stats on code 200', async () => {
+      const payload = {
+        totalUsers: 100,
+        newUsersToday: 5,
+        activeUsers: 80,
+        authors: 10,
+        admins: 2,
+        totalNovels: 50,
+        publishedNovels: 40,
+        completedNovels: 20,
+        totalChapters: 500,
+        totalWords: 1000000,
+        totalViews: 200000,
+        totalComments: 3000,
+        totalReviews: 800,
+        totalVotes: 1200,
+        averageRating: 4.2,
+        userGrowthRate: 3.1,
+        contentGrowthRate: 2.4,
+        engagementGrowthRate: 5.6,
+        dailyActiveUsers: 70,
+        weeklyActiveUsers: 200,
+        monthlyActiveUsers: 500,
+        timestamp: '2025-01-01T00:00:00Z',
       };
-      expect(Object.keys(endpoints).length).toBeGreaterThan(0);
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: payload } });
+
+      const res = await dashboardService.getDashboardStats();
+      expect(res.success).toBe(true);
+      expect(res.data.totalUsers).toBe(100);
+      expect(res.data.totalNovels).toBe(50);
+      expect(res.data.totalViews).toBe(200000);
+      expect(res.data.lastUpdated).toBe(payload.timestamp);
+
+      const [url] = api.get.mock.calls[0];
+      expect(url).toEqual(
+        expect.stringContaining('/admin/analytics/platform/overview')
+      );
+    });
+
+    test('throws on non-200 code', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 500, message: 'fail' } });
+      await expect(dashboardService.getDashboardStats()).rejects.toThrow(
+        /fail|Failed to fetch dashboard statistics/i
+      );
+    });
+
+    test('throws on network error', async () => {
+      api.get.mockRejectedValueOnce(new Error('net'));
+      await expect(dashboardService.getDashboardStats()).rejects.toThrow(
+        /net|Failed to fetch dashboard statistics/i
+      );
     });
   });
 
-  describe('Dashboard Statistics', () => {
-    test('dashboard stats should include user metrics', () => {
-      const stats = {
-        totalUsers: 5000,
-        newUsersToday: 50,
-        activeUsers: 3000,
-      };
-      expect(stats.totalUsers).toBeGreaterThan(0);
-    });
-
-    test('dashboard stats should include novel metrics', () => {
-      const stats = {
-        totalNovels: 2000,
-        publishedNovels: 1800,
-        completedNovels: 500,
-      };
-      expect(stats.totalNovels).toBeGreaterThan(0);
-    });
-
-    test('dashboard stats should include engagement metrics', () => {
-      const stats = {
-        totalViews: 100000,
-        totalComments: 5000,
-        totalReviews: 2000,
-      };
-      expect(stats.totalViews).toBeGreaterThan(0);
+  describe('getRecentActivity', () => {
+    test('returns empty array (placeholder implementation)', async () => {
+      const res = await dashboardService.getRecentActivity();
+      expect(res.success).toBe(true);
+      expect(Array.isArray(res.data)).toBe(true);
+      expect(res.data).toHaveLength(0);
+      expect(api.get).not.toHaveBeenCalled();
     });
   });
 
-  describe('Activity Feed', () => {
-    test('recent activity should return array', () => {
-      const activities = [];
-      expect(Array.isArray(activities)).toBe(true);
+  describe('getAnalyticsSummary', () => {
+    test('returns data on code 200 and forwards period param', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: { a: 1 } } });
+      const res = await dashboardService.getAnalyticsSummary('weekly');
+      expect(res.success).toBe(true);
+      expect(res.data).toEqual({ a: 1 });
+
+      const [url, cfg] = api.get.mock.calls[0];
+      expect(url).toEqual(expect.stringContaining('/admin/analytics/summary'));
+      expect(cfg.params).toEqual({ period: 'weekly' });
     });
 
-    test('activity items should have timestamps', () => {
-      const activity = { timestamp: '2024-01-01T00:00:00Z' };
-      expect(activity.timestamp).toBeDefined();
-    });
-  });
-
-  describe('Analytics Summary', () => {
-    test('should support daily period', () => {
-      const period = 'daily';
-      expect(['daily', 'weekly', 'monthly']).toContain(period);
-    });
-
-    test('should support weekly period', () => {
-      const period = 'weekly';
-      expect(['daily', 'weekly', 'monthly']).toContain(period);
-    });
-
-    test('should support monthly period', () => {
-      const period = 'monthly';
-      expect(['daily', 'weekly', 'monthly']).toContain(period);
+    test('throws on non-200 code', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 400, message: 'bad' } });
+      await expect(
+        dashboardService.getAnalyticsSummary('daily')
+      ).rejects.toThrow(/bad|Failed to fetch analytics summary/i);
     });
   });
 
-  describe('Growth Metrics', () => {
-    test('should calculate user growth rate', () => {
-      const today = 100;
-      const yesterday = 90;
-      const growthRate = ((today - yesterday) / yesterday) * 100;
-      expect(growthRate > 0).toBe(true);
-    });
+  describe('getUserTrends', () => {
+    test('returns data and forwards params', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: [1, 2] } });
+      const res = await dashboardService.getUserTrends(
+        'monthly',
+        '2024-01-01',
+        '2024-01-31'
+      );
+      expect(res.success).toBe(true);
+      expect(res.data).toEqual([1, 2]);
 
-    test('should calculate content growth', () => {
-      const newNovels = 50;
-      expect(newNovels).toBeGreaterThan(0);
-    });
-
-    test('should calculate engagement growth', () => {
-      const growth = 15;
-      expect(growth).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Data Aggregation', () => {
-    test('should aggregate user statistics', () => {
-      const users = {
-        active: 1000,
-        inactive: 500,
-        new: 100,
-      };
-      expect(users.active).toBeGreaterThan(0);
-    });
-
-    test('should aggregate content statistics', () => {
-      const content = {
-        total: 2000,
-        published: 1800,
-        draft: 200,
-      };
-      expect(content.total).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Metric Formatting', () => {
-    test('should format currency values', () => {
-      const amount = 1000.5;
-      const formatted = amount.toFixed(2);
-      expect(formatted).toBe('1000.50');
-    });
-
-    test('should format percentage values', () => {
-      const percentage = 45.5;
-      expect(percentage >= 0 && percentage <= 100).toBe(true);
-    });
-
-    test('should format large numbers', () => {
-      const number = 1000000;
-      expect(number).toBeGreaterThan(999999);
-    });
-  });
-
-  describe('Time Range Parameters', () => {
-    test('should support start and end dates', () => {
-      const params = {
+      const [url, cfg] = api.get.mock.calls[0];
+      expect(url).toEqual(
+        expect.stringContaining('/admin/analytics/users/trends')
+      );
+      expect(cfg.params).toEqual({
+        period: 'monthly',
         startDate: '2024-01-01',
-        endDate: '2024-12-31',
-      };
-      expect(params.startDate).toBeDefined();
-      expect(params.endDate).toBeDefined();
+        endDate: '2024-01-31',
+      });
     });
 
-    test('should format dates correctly', () => {
-      const date = '2024-01-01';
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      expect(dateRegex.test(date)).toBe(true);
-    });
-  });
-
-  describe('Error Handling', () => {
-    test('should handle stats not available', () => {
-      const error = { status: 404 };
-      expect(error.status).toBe(404);
-    });
-
-    test('should handle unauthorized access', () => {
-      const error = { status: 401 };
-      expect(error.status).toBe(401);
-    });
-
-    test('should handle server errors', () => {
-      const error = { status: 500 };
-      expect(error.status).toBe(500);
+    test('throws on error', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 500, message: 'x' } });
+      await expect(dashboardService.getUserTrends()).rejects.toThrow(
+        /x|Failed to fetch user trends/i
+      );
     });
   });
 
-  describe('Request Interceptors', () => {
-    test('should attach authorization token', () => {
-      const token = 'Bearer test-token-123';
-      expect(token).toMatch(/^Bearer /);
+  describe('getNovelTrends', () => {
+    test('returns data and forwards extended params', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: [{ id: 1 }] } });
+      const res = await dashboardService.getNovelTrends(
+        'daily',
+        '2024-01-01',
+        '2024-01-31',
+        'cat1',
+        'auth9',
+        1
+      );
+      expect(res.success).toBe(true);
+      expect(res.data).toEqual([{ id: 1 }]);
+
+      const [url, cfg] = api.get.mock.calls[0];
+      expect(url).toEqual(
+        expect.stringContaining('/admin/analytics/novels/trends')
+      );
+      expect(cfg.params).toEqual({
+        period: 'daily',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        categoryId: 'cat1',
+        authorId: 'auth9',
+        status: 1,
+      });
     });
 
-    test('should set content-type header', () => {
-      const headers = { 'Content-Type': 'application/json' };
-      expect(headers['Content-Type']).toBe('application/json');
+    test('throws on non-200 code', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 400, message: 'bad' } });
+      await expect(dashboardService.getNovelTrends()).rejects.toThrow(
+        /bad|Failed to fetch novel trends/i
+      );
+    });
+  });
+
+  describe('getReadingActivity', () => {
+    test('returns data and forwards params', async () => {
+      api.get.mockResolvedValueOnce({
+        data: { code: 200, data: { hours: [] } },
+      });
+      const res = await dashboardService.getReadingActivity(
+        'weekly',
+        '2024-02-01',
+        '2024-02-28'
+      );
+      expect(res.success).toBe(true);
+      expect(res.data).toEqual({ hours: [] });
+
+      const [url, cfg] = api.get.mock.calls[0];
+      expect(url).toEqual(
+        expect.stringContaining('/admin/analytics/reading/activity')
+      );
+      expect(cfg.params).toEqual({
+        period: 'weekly',
+        startDate: '2024-02-01',
+        endDate: '2024-02-28',
+      });
+    });
+
+    test('throws on non-200 code', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 500, message: 'err' } });
+      await expect(dashboardService.getReadingActivity()).rejects.toThrow(
+        /err|Failed to fetch reading activity/i
+      );
+    });
+  });
+
+  describe('getTopContent', () => {
+    test('returns data and forwards limit param', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: ['a'] } });
+      const res = await dashboardService.getTopContent(7);
+      expect(res.success).toBe(true);
+      expect(res.data).toEqual(['a']);
+
+      const [url, cfg] = api.get.mock.calls[0];
+      expect(url).toEqual(
+        expect.stringContaining('/admin/analytics/platform/top-content')
+      );
+      expect(cfg.params).toEqual({ limit: 7 });
+    });
+
+    test('throws on non-200 code', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 400, message: 'no' } });
+      await expect(dashboardService.getTopContent()).rejects.toThrow(
+        /no|Failed to fetch top content/i
+      );
+    });
+  });
+
+  describe('getDailyActiveUsers', () => {
+    test('default date is set (YYYY-MM-DD)', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: { dau: [] } } });
+      const res = await dashboardService.getDailyActiveUsers();
+      expect(res.success).toBe(true);
+
+      const [url, cfg] = api.get.mock.calls[0];
+      expect(url).toEqual(
+        expect.stringContaining('/admin/analytics/platform/dau')
+      );
+      expect(cfg.params.date).toEqual(
+        expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)
+      );
+    });
+
+    test('forwards provided date param', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 200, data: { dau: [] } } });
+      await dashboardService.getDailyActiveUsers('2024-03-01');
+
+      const [, cfg] = api.get.mock.calls[0];
+      expect(cfg.params.date).toBe('2024-03-01');
+    });
+
+    test('throws on non-200 code', async () => {
+      api.get.mockResolvedValueOnce({ data: { code: 500, message: 'bad' } });
+      await expect(
+        dashboardService.getDailyActiveUsers('2024-03-02')
+      ).rejects.toThrow(/bad|Failed to fetch daily active users/i);
     });
   });
 });
