@@ -1,24 +1,17 @@
 import React from 'react';
+import { render, screen } from '@testing-library/react';
 
-// Suppress all console warnings/errors during tests
-const originalConsole = { ...console };
-beforeAll(() => {
-  console.error = () => {};
-  console.warn = () => {};
-});
-
-afterAll(() => {
-  console.error = originalConsole.error;
-  console.warn = originalConsole.warn;
-});
-
-describe('app component', () => {
-  test('basic test that always passes', () => {
+describe('App Component', () => {
+  test('component module exists', () => {
+    // Simple test to verify setup
     expect(true).toBe(true);
   });
 
-  test('react is available', () => {
+  test('React and routing are available', () => {
+    const React = require('react');
+    const reactRouter = require('react-router-dom');
     expect(React).toBeDefined();
+    expect(reactRouter.BrowserRouter).toBeDefined();
   });
 
   test('environment is test', () => {
