@@ -11,7 +11,6 @@ export { default as Writers } from './users/writers';
 
 // Content Management
 export { default as Novels } from './novels';
-export { default as NovelDetail } from './novels/noveldetail';
 export { default as Chapters } from './chapters';
 export { default as Categories } from './categories';
 
