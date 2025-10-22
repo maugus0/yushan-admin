@@ -1,21 +1,11 @@
-describe('Utility Module', () => {
-  test('module exists and is importable', () => {
-    expect(true).toBe(true);
+describe('ExportUtils Utility', () => {
+  test('export utils module can be imported', () => {
+    const exportUtils = require('./exportutils');
+    expect(exportUtils).toBeDefined();
   });
 
-  test('exports functions correctly', () => {
-    expect(typeof describe).toBe('function');
-  });
-
-  test('handles basic operations', () => {
-    expect(true).toBe(true);
-  });
-
-  test('utility is properly structured', () => {
-    expect(true).toBe(true);
-  });
-
-  test('all expected functions work', () => {
-    expect(true).toBe(true);
+  test('export utils is an object', () => {
+    const exportUtils = require('./exportutils');
+    expect(typeof exportUtils).toBe('object');
   });
 });

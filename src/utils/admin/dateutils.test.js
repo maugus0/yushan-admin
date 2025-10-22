@@ -1,21 +1,11 @@
-describe('Utility Module', () => {
-  test('module exists and is importable', () => {
-    expect(true).toBe(true);
+describe('DateUtils Utility', () => {
+  test('date utils module can be imported', () => {
+    const dateUtils = require('./dateutils');
+    expect(dateUtils).toBeDefined();
   });
 
-  test('exports functions correctly', () => {
-    expect(typeof describe).toBe('function');
-  });
-
-  test('handles basic operations', () => {
-    expect(true).toBe(true);
-  });
-
-  test('utility is properly structured', () => {
-    expect(true).toBe(true);
-  });
-
-  test('all expected functions work', () => {
-    expect(true).toBe(true);
+  test('date utils exports functions', () => {
+    const dateUtils = require('./dateutils');
+    expect(typeof dateUtils).toBe('object');
   });
 });

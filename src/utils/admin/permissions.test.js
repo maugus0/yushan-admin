@@ -1,21 +1,11 @@
-describe('Utility Module', () => {
-  test('module exists and is importable', () => {
-    expect(true).toBe(true);
+describe('Permissions Utility', () => {
+  test('permissions module can be imported', () => {
+    const permissions = require('./permissions');
+    expect(permissions).toBeDefined();
   });
 
-  test('exports functions correctly', () => {
-    expect(typeof describe).toBe('function');
-  });
-
-  test('handles basic operations', () => {
-    expect(true).toBe(true);
-  });
-
-  test('utility is properly structured', () => {
-    expect(true).toBe(true);
-  });
-
-  test('all expected functions work', () => {
-    expect(true).toBe(true);
+  test('permissions is an object with functions', () => {
+    const permissions = require('./permissions');
+    expect(typeof permissions).toBe('object');
   });
 });
