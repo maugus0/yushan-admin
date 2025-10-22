@@ -22,6 +22,31 @@ export const useSearch = (options = {}) => {
   const [suggestions, setSuggestions] = useState([]);
   const [error, setError] = useState(null);
 
+  // Add query to search history
+  const addToHistory = useCallback(
+    (searchQuery) => {
+      const trimmedQuery = searchQuery.trim();
+      if (!trimmedQuery) return;
+
+      setSearchHistory((prev) => {
+        const newHistory = [
+          trimmedQuery,
+          ...prev.filter((item) => item !== trimmedQuery),
+        ];
+        return newHistory.slice(0, maxHistoryItems);
+      });
+
+      setRecentSearches((prev) => {
+        const newRecent = [
+          trimmedQuery,
+          ...prev.filter((item) => item !== trimmedQuery),
+        ];
+        return newRecent.slice(0, 5); // Keep only 5 recent searches
+      });
+    },
+    [maxHistoryItems]
+  );
+
   // Debounced search function
   const debouncedSearch = useMemo(
     () =>
@@ -77,31 +102,6 @@ export const useSearch = (options = {}) => {
       }
     },
     [minLength, enableHistory, addToHistory]
-  );
-
-  // Add query to search history
-  const addToHistory = useCallback(
-    (searchQuery) => {
-      const trimmedQuery = searchQuery.trim();
-      if (!trimmedQuery) return;
-
-      setSearchHistory((prev) => {
-        const newHistory = [
-          trimmedQuery,
-          ...prev.filter((item) => item !== trimmedQuery),
-        ];
-        return newHistory.slice(0, maxHistoryItems);
-      });
-
-      setRecentSearches((prev) => {
-        const newRecent = [
-          trimmedQuery,
-          ...prev.filter((item) => item !== trimmedQuery),
-        ];
-        return newRecent.slice(0, 5); // Keep only 5 recent searches
-      });
-    },
-    [maxHistoryItems]
   );
 
   // Clear search history
