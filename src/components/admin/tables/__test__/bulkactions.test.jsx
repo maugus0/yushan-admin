@@ -4,7 +4,7 @@ import {
   screen,
   fireEvent,
   act,
-  waitFor
+  waitFor,
 } from '@testing-library/react';
 import { renderHook } from '@testing-library/react'; // For testing hooks
 import '@testing-library/jest-dom';
