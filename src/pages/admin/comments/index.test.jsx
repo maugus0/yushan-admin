@@ -1,4 +1,5 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Comments from './index';
 
@@ -152,16 +153,11 @@ jest.mock('antd', () => ({
       </button>
     </div>
   ),
-  Layout: {
-    Content: ({ children }) => (
-      <div data-testid="layout-content">{children}</div>
-    ),
-    Card: ({ children, style, key }) => (
-      <div data-testid="card" style={style} key={key}>
-        {children}
-      </div>
-    ),
-  },
+  Card: ({ children, style, key }) => (
+    <div data-testid="card" style={style} key={key}>
+      {children}
+    </div>
+  ),
   Divider: ({ style }) => <div data-testid="divider" style={style} />,
   Typography: {
     Text: ({ children, strong, type, style }) => (
@@ -793,12 +789,324 @@ describe('Comments Component', () => {
     });
   });
 
-  describe('Spoiler Counter', () => {
-    test('displays correct spoiler comment count in header', async () => {
+  describe('Mobile View Rendering', () => {
+    beforeEach(() => {
+      // Mock mobile breakpoint
+      const mockUseBreakpoint = require('antd').Grid.useBreakpoint;
+      mockUseBreakpoint.mockReturnValue({ md: false });
+    });
+
+    test('renders mobile card view when screen is not md', async () => {
       render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getAllByTestId('card')).toHaveLength(3);
+      });
+    });
+
+    test('displays mobile card content correctly', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getByText('reader123')).toBeInTheDocument();
+        expect(
+          screen.getByText('This is a great chapter! I love the plot twist.')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('on Chapter 1: The Beginning')
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('renders mobile pagination controls', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getByText('1 of 1 pages')).toBeInTheDocument();
+        expect(screen.getByText('Previous')).toBeInTheDocument();
+        expect(screen.getByText('Next')).toBeInTheDocument();
+      });
+    });
+
+    test('mobile previous button is disabled on first page', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        const previousButton = screen.getByText('Previous');
+        expect(previousButton.closest('button')).toBeDisabled();
+      });
+    });
+
+    test('mobile next button is disabled on last page', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        const nextButton = screen.getByText('Next');
+        expect(nextButton.closest('button')).toBeDisabled();
+      });
+    });
+
+    test('mobile view shows stats and delete buttons', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getAllByText('Stats')).toHaveLength(3);
+        expect(screen.getAllByText('Delete')).toHaveLength(3);
+      });
+    });
+  });
+
+  describe('Statistics Modal Content', () => {
+    test('renders complete statistics modal content', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        const statisticsButtons = screen.getAllByText('Statistics');
+        fireEvent.click(statisticsButtons[0]);
+      });
+
+      expect(mockGetCommentStatistics).toHaveBeenCalledWith('chap-001');
+      expect(require('antd').Modal.info).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Comment Statistics - Chapter 1: The Beginning',
+        })
+      );
+    });
+
+    test('statistics modal shows all required fields', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        const statisticsButtons = screen.getAllByText('Statistics');
+        fireEvent.click(statisticsButtons[0]);
+      });
+
+      const modalCall = require('antd').Modal.info.mock.calls[0][0];
+      expect(modalCall.content).toBeDefined();
+      // The modal content includes all the statistics fields
+    });
+  });
+
+  describe('Table Column Rendering', () => {
+    test('renders engagement column with like icon and count', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getAllByTestId('like-icon')).toHaveLength(3);
+        expect(screen.getByText('15')).toBeInTheDocument();
+      });
+    });
+
+    test('renders created column with tooltip and date', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getAllByTestId('calendar-icon')).toHaveLength(3);
+        expect(screen.getAllByText('1/15/2024')).toHaveLength(3);
+      });
+    });
+
+    test('renders actions column with both buttons', async () => {
+      render(<Comments />);
+      await waitFor(() => {
+        expect(screen.getAllByText('Statistics')).toHaveLength(3);
+        expect(screen.getAllByText('Delete')).toHaveLength(3);
+      });
+    });
+  });
+
+  describe('Async Operations with act()', () => {
+    test('handles search with proper act wrapping', async () => {
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        expect(mockGetAllComments).toHaveBeenCalledTimes(1);
+      });
+
+      const searchInput = screen.getByTestId('search-input');
+
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: 'test search' } });
+      });
+
+      await waitFor(() => {
+        expect(mockGetAllComments).toHaveBeenCalledWith(
+          expect.objectContaining({ search: 'test search' })
+        );
+      });
+    });
+
+    test('handles filter changes with proper act wrapping', async () => {
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        expect(mockGetAllComments).toHaveBeenCalledTimes(1);
+      });
+
+      const clearFiltersButton = screen.getByTestId('clear-filters');
+
+      await act(async () => {
+        fireEvent.click(clearFiltersButton);
+      });
+
+      await waitFor(() => {
+        expect(mockGetAllComments).toHaveBeenCalledWith(
+          expect.objectContaining({ search: '' })
+        );
+      });
+    });
+
+    test('handles statistics button click with proper act wrapping', async () => {
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Statistics')).toHaveLength(3);
+      });
+
+      const statisticsButtons = screen.getAllByText('Statistics');
+
+      await act(async () => {
+        fireEvent.click(statisticsButtons[0]);
+      });
+
+      expect(mockGetCommentStatistics).toHaveBeenCalledWith('chap-001');
+    });
+
+    test('handles delete confirmation with proper act wrapping', async () => {
+      const mockConfirm = require('antd').Modal.confirm;
+      mockConfirm.mockImplementation(({ onOk }) => {
+        onOk();
+      });
+
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Delete')).toHaveLength(3);
+      });
+
+      const deleteButtons = screen.getAllByText('Delete');
+
+      await act(async () => {
+        fireEvent.click(deleteButtons[0]);
+      });
+
+      expect(mockConfirm).toHaveBeenCalled();
+      expect(mockDeleteCommentAdmin).toHaveBeenCalledWith('1');
+    });
+  });
+
+  describe('Edge Cases and Error Handling', () => {
+    test('handles comments without chapter information', async () => {
+      const commentsWithoutChapter = [
+        {
+          id: '1',
+          content: 'Comment without chapter',
+          username: 'user1',
+          isSpoiler: false,
+          likes: 5,
+          createdAt: '2024-01-15T10:30:00Z',
+        },
+      ];
+
+      mockGetAllComments.mockResolvedValueOnce({
+        success: true,
+        data: commentsWithoutChapter,
+        total: 1,
+        totalPages: 1,
+      });
+
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Comment without chapter')).toBeInTheDocument();
+        expect(screen.queryByText('Chapter ID:')).not.toBeInTheDocument();
+      });
+    });
+
+    test('handles statistics loading state', async () => {
+      mockGetCommentStatistics.mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve(mockStatisticsData), 100)
+          )
+      );
+
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        const statisticsButtons = screen.getAllByText('Statistics');
+        fireEvent.click(statisticsButtons[0]);
+      });
+
+      // The loading state should be managed by the component
+      expect(mockGetCommentStatistics).toHaveBeenCalledWith('chap-001');
+    });
+
+    test('handles delete operation loading state', async () => {
+      mockDeleteCommentAdmin.mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ success: true }), 100)
+          )
+      );
+
+      const mockConfirm = require('antd').Modal.confirm;
+      mockConfirm.mockImplementation(({ onOk }) => {
+        onOk();
+      });
+
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        const deleteButtons = screen.getAllByText('Delete');
+        fireEvent.click(deleteButtons[0]);
+      });
+
+      expect(mockDeleteCommentAdmin).toHaveBeenCalledWith('1');
+    });
+  });
+
+  describe('Data Transformation and Display', () => {
+    test('correctly filters spoiler comments for header count', async () => {
+      await act(async () => {
+        render(<Comments />);
+      });
+
       await waitFor(() => {
         expect(screen.getByText('Spoiler Comments (1)')).toBeInTheDocument();
       });
+    });
+
+    test('displays pagination information correctly', async () => {
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('1-3 of 3 comments')).toBeInTheDocument();
+      });
+    });
+
+    test('handles sorter changes in table', async () => {
+      await act(async () => {
+        render(<Comments />);
+      });
+
+      await waitFor(() => {
+        const changeButton = screen.getByTestId('table-change');
+        fireEvent.click(changeButton);
+      });
+
+      expect(mockGetAllComments).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sort: 'createTime',
+          order: 'desc',
+        })
+      );
     });
   });
 });

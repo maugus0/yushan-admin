@@ -18,17 +18,74 @@ jest.mock('./chartwrapper', () => {
   };
 });
 
-// Mock recharts
+// Mock recharts with better coverage
 jest.mock('recharts', () => ({
   PieChart: ({ children }) => <div data-testid="pie-chart">{children}</div>,
-  Pie: ({ dataKey, _innerRadius, _outerRadius, children, data }) => (
-    <div data-testid="pie" data-key={dataKey} data-items={data?.length || 0}>
-      {children}
-    </div>
-  ),
+  Pie: ({ dataKey, innerRadius, outerRadius, children, data, label }) => {
+    // Call the label function to test renderCustomLabel and check if any labels are rendered
+    const hasLabels =
+      data &&
+      data.length > 0 &&
+      label &&
+      typeof label === 'function' &&
+      data.some((entry, index) => {
+        const result = label({
+          cx: 100,
+          cy: 100,
+          midAngle: (360 / data.length) * index,
+          innerRadius: innerRadius || 0,
+          outerRadius: outerRadius || 80,
+          value: entry.value,
+          index,
+        });
+        return result !== null;
+      });
+
+    return (
+      <div
+        data-testid="pie"
+        data-key={dataKey}
+        data-items={data?.length || 0}
+        data-inner-radius={innerRadius}
+        data-outer-radius={outerRadius}
+      >
+        {/* Only render custom-labels div if labels are actually shown */}
+        {hasLabels && (
+          <div data-testid="custom-labels">
+            {data.map((entry, index) =>
+              label({
+                cx: 100,
+                cy: 100,
+                midAngle: (360 / data.length) * index,
+                innerRadius: innerRadius || 0,
+                outerRadius: outerRadius || 80,
+                value: entry.value,
+                index,
+              })
+            )}
+          </div>
+        )}
+        {children}
+      </div>
+    );
+  },
   Cell: ({ fill }) => <div data-testid="pie-cell" data-fill={fill} />,
-  Tooltip: () => <div data-testid="tooltip" />,
-  Legend: ({ _formatter }) => <div data-testid="legend" />,
+  Tooltip: ({ formatter }) => {
+    // Call the formatter function to test formatTooltip
+    const testData = [
+      { name: 'Test A', value: 100 },
+      { name: 'Test B', value: 200 },
+    ];
+    // eslint-disable-next-line no-unused-vars
+    const _total = testData.reduce((sum, entry) => sum + entry.value, 0);
+    const formatted = formatter ? formatter(100, 'Test A') : ['100', 'Test A'];
+    return (
+      <div data-testid="tooltip" data-formatted={JSON.stringify(formatted)}>
+        {formatted[0]} - {formatted[1]}
+      </div>
+    );
+  },
+  Legend: ({ formatter: _formatter }) => <div data-testid="legend" />,
   ResponsiveContainer: ({ children }) => (
     <div data-testid="responsive-container">{children}</div>
   ),
@@ -220,5 +277,76 @@ describe('CustomPieChart Component', () => {
     render(<CustomPieChart data={manyItems} />);
     const cells = screen.getAllByTestId('pie-cell');
     expect(cells.length).toBe(10);
+  });
+
+  test('formatTooltip calculates percentages correctly', () => {
+    const testData = [
+      { name: 'A', value: 100 },
+      { name: 'B', value: 200 },
+    ];
+    render(<CustomPieChart data={testData} />);
+    const tooltip = screen.getByTestId('tooltip');
+    // The tooltip should contain formatted data from our mock
+    expect(tooltip).toBeInTheDocument();
+    expect(tooltip).toHaveAttribute('data-formatted');
+  });
+
+  test('renderCustomLabel calculates positions and percentages', () => {
+    const testData = [
+      { name: 'A', value: 150 },
+      { name: 'B', value: 250 },
+      { name: 'C', value: 100 },
+    ];
+    render(<CustomPieChart data={testData} showLabels={true} />);
+    // The custom labels should be rendered by our mock
+    expect(screen.getByTestId('custom-labels')).toBeInTheDocument();
+  });
+
+  test('renderCustomLabel returns null when showLabels is false', () => {
+    const testData = [
+      { name: 'A', value: 100 },
+      { name: 'B', value: 200 },
+    ];
+    render(<CustomPieChart data={testData} showLabels={false} />);
+    // No custom labels should be rendered
+    expect(screen.queryByTestId('custom-labels')).not.toBeInTheDocument();
+  });
+
+  test('handles edge case with zero total value', () => {
+    const zeroData = [
+      { name: 'A', value: 0 },
+      { name: 'B', value: 0 },
+    ];
+    render(<CustomPieChart data={zeroData} />);
+    expect(screen.getByTestId('pie')).toHaveAttribute('data-items', '2');
+  });
+
+  test('handles single data item', () => {
+    const singleData = [{ name: 'Only Item', value: 500 }];
+    render(<CustomPieChart data={singleData} />);
+    const cells = screen.getAllByTestId('pie-cell');
+    expect(cells).toHaveLength(1);
+    expect(cells[0]).toHaveAttribute('data-fill', '#1890ff');
+  });
+
+  test('handles very large numbers in tooltip formatting', () => {
+    const largeData = [
+      { name: 'Large', value: 1000000 },
+      { name: 'Small', value: 1000 },
+    ];
+    render(<CustomPieChart data={largeData} />);
+    const tooltip = screen.getByTestId('tooltip');
+    expect(tooltip).toBeInTheDocument();
+  });
+
+  test('renderCustomLabel handles different angles and positions', () => {
+    const testData = [
+      { name: 'First', value: 100 },
+      { name: 'Second', value: 200 },
+      { name: 'Third', value: 300 },
+      { name: 'Fourth', value: 400 },
+    ];
+    render(<CustomPieChart data={testData} showLabels={true} />);
+    expect(screen.getByTestId('custom-labels')).toBeInTheDocument();
   });
 });

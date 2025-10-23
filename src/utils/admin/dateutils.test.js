@@ -19,6 +19,11 @@ import {
   getMonthName,
   isLeapYear,
   getDaysInMonth,
+  parseISODate,
+  toISOString,
+  getTimezoneOffset,
+  utcToLocal,
+  localToUTC,
 } from './dateutils';
 
 describe('Date Utilities', () => {
@@ -111,34 +116,48 @@ describe('Date Utilities', () => {
       expect(result.length > 0).toBe(true);
     });
 
-    test('returns "刚刚" (just now) for recent timestamp', () => {
+    test('returns "刚刚" (just now) for very recent timestamp', () => {
       const justNow = new Date(Date.now() - 100);
       const result = getRelativeTime(justNow);
-      expect(result).toContain('刚刚');
+      expect(result).toBe('刚刚');
     });
 
     test('returns minutes ago for past within hour', () => {
       const tenMinutesAgo = new Date(Date.now() - 10 * 60000);
       const result = getRelativeTime(tenMinutesAgo);
-      expect(result).toContain('分钟');
+      expect(result).toBe('10分钟前');
     });
 
     test('returns hours ago for past within day', () => {
       const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60000);
       const result = getRelativeTime(threeHoursAgo);
-      expect(result).toContain('小时');
+      expect(result).toBe('3小时前');
     });
 
     test('returns days ago for past within month', () => {
       const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60000);
       const result = getRelativeTime(fiveDaysAgo);
-      expect(result).toContain('天');
+      expect(result).toBe('5天前');
     });
 
     test('returns weeks ago for past within 2 months', () => {
       const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60000);
       const result = getRelativeTime(twoWeeksAgo);
-      expect(result).toContain('周');
+      expect(result).toBe('2周前');
+    });
+
+    test('returns months ago for past within year', () => {
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      const result = getRelativeTime(threeMonthsAgo);
+      expect(result).toBe('3个月前');
+    });
+
+    test('returns years ago for past over year', () => {
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+      const result = getRelativeTime(twoYearsAgo);
+      expect(result).toBe('2年前');
     });
 
     test('returns empty string for null', () => {
@@ -167,14 +186,68 @@ describe('Date Utilities', () => {
       expect(Array.isArray(range)).toBe(true);
     });
 
+    test('returns date range for last_week', () => {
+      const range = getDateRange('last_week');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
     test('returns date range for month', () => {
       const range = getDateRange('month');
       expect(Array.isArray(range)).toBe(true);
     });
 
+    test('returns date range for last_month', () => {
+      const range = getDateRange('last_month');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
+    test('returns date range for quarter', () => {
+      const range = getDateRange('quarter');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
+    test('returns date range for last_quarter', () => {
+      const range = getDateRange('last_quarter');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
     test('returns date range for year', () => {
       const range = getDateRange('year');
       expect(Array.isArray(range)).toBe(true);
+    });
+
+    test('returns date range for last_year', () => {
+      const range = getDateRange('last_year');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
+    test('returns date range for last_7_days', () => {
+      const range = getDateRange('last_7_days');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
+    test('returns date range for last_30_days', () => {
+      const range = getDateRange('last_30_days');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
+    test('returns date range for last_90_days', () => {
+      const range = getDateRange('last_90_days');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
+    });
+
+    test('returns today range for unknown period', () => {
+      const range = getDateRange('unknown');
+      expect(Array.isArray(range)).toBe(true);
+      expect(range).toHaveLength(2);
     });
   });
 
@@ -314,6 +387,124 @@ describe('Date Utilities', () => {
     test('getDaysInMonth handles leap year February', () => {
       expect(getDaysInMonth(2024, 1)).toBe(29);
       expect(getDaysInMonth(2023, 1)).toBe(28);
+    });
+  });
+
+  describe('ISO Date Functions', () => {
+    test('parseISODate parses valid ISO string', () => {
+      const isoString = '2024-01-15T10:30:45Z';
+      const result = parseISODate(isoString);
+      expect(result).toBeInstanceOf(Date);
+      expect(result.getFullYear()).toBe(2024);
+      expect(result.getMonth()).toBe(0); // January is 0
+      expect(result.getDate()).toBe(15);
+    });
+
+    test('parseISODate returns null for null input', () => {
+      const result = parseISODate(null);
+      expect(result).toBeNull();
+    });
+
+    test('parseISODate returns null for empty string', () => {
+      const result = parseISODate('');
+      expect(result).toBeNull();
+    });
+
+    test('parseISODate returns null for invalid string', () => {
+      const result = parseISODate('invalid-date-string');
+      expect(result).toBeNull();
+    });
+
+    test('toISOString converts date to ISO string', () => {
+      const date = new Date('2024-01-15T10:30:45Z');
+      const result = toISOString(date);
+      expect(typeof result).toBe('string');
+      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+    });
+
+    test('toISOString returns empty string for null', () => {
+      const result = toISOString(null);
+      expect(result).toBe('');
+    });
+
+    test('toISOString returns empty string for invalid date', () => {
+      const result = toISOString('invalid-date');
+      expect(result).toBe('');
+    });
+  });
+
+  describe('Timezone Functions', () => {
+    test('getTimezoneOffset returns number', () => {
+      const offset = getTimezoneOffset();
+      expect(typeof offset).toBe('number');
+    });
+
+    test('utcToLocal converts UTC to local time', () => {
+      const utcDate = new Date('2024-01-15T10:30:45Z');
+      const localDate = utcToLocal(utcDate);
+      expect(localDate).toBeInstanceOf(Date);
+    });
+
+    test('utcToLocal returns null for null input', () => {
+      const result = utcToLocal(null);
+      expect(result).toBeNull();
+    });
+
+    test('localToUTC converts local to UTC time', () => {
+      const localDate = new Date('2024-01-15T10:30:45');
+      const utcDate = localToUTC(localDate);
+      expect(utcDate).toBeInstanceOf(Date);
+    });
+
+    test('localToUTC returns null for null input', () => {
+      const result = localToUTC(null);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('Edge Cases and Error Handling', () => {
+    test('formatDate handles edge cases', () => {
+      expect(formatDate(undefined)).toBe('');
+      expect(formatDate('')).toBe('');
+      expect(formatDate(new Date('invalid'))).toBe('');
+    });
+
+    test('formatChineseDate handles edge cases', () => {
+      expect(formatChineseDate(undefined)).toBe('');
+      expect(formatChineseDate('')).toBe('');
+      expect(formatChineseDate(new Date('invalid'))).toBe('');
+    });
+
+    test('getRelativeTime handles edge cases', () => {
+      expect(getRelativeTime(undefined)).toBe('');
+      expect(getRelativeTime('')).toBe('');
+      expect(getRelativeTime(new Date('invalid'))).toBe('');
+    });
+
+    test('Date checking functions handle null/undefined', () => {
+      expect(isToday(null)).toBe(false);
+      expect(isYesterday(null)).toBe(false);
+      expect(isThisWeek(null)).toBe(false);
+      expect(isThisMonth(null)).toBe(false);
+      expect(isThisYear(null)).toBe(false);
+    });
+
+    test('getAge handles edge cases', () => {
+      expect(getAge(undefined)).toBe(0);
+      expect(getAge('')).toBe(0);
+      expect(getAge(new Date('invalid'))).toBe(0);
+    });
+
+    test('getWeekdayName handles edge cases', () => {
+      expect(getWeekdayName(null)).toBe('');
+      expect(getWeekdayName('')).toBe('');
+      expect(getWeekdayName(new Date('invalid'))).toBe('');
+    });
+
+    test('getMonthName handles edge cases', () => {
+      expect(getMonthName(null)).toBe('');
+      expect(getMonthName('')).toBe('');
+      expect(getMonthName(new Date('invalid'))).toBe('');
     });
   });
 });
