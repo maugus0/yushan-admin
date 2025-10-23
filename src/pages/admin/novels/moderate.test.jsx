@@ -1,4 +1,10 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import ModerateNovels from './moderate';
@@ -56,28 +62,19 @@ jest.mock('antd', () => ({
           <div key={col.key || col.dataIndex}>{col.title}</div>
         ))}
       </div>
-      <div data-testid="table-data">
+
+      <div data-testid="table-rows">
         {dataSource?.map((item) => (
-          <div key={item.id}>
-            <div data-testid="novel-title">{item.title}</div>
-            <div data-testid="novel-author">{item.authorUsername}</div>
-            <span
-              data-testid="status-badge"
-              data-status={item.status === 'PUBLISHED' ? 'published' : 'draft'}
-            ></span>
-            <span data-testid="rate" data-value={item.avgRating}></span>
-            <span data-testid="badge" data-color="gold">
-              Premium
-            </span>
-            <span data-testid="tag">{item.categoryName}</span>
-            <span>{item.chapterCnt} chapters</span>
-            <span>{item.viewCnt} views</span>
-            <span>{item.wordCnt} words</span>
-            <span>{item.voteCnt} votes</span>
-            <span>{item.reviewCnt} reviews</span>
-            <span>{item.yuanCnt} yuan</span>
-            {item.title}
-            {item.authorUsername}
+          <div data-testid={`row-${item.id}`} key={item.id}>
+            {columns?.map((col) => {
+              const key = col.key || col.dataIndex;
+              const value = col.dataIndex ? item[col.dataIndex] : undefined;
+              return (
+                <div data-testid={`cell-${key}`} key={key}>
+                  {col.render ? col.render(value, item) : value}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
@@ -144,9 +141,9 @@ jest.mock('antd', () => ({
       data-type={type}
       data-danger={danger}
       data-size={size}
-      data-loading={loading}
-      data-disabled={disabled}
-      data-block={block}
+      data-loading={loading ? 'true' : 'false'}
+      data-disabled={disabled ? 'true' : 'false'}
+      data-block={block ? 'true' : 'false'}
       key={key}
       onClick={onClick}
     >
@@ -587,5 +584,163 @@ describe('ModerateNovels Component', () => {
       const tags = screen.getAllByTestId('tag');
       expect(tags.length).toBeGreaterThan(0);
     });
+  });
+});
+
+describe('ModerateNovels actions coverage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetAllNovels.mockResolvedValue(mockNovelsData);
+    mockGetAllCategories.mockResolvedValue(mockCategoriesData);
+    mockHideNovel.mockResolvedValue({ message: 'Novel hidden successfully' });
+    mockUnhideNovel.mockResolvedValue({
+      message: 'Novel unhidden successfully',
+    });
+    mockArchiveNovel.mockResolvedValue({
+      message: 'Novel archived successfully',
+    });
+  });
+
+  test('hide/unhide/archive success calls services and shows success message', async () => {
+    render(
+      <TestWrapper>
+        <ModerateNovels />
+      </TestWrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-1')).toBeInTheDocument();
+    });
+
+    const row = screen.getByTestId('row-1');
+    const confirms = within(row).getAllByTestId('popconfirm-confirm');
+
+    // Hide
+    fireEvent.click(confirms[0]);
+    await waitFor(() => {
+      expect(mockHideNovel).toHaveBeenCalledWith('1');
+      expect(require('antd').message.success).toHaveBeenCalled();
+    });
+
+    // Unhide
+    fireEvent.click(confirms[1]);
+    await waitFor(() => {
+      expect(mockUnhideNovel).toHaveBeenCalledWith('1');
+      expect(require('antd').message.success).toHaveBeenCalled();
+    });
+
+    // Archive
+    fireEvent.click(confirms[2]);
+    await waitFor(() => {
+      expect(mockArchiveNovel).toHaveBeenCalledWith('1');
+      expect(require('antd').message.success).toHaveBeenCalled();
+    });
+  });
+
+  test('action loading state toggles during async operation', async () => {
+    let resolveHide;
+    mockHideNovel.mockReturnValue(new Promise((res) => (resolveHide = res)));
+
+    render(
+      <TestWrapper>
+        <ModerateNovels />
+      </TestWrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-1')).toBeInTheDocument();
+    });
+
+    const row = screen.getByTestId('row-1');
+    const confirms = within(row).getAllByTestId('popconfirm-confirm');
+
+    fireEvent.click(confirms[0]);
+
+    const actionsCell = within(row).getByTestId('cell-actions');
+    const buttons = within(actionsCell).getAllByTestId('button');
+    expect(buttons[0]).toHaveAttribute('data-loading', 'true');
+
+    resolveHide({ message: 'ok' });
+    await waitFor(() => {
+      expect(buttons[0]).toHaveAttribute('data-loading', 'false');
+    });
+  });
+
+  test('action failure shows error message', async () => {
+    mockHideNovel.mockRejectedValueOnce(new Error('fail hide'));
+    mockUnhideNovel.mockRejectedValueOnce(new Error('fail unhide'));
+    mockArchiveNovel.mockRejectedValueOnce(new Error('fail archive'));
+
+    render(
+      <TestWrapper>
+        <ModerateNovels />
+      </TestWrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-1')).toBeInTheDocument();
+    });
+
+    const row = screen.getByTestId('row-1');
+    const confirms = within(row).getAllByTestId('popconfirm-confirm');
+
+    fireEvent.click(confirms[0]);
+    fireEvent.click(confirms[1]);
+    fireEvent.click(confirms[2]);
+
+    await waitFor(() => {
+      const { message } = require('antd');
+      expect(message.error).toHaveBeenCalled();
+    });
+  });
+
+  test('archived row shows Archived tag and no action buttons', async () => {
+    mockGetAllNovels.mockResolvedValueOnce({
+      data: [
+        {
+          ...mockNovelsData.data[0],
+          id: '9',
+          status: 'ARCHIVED',
+        },
+      ],
+      page: 1,
+      total: 1,
+      pageSize: 10,
+    });
+
+    render(
+      <TestWrapper>
+        <ModerateNovels />
+      </TestWrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-9')).toBeInTheDocument();
+    });
+
+    const row = screen.getByTestId('row-9');
+    const actionsCell = within(row).getByTestId('cell-actions');
+
+    expect(within(actionsCell).getByText('Archived')).toBeInTheDocument();
+
+    expect(within(actionsCell).queryByTestId('popconfirm')).toBeNull();
+  });
+
+  test('novel cover fallback to default image when not data url', async () => {
+    render(
+      <TestWrapper>
+        <ModerateNovels />
+      </TestWrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-2')).toBeInTheDocument();
+    });
+
+    const infoCell = within(screen.getByTestId('row-2')).getByTestId(
+      'cell-title'
+    );
+    const img = within(infoCell).getByRole('img');
+    expect(img.getAttribute('src')).toBe('mock-novel-image.png');
   });
 });

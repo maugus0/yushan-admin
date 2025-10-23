@@ -245,4 +245,134 @@ describe('YuanStatistics Component', () => {
       });
     });
   });
+
+  describe('Header and Navigation', () => {
+    test('renders header, breadcrumbs, and navigates back when back button clicked', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+
+      renderYuanStatistics();
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+      });
+
+      // Header and breadcrumbs
+      expect(screen.getByTestId('page-header')).toBeInTheDocument();
+      expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
+
+      // Back button should exist and navigate
+      const backBtn = screen.getByTestId('back-button');
+      backBtn.click();
+      expect(mockNavigate).toHaveBeenCalledWith('/admin/yuan');
+    });
+  });
+
+  describe('Totals computation and rendering', () => {
+    test('computes Total Votes and Total Yuan from mixed fields across datasets', async () => {
+      const mockNovelData = {
+        success: true,
+        data: [
+          { novelId: 'n1', title: 'A', voteCnt: 10 },
+          { novelId: 'n2', title: 'B', votes: 5 },
+        ],
+      };
+      const mockAuthorData = {
+        success: true,
+        data: [
+          {
+            authorId: 'auth1',
+            username: 'X',
+            totalVoteCnt: 8,
+            currentBalance: 7,
+          },
+        ],
+      };
+      const mockUserData = {
+        success: true,
+        data: [{ userId: 'u1', username: 'Y', yuan: 3 }],
+      };
+
+      rankingService.getNovelRankings.mockResolvedValue(mockNovelData);
+      rankingService.getAuthorRankings.mockResolvedValue(mockAuthorData);
+      rankingService.getUserRankings.mockResolvedValue(mockUserData);
+
+      renderYuanStatistics();
+
+      await waitFor(() => {
+        // Totals: votes = 10 + 5 + 8 = 23, yuan = 0 (novels) + 7 (authors) + 3 (users) = 10
+        expect(screen.getByText('Total Votes')).toBeInTheDocument();
+        expect(screen.getByText('23')).toBeInTheDocument();
+        expect(screen.getByText('Total Yuan')).toBeInTheDocument();
+        expect(screen.getByText('10')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Mixed shapes and row keys', () => {
+    test('supports array and content shapes and sets stable row keys', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: [{ novelId: 'nx1', title: 'N' }],
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ authorId: 'ax1', username: 'A' }] },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: [{ userId: 'ux1', username: 'U' }],
+      });
+
+      renderYuanStatistics();
+
+      await waitFor(() => {
+        // Check rowKey mapping across three tables
+        const hasNovelRow = document.querySelector('tr[data-row-key="nx1"]');
+        const hasAuthorRow = document.querySelector('tr[data-row-key="ax1"]');
+        const hasUserRow = document.querySelector('tr[data-row-key="ux1"]');
+        expect(!!hasNovelRow).toBe(true);
+        expect(!!hasAuthorRow).toBe(true);
+        expect(!!hasUserRow).toBe(true);
+      });
+    });
+  });
+
+  describe('Tables and pagination', () => {
+    test('renders three ranking tables with pagination controls', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 1, title: 'T1', voteCnt: 1 }] },
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 2, username: 'A1', totalVoteCnt: 2 }] },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 3, username: 'U1', yuan: 3 }] },
+      });
+
+      renderYuanStatistics();
+
+      await waitFor(() => {
+        const tables = screen.getAllByRole('table');
+        expect(tables.length).toBeGreaterThanOrEqual(3);
+      });
+
+      // AntD pagination elements should exist
+      const paginations = document.querySelectorAll('.ant-pagination');
+      expect(paginations.length).toBeGreaterThanOrEqual(3);
+    });
+  });
 });

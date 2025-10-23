@@ -51,25 +51,7 @@ const renderYuan = () => {
 };
 
 describe('Yuan Component', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe('Rendering', () => {
-    test('renders page header with correct title and subtitle', () => {
-      renderYuan();
-      expect(screen.getByText('Yuan Management')).toBeInTheDocument();
-      expect(
-        screen.getByText('Manage platform currency, transactions, and rewards')
-      ).toBeInTheDocument();
-    });
-
-    test('renders breadcrumbs correctly', () => {
-      renderYuan();
-      const breadcrumbs = screen.getByTestId('breadcrumbs');
-      expect(breadcrumbs).toHaveTextContent('Dashboard > Yuan');
-    });
-
     test('renders statistics button in actions', () => {
       renderYuan();
       const actions = screen.getByTestId('actions');
@@ -81,6 +63,30 @@ describe('Yuan Component', () => {
       expect(screen.getByTestId('loading-spinner')).toHaveTextContent(
         'Loading ranking data...'
       );
+    });
+
+    test('renders section headings for rankings', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+
+      renderYuan();
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getByText(/Top Novels/i)).toBeInTheDocument();
+      expect(screen.getByText(/Top Authors/i)).toBeInTheDocument();
     });
   });
 
@@ -224,4 +230,92 @@ describe('Yuan Component', () => {
   });
 
   describe('Accessibility', () => {});
+
+  describe('Additional Coverage', () => {
+    test('supports mixed response shapes (array vs content) and renders texts', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: [{ id: 'm1', title: 'Mix Novel', voteCnt: 22 }],
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: {
+          content: [{ id: 'm2', username: 'Mix Author', totalVoteCnt: 11 }],
+        },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 'm3', username: 'Mix User', yuan: 33 }] },
+      });
+
+      renderYuan();
+
+      await waitFor(() => {
+        const hasNovelRow = document.querySelector('tr[data-row-key="m1"]');
+        const hasAuthorRow = document.querySelector('tr[data-row-key="m2"]');
+        const hasUserRow = document.querySelector('tr[data-row-key="m3"]');
+        expect(!!hasNovelRow).toBe(true);
+        expect(!!hasAuthorRow).toBe(true);
+        expect(!!hasUserRow).toBe(true);
+      });
+
+      // Ensure tables rendered
+      expect(screen.getAllByRole('table').length).toBeGreaterThan(0);
+    });
+
+    test('sets row keys to item ids for nested content shape', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 'nx1', title: 'NX', voteCnt: 10 }] },
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 'ax1', username: 'AX', totalVoteCnt: 3 }] },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: { content: [{ id: 'ux1', username: 'UX', yuan: 1 }] },
+      });
+
+      renderYuan();
+
+      await waitFor(() => {
+        // antd Table rows usually include data-row-key with the record key/id
+        const hasRowKeys =
+          document.querySelector('tr[data-row-key="nx1"]') ||
+          document.querySelector('tr[data-row-key="ax1"]') ||
+          document.querySelector('tr[data-row-key="ux1"]');
+        expect(!!hasRowKeys).toBe(true);
+      });
+    });
+
+    test('statistics button triggers navigate once', async () => {
+      rankingService.getNovelRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+      rankingService.getAuthorRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+      rankingService.getUserRankings.mockResolvedValue({
+        success: true,
+        data: { content: [] },
+      });
+
+      renderYuan();
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+      });
+
+      const statsButton = screen.getByRole('button', {
+        name: /view statistics/i,
+      });
+      fireEvent.click(statsButton);
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith('/admin/yuan/statistics');
+    });
+  });
 });

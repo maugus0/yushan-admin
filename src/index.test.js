@@ -1,5 +1,31 @@
 import React from 'react';
 
+// Mock react-dom/client to capture createRoot and render calls
+let mockRootRender;
+jest.mock('react-dom/client', () => {
+  return {
+    __esModule: true,
+    createRoot: jest.fn(() => {
+      mockRootRender = jest.fn();
+      return { render: mockRootRender };
+    }),
+  };
+});
+
+// Mock antd ConfigProvider as a functional component (no side effects)
+const mockedConfigProvider = (props) =>
+  React.createElement('config-provider', null, props.children);
+jest.mock('antd', () => ({
+  ConfigProvider: mockedConfigProvider,
+}));
+
+// Mock App to a simple component (avoid pulling the whole app)
+const MockApp = () => React.createElement('div', null, 'MockApp');
+jest.mock('./App', () => ({
+  __esModule: true,
+  default: MockApp,
+}));
+
 describe('index.js', () => {
   test('React is available and importable', () => {
     expect(React).toBeDefined();

@@ -1,6 +1,17 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import Readers from './readers';
 import { BrowserRouter } from 'react-router-dom';
+
+// Spy antd.message to assert info calls from bulk actions
+jest.mock('antd', () => ({
+  ...jest.requireActual('antd'),
+  message: {
+    success: jest.fn(),
+    error: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn(),
+  },
+}));
 
 jest.mock('../../../components/admin/common/pageheader', () => {
   const MockPageHeader = (props) => (
@@ -18,20 +29,76 @@ jest.mock('../../../components/admin/common/breadcrumbs', () => {
   MockBreadcrumbs.displayName = 'MockBreadcrumbs';
   return MockBreadcrumbs;
 });
+// Interactive DataTable mock: shows items count, exposes pagination current,
+// and provides triggers to call onChange and onBulkAction
 jest.mock('../../../components/admin/tables/datatable', () => {
-  const MockDataTable = (props) => (
-    <div
-      data-testid="data-table"
-      data-datasource={JSON.stringify(props.dataSource)}
-    >
-      {props.dataSource?.length || 0} items
-    </div>
-  );
+  const MockDataTable = (props) => {
+    // Expose columns for advanced assertions in tests
+    globalThis.__ReadersColumns = props.columns;
+    return (
+      <div
+        data-testid="data-table"
+        data-datasource={JSON.stringify(props.dataSource)}
+        data-current={props.pagination?.current ?? ''}
+      >
+        {props.dataSource?.length || 0} items
+        <div data-testid="col-keys">
+          {(props.columns || []).map((c) => c.key || c.dataIndex).join(',')}
+        </div>
+        <button
+          data-testid="trigger-table-change"
+          onClick={() =>
+            props.onChange &&
+            props.onChange({ current: 2, pageSize: 10 }, {}, {})
+          }
+        >
+          change
+        </button>
+        <button
+          data-testid="trigger-bulk-export"
+          onClick={() =>
+            props.onBulkAction && props.onBulkAction('export', [], [])
+          }
+        >
+          bulk-export
+        </button>
+      </div>
+    );
+  };
   MockDataTable.displayName = 'MockDataTable';
   return MockDataTable;
 });
+// Interactive TableFilters mock: provides buttons to apply and clear filters
 jest.mock('../../../components/admin/tables/tablefilters', () => {
-  const MockTableFilters = () => <div data-testid="table-filters"></div>;
+  const MockTableFilters = ({ onFiltersChange, onReset }) => (
+    <div data-testid="table-filters">
+      <button
+        data-testid="apply-search-reader1"
+        onClick={() =>
+          onFiltersChange && onFiltersChange({ search: 'reader1' })
+        }
+      >
+        search-r1
+      </button>
+      <button
+        data-testid="apply-status-suspended"
+        onClick={() =>
+          onFiltersChange && onFiltersChange({ status: 'suspended' })
+        }
+      >
+        status-suspended
+      </button>
+      <button
+        data-testid="clear-filters"
+        onClick={() => {
+          onReset && onReset();
+          onFiltersChange && onFiltersChange({});
+        }}
+      >
+        clear
+      </button>
+    </div>
+  );
   MockTableFilters.displayName = 'MockTableFilters';
   return MockTableFilters;
 });
@@ -50,6 +117,7 @@ jest.mock('../../../services/admin/userservice', () => ({
 }));
 
 import { userService } from '../../../services/admin/userservice';
+import { message } from 'antd';
 
 describe('Readers page', () => {
   const mockReaders = [
@@ -116,67 +184,82 @@ describe('Readers page', () => {
     });
   });
 
-  test('handles search filter', async () => {
+  test('applies search filter and updates items count', async () => {
     render(
       <BrowserRouter>
         <Readers />
       </BrowserRouter>
     );
-
+    await waitFor(() => screen.getByTestId('table-filters'));
+    fireEvent.click(screen.getByTestId('apply-search-reader1'));
     await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      expect(screen.getByTestId('data-table')).toHaveTextContent('1 items');
     });
-
-    // Simulate filter change for search
-    const tableFilters = screen.getByTestId('table-filters');
-
-    // Since we mocked it, we can't directly call the function, but we can verify the component renders
-    expect(tableFilters).toBeInTheDocument();
   });
 
-  test('handles status filter', async () => {
+  test('applies status filter and updates items count', async () => {
     render(
       <BrowserRouter>
         <Readers />
       </BrowserRouter>
     );
-
+    await waitFor(() => screen.getByTestId('table-filters'));
+    fireEvent.click(screen.getByTestId('apply-status-suspended'));
     await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      expect(screen.getByTestId('data-table')).toHaveTextContent('1 items');
     });
-
-    // Status filtering is handled by TableFilters component, verify component renders
-    expect(screen.getByTestId('table-filters')).toBeInTheDocument();
   });
 
-  test('handles table pagination change', async () => {
+  test('clears filters and restores items count', async () => {
     render(
       <BrowserRouter>
         <Readers />
       </BrowserRouter>
     );
-
+    await waitFor(() => screen.getByTestId('table-filters'));
+    fireEvent.click(screen.getByTestId('apply-status-suspended'));
     await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      expect(screen.getByTestId('data-table')).toHaveTextContent('1 items');
     });
-
-    // Table change is handled internally, verify component renders
-    expect(screen.getByTestId('data-table')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('clear-filters'));
+    await waitFor(() => {
+      expect(screen.getByTestId('data-table')).toHaveTextContent('2 items');
+    });
   });
 
-  test('handles bulk actions', async () => {
+  test('handles table pagination change (updates current page)', async () => {
     render(
       <BrowserRouter>
         <Readers />
       </BrowserRouter>
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
-    });
+    await waitFor(() => screen.getByTestId('data-table'));
+    fireEvent.click(screen.getByTestId('trigger-table-change'));
 
-    // Bulk actions are handled by DataTable component, verify component renders
-    expect(screen.getByTestId('data-table')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('data-table')).toHaveAttribute(
+        'data-current',
+        '2'
+      );
+    });
+  });
+
+  test('bulk export action triggers info message', async () => {
+    render(
+      <BrowserRouter>
+        <Readers />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => screen.getByTestId('data-table'));
+    fireEvent.click(screen.getByTestId('trigger-bulk-export'));
+
+    await waitFor(() => {
+      expect(message.info).toHaveBeenCalledWith(
+        'Export functionality will be implemented'
+      );
+    });
   });
 
   test('renders breadcrumbs correctly', async () => {
@@ -203,21 +286,5 @@ describe('Readers page', () => {
       const header = screen.getByTestId('page-header');
       expect(header).toHaveTextContent('Readers');
     });
-  });
-
-  test('handles bulk actions correctly', async () => {
-    render(
-      <BrowserRouter>
-        <Readers />
-      </BrowserRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
-    });
-
-    // The bulk action handler is passed to DataTable, so we can't directly test it
-    // But we can verify the component renders with bulk action props
-    expect(screen.getByTestId('data-table')).toBeInTheDocument();
   });
 });
