@@ -34,7 +34,7 @@ const { confirm } = Modal;
 const { useBreakpoint } = Grid;
 
 const Comments = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -47,7 +47,7 @@ const Comments = () => {
   const [sortBy, setSortBy] = useState('createTime');
   const [sortOrder, setSortOrder] = useState('desc');
   const [statLoading, setStatLoading] = useState(false);
-  const screens = useBreakpoint();
+  const screens = useBreakpoint() || { md: true };
 
   // Fetch data from API
   const fetchData = useCallback(

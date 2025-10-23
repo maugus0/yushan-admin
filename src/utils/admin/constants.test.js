@@ -217,6 +217,78 @@ describe('Constants Module', () => {
       expect(commonFilters.status.type).toBe('select');
       expect(commonFilters.dateRange.type).toBe('daterange');
     });
+
+    test('search filter configuration', () => {
+      expect(commonFilters.search.label).toBe('Search');
+      expect(commonFilters.search.placeholder).toBe('Enter keywords to search');
+      expect(commonFilters.search.quickFilter).toBe(true);
+      expect(commonFilters.search.span).toBe(8);
+    });
+
+    test('status filter options', () => {
+      expect(commonFilters.status.options).toEqual(
+        expect.arrayContaining([
+          { label: 'All', value: '' },
+          { label: 'Active', value: STATUS.ACTIVE },
+          { label: 'Inactive', value: STATUS.INACTIVE },
+          { label: 'Pending', value: STATUS.PENDING },
+          { label: 'Approved', value: STATUS.APPROVED },
+          { label: 'Rejected', value: STATUS.REJECTED },
+          { label: 'Suspended', value: STATUS.SUSPENDED },
+          { label: 'Banned', value: STATUS.BANNED },
+        ])
+      );
+    });
+
+    test('role filter options', () => {
+      expect(commonFilters.role.options).toEqual(
+        expect.arrayContaining([
+          { label: 'All', value: '' },
+          { label: 'Super Admin', value: USER_ROLES.SUPER_ADMIN },
+          { label: 'Admin', value: USER_ROLES.ADMIN },
+          { label: 'Moderator', value: USER_ROLES.MODERATOR },
+          { label: 'Editor', value: USER_ROLES.EDITOR },
+          { label: 'Author', value: USER_ROLES.AUTHOR },
+          { label: 'User', value: USER_ROLES.USER },
+        ])
+      );
+    });
+
+    test('genre filter options', () => {
+      expect(commonFilters.genre.options).toEqual(
+        expect.arrayContaining([
+          { label: 'All', value: '' },
+          { label: 'Fantasy', value: NOVEL_GENRES.FANTASY },
+          { label: 'Romance', value: NOVEL_GENRES.ROMANCE },
+          { label: 'Mystery', value: NOVEL_GENRES.MYSTERY },
+          { label: 'Thriller', value: NOVEL_GENRES.THRILLER },
+          { label: 'Horror', value: NOVEL_GENRES.HORROR },
+          { label: 'Sci-Fi', value: NOVEL_GENRES.SCIFI },
+          { label: 'Historical', value: NOVEL_GENRES.HISTORICAL },
+          { label: 'Contemporary', value: NOVEL_GENRES.CONTEMPORARY },
+          { label: 'Urban', value: NOVEL_GENRES.URBAN },
+          { label: 'Martial Arts', value: NOVEL_GENRES.MARTIAL_ARTS },
+          { label: 'Cultivation', value: NOVEL_GENRES.CULTIVATION },
+          { label: 'System', value: NOVEL_GENRES.SYSTEM },
+          { label: 'Reincarnation', value: NOVEL_GENRES.REINCARNATION },
+          { label: 'Transmigration', value: NOVEL_GENRES.TRANSMIGRATION },
+        ])
+      );
+    });
+
+    test('priority filter options', () => {
+      expect(commonFilters.priority.options).toEqual(
+        expect.arrayContaining([
+          { label: 'All', value: '' },
+          { label: 'Low', value: PRIORITY_LEVELS.LOW },
+          { label: 'Normal', value: PRIORITY_LEVELS.NORMAL },
+          { label: 'Medium', value: PRIORITY_LEVELS.MEDIUM },
+          { label: 'High', value: PRIORITY_LEVELS.HIGH },
+          { label: 'Urgent', value: PRIORITY_LEVELS.URGENT },
+          { label: 'Critical', value: PRIORITY_LEVELS.CRITICAL },
+        ])
+      );
+    });
   });
 
   describe('fieldTypes', () => {
@@ -230,6 +302,222 @@ describe('Constants Module', () => {
       expect(s.type).toBe('select');
       expect(s.options[0].value).toBe('a');
     });
+
+    test('text field type', () => {
+      const field = fieldTypes.text('name', 'Full Name', {
+        required: true,
+        placeholder: 'Enter name',
+      });
+      expect(field).toEqual({
+        type: 'text',
+        name: 'name',
+        label: 'Full Name',
+        required: true,
+        placeholder: 'Enter name',
+      });
+    });
+
+    test('textarea field type', () => {
+      const field = fieldTypes.textarea('description', 'Description', {
+        rows: 4,
+      });
+      expect(field).toEqual({
+        type: 'textarea',
+        name: 'description',
+        label: 'Description',
+        rows: 4,
+      });
+    });
+
+    test('select field type', () => {
+      const options = [{ label: 'Option 1', value: '1' }];
+      const field = fieldTypes.select('category', 'Category', options, {
+        multiple: true,
+      });
+      expect(field).toEqual({
+        type: 'select',
+        name: 'category',
+        label: 'Category',
+        options,
+        multiple: true,
+      });
+    });
+
+    test('number field type', () => {
+      const field = fieldTypes.number('age', 'Age', { min: 0, max: 120 });
+      expect(field).toEqual({
+        type: 'number',
+        name: 'age',
+        label: 'Age',
+        min: 0,
+        max: 120,
+      });
+    });
+
+    test('date field type', () => {
+      const field = fieldTypes.date('birthdate', 'Birth Date', {
+        format: 'YYYY-MM-DD',
+      });
+      expect(field).toEqual({
+        type: 'date',
+        name: 'birthdate',
+        label: 'Birth Date',
+        format: 'YYYY-MM-DD',
+      });
+    });
+
+    test('daterange field type', () => {
+      const field = fieldTypes.daterange('period', 'Time Period', {
+        showTime: true,
+      });
+      expect(field).toEqual({
+        type: 'daterange',
+        name: 'period',
+        label: 'Time Period',
+        showTime: true,
+      });
+    });
+
+    test('checkbox field type', () => {
+      const field = fieldTypes.checkbox('agree', 'I agree', {
+        defaultChecked: false,
+      });
+      expect(field).toEqual({
+        type: 'checkbox',
+        name: 'agree',
+        label: 'I agree',
+        defaultChecked: false,
+      });
+    });
+
+    test('radio field type', () => {
+      const radioOptions = [
+        { label: 'Yes', value: 'yes' },
+        { label: 'No', value: 'no' },
+      ];
+      const field = fieldTypes.radio('choice', 'Choose', radioOptions, {
+        buttonStyle: 'solid',
+      });
+      expect(field).toEqual({
+        type: 'radio',
+        name: 'choice',
+        label: 'Choose',
+        options: radioOptions,
+        buttonStyle: 'solid',
+      });
+    });
+
+    test('switch field type', () => {
+      const field = fieldTypes.switch('enabled', 'Enabled', {
+        defaultChecked: true,
+      });
+      expect(field).toEqual({
+        type: 'switch',
+        name: 'enabled',
+        label: 'Enabled',
+        defaultChecked: true,
+      });
+    });
+
+    test('upload field type', () => {
+      const field = fieldTypes.upload('avatar', 'Avatar', {
+        accept: 'image/*',
+        maxCount: 1,
+      });
+      expect(field).toEqual({
+        type: 'upload',
+        name: 'avatar',
+        label: 'Avatar',
+        accept: 'image/*',
+        maxCount: 1,
+      });
+    });
+
+    test('password field type', () => {
+      const field = fieldTypes.password('password', 'Password', {
+        minLength: 8,
+      });
+      expect(field).toEqual({
+        type: 'password',
+        name: 'password',
+        label: 'Password',
+        minLength: 8,
+      });
+    });
+
+    test('email field type', () => {
+      const field = fieldTypes.email('email', 'Email Address', {
+        required: true,
+      });
+      expect(field).toEqual({
+        type: 'email',
+        name: 'email',
+        label: 'Email Address',
+        required: true,
+      });
+    });
+
+    test('url field type', () => {
+      const field = fieldTypes.url('website', 'Website', {
+        placeholder: 'https://',
+      });
+      expect(field).toEqual({
+        type: 'url',
+        name: 'website',
+        label: 'Website',
+        placeholder: 'https://',
+      });
+    });
+
+    test('tags field type', () => {
+      const field = fieldTypes.tags('tags', 'Tags', { maxTagCount: 5 });
+      expect(field).toEqual({
+        type: 'tags',
+        name: 'tags',
+        label: 'Tags',
+        maxTagCount: 5,
+      });
+    });
+
+    test('rating field type', () => {
+      const field = fieldTypes.rating('rating', 'Rating', {
+        count: 5,
+        allowHalf: true,
+      });
+      expect(field).toEqual({
+        type: 'rating',
+        name: 'rating',
+        label: 'Rating',
+        count: 5,
+        allowHalf: true,
+      });
+    });
+
+    test('slider field type', () => {
+      const field = fieldTypes.slider('volume', 'Volume', {
+        min: 0,
+        max: 100,
+        step: 10,
+      });
+      expect(field).toEqual({
+        type: 'slider',
+        name: 'volume',
+        label: 'Volume',
+        min: 0,
+        max: 100,
+        step: 10,
+      });
+    });
+
+    test('color field type', () => {
+      const field = fieldTypes.color('color', 'Color', { showText: true });
+      expect(field).toEqual({
+        type: 'color',
+        name: 'color',
+        label: 'Color',
+        showText: true,
+      });
+    });
   });
 
   describe('validationRules', () => {
@@ -237,6 +525,78 @@ describe('Constants Module', () => {
       expect(validationRules.required.required).toBe(true);
       expect(validationRules.email.type).toBe('email');
       expect(validationRules.password.min).toBeGreaterThan(0);
+    });
+
+    test('required validation rule', () => {
+      expect(validationRules.required).toEqual({
+        required: true,
+        message: 'This field is required',
+      });
+    });
+
+    test('email validation rule', () => {
+      expect(validationRules.email).toEqual({
+        type: 'email',
+        message: 'Please enter a valid email address',
+      });
+    });
+
+    test('phone validation rule', () => {
+      expect(validationRules.phone.pattern).toBeInstanceOf(RegExp);
+      expect(validationRules.phone.message).toBe(
+        'Please enter a valid phone number'
+      );
+    });
+
+    test('password validation rule', () => {
+      expect(validationRules.password.min).toBe(8);
+      expect(validationRules.password.message).toBe(
+        'Password must be at least 8 characters'
+      );
+    });
+
+    test('username validation rule', () => {
+      expect(validationRules.username.pattern).toBeInstanceOf(RegExp);
+      expect(validationRules.username.message).toContain(
+        'Username must be 3-20 characters'
+      );
+    });
+
+    test('positiveNumber validation rule', () => {
+      expect(validationRules.positiveNumber.type).toBe('number');
+      expect(validationRules.positiveNumber.min).toBe(0);
+      expect(validationRules.positiveNumber.message).toBe(
+        'Please enter a number greater than or equal to 0'
+      );
+    });
+
+    test('integer validation rule', () => {
+      expect(validationRules.integer.type).toBe('integer');
+      expect(validationRules.integer.message).toBe('Please enter an integer');
+    });
+
+    test('url validation rule', () => {
+      expect(validationRules.url.type).toBe('url');
+      expect(validationRules.url.message).toBe('Please enter a valid URL');
+    });
+
+    test('maxLength validation rule factory', () => {
+      const rule = validationRules.maxLength(100);
+      expect(rule.max).toBe(100);
+      expect(rule.message).toBe('Maximum 100 characters');
+    });
+
+    test('minLength validation rule factory', () => {
+      const rule = validationRules.minLength(5);
+      expect(rule.min).toBe(5);
+      expect(rule.message).toBe('Minimum 5 characters');
+    });
+
+    test('range validation rule factory', () => {
+      const rule = validationRules.range(5, 100);
+      expect(rule.min).toBe(5);
+      expect(rule.max).toBe(100);
+      expect(rule.message).toBe('Length must be between 5-100 characters');
     });
   });
 
@@ -257,6 +617,72 @@ describe('Constants Module', () => {
       expect(SEARCH_OPERATORS.CONTAINS).toBe('contains');
       expect(SEARCH_OPERATORS.STARTS_WITH).toBe('starts_with');
       expect(SEARCH_OPERATORS.BETWEEN).toBe('between');
+    });
+
+    test('comparison operators', () => {
+      expect(SEARCH_OPERATORS.EQUALS).toBe('eq');
+      expect(SEARCH_OPERATORS.NOT_EQUALS).toBe('ne');
+      expect(SEARCH_OPERATORS.GREATER_THAN).toBe('gt');
+      expect(SEARCH_OPERATORS.GREATER_THAN_OR_EQUAL).toBe('gte');
+      expect(SEARCH_OPERATORS.LESS_THAN).toBe('lt');
+      expect(SEARCH_OPERATORS.LESS_THAN_OR_EQUAL).toBe('lte');
+    });
+
+    test('array and null operators', () => {
+      expect(SEARCH_OPERATORS.IN).toBe('in');
+      expect(SEARCH_OPERATORS.NOT_IN).toBe('not_in');
+      expect(SEARCH_OPERATORS.IS_NULL).toBe('is_null');
+      expect(SEARCH_OPERATORS.IS_NOT_NULL).toBe('is_not_null');
+    });
+  });
+
+  describe('CHART_COLORS', () => {
+    test('primary colors array', () => {
+      expect(CHART_COLORS.PRIMARY).toBeInstanceOf(Array);
+      expect(CHART_COLORS.PRIMARY.length).toBeGreaterThan(0);
+      expect(CHART_COLORS.PRIMARY[0]).toMatch(/^#/);
+    });
+
+    test('secondary colors array', () => {
+      expect(CHART_COLORS.SECONDARY).toBeInstanceOf(Array);
+      expect(CHART_COLORS.SECONDARY.length).toBeGreaterThan(0);
+    });
+
+    test('gradient colors array', () => {
+      expect(CHART_COLORS.GRADIENT).toBeInstanceOf(Array);
+      expect(CHART_COLORS.GRADIENT.length).toBeGreaterThan(0);
+      expect(CHART_COLORS.GRADIENT[0]).toMatch(/linear-gradient/);
+    });
+  });
+
+  describe('ANIMATION and Z_INDEX', () => {
+    test('animation durations', () => {
+      expect(ANIMATION.FAST).toBe(150);
+      expect(ANIMATION.NORMAL).toBe(300);
+      expect(ANIMATION.SLOW).toBe(500);
+      expect(ANIMATION.PAGE_TRANSITION).toBe(200);
+      expect(ANIMATION.MODAL_TRANSITION).toBe(300);
+    });
+
+    test('z-index layers', () => {
+      expect(Z_INDEX.DROPDOWN).toBe(1050);
+      expect(Z_INDEX.MODAL_BACKDROP).toBe(1040);
+      expect(Z_INDEX.MODAL).toBe(1050);
+      expect(Z_INDEX.POPOVER).toBe(1060);
+      expect(Z_INDEX.TOOLTIP).toBe(1070);
+      expect(Z_INDEX.NOTIFICATION).toBe(1080);
+      expect(Z_INDEX.LOADING).toBe(9999);
+    });
+  });
+
+  describe('BREAKPOINTS', () => {
+    test('responsive breakpoints', () => {
+      expect(BREAKPOINTS.XS).toBe(480);
+      expect(BREAKPOINTS.SM).toBe(576);
+      expect(BREAKPOINTS.MD).toBe(768);
+      expect(BREAKPOINTS.LG).toBe(992);
+      expect(BREAKPOINTS.XL).toBe(1200);
+      expect(BREAKPOINTS.XXL).toBe(1600);
     });
   });
 

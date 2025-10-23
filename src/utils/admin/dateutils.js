@@ -358,6 +358,8 @@ export const getAge = (birthdate) => {
   if (!birthdate) return 0;
 
   const birthdateObj = new Date(birthdate);
+  if (isNaN(birthdateObj.getTime())) return 0;
+
   const today = new Date();
 
   let age = today.getFullYear() - birthdateObj.getFullYear();
@@ -409,6 +411,8 @@ export const getWeekdayName = (date, short = false) => {
   if (!date) return '';
 
   const dateObj = new Date(date);
+  if (isNaN(dateObj.getTime())) return '';
+
   const weekdays = short
     ? ['日', '一', '二', '三', '四', '五', '六']
     : ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -426,6 +430,8 @@ export const getMonthName = (date, short = false) => {
   if (!date) return '';
 
   const dateObj = new Date(date);
+  if (isNaN(dateObj.getTime())) return '';
+
   const months = short
     ? [
         '1月',
@@ -487,7 +493,13 @@ export const parseISODate = (isoString) => {
   if (!isoString) return null;
 
   try {
-    return new Date(isoString);
+    const date = new Date(isoString);
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.error('Error parsing ISO date: Invalid date string');
+      return null;
+    }
+    return date;
   } catch (error) {
     console.error('Error parsing ISO date:', error);
     return null;
@@ -504,6 +516,10 @@ export const toISOString = (date) => {
 
   try {
     const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      console.error('Error converting to ISO string: Invalid date');
+      return '';
+    }
     return dateObj.toISOString();
   } catch (error) {
     console.error('Error converting to ISO string:', error);
