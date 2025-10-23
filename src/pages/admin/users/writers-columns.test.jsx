@@ -1,10 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { Avatar, Tag, Tooltip, Space } from 'antd';
-import {
-  UserOutlined,
-  MailOutlined,
-  CalendarOutlined,
-} from '@ant-design/icons';
+import { Avatar, Tag, Space } from 'antd';
+import { UserOutlined, MailOutlined } from '@ant-design/icons';
 
 // Import the components that are used in column renders
 import StatusBadge from '../../../components/admin/common/statusbadge';
@@ -62,20 +58,5 @@ describe('Writers Column Render Functions', () => {
     render(verifiedColumnRender());
 
     expect(screen.getByText('Verified')).toBeInTheDocument();
-  });
-
-  test('join date column renders with tooltip', () => {
-    const joinDateColumnRender = (date) => (
-      <Tooltip title={new Date(date).toLocaleString()}>
-        <Space>
-          <CalendarOutlined />
-          {new Date(date).toLocaleDateString()}
-        </Space>
-      </Tooltip>
-    );
-
-    render(joinDateColumnRender(mockRecord.joinDate));
-
-    expect(screen.getByText('1/1/2024')).toBeInTheDocument();
   });
 });

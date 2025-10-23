@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, useLocation } from 'react-router-dom';
 import Categories from './index';
 import { categoryService } from '../../../services/admin/categoryservice';
 
@@ -523,6 +523,64 @@ describe('Categories Page', () => {
         expect(hexColors.length).toBeGreaterThan(0);
         expect(hexColors).toContain('#eb2f96'); // Color for ID 1 (1 % 10 = 1)
         expect(hexColors).toContain('#fa8c16'); // Color for ID 2 (2 % 10 = 2)
+      });
+    });
+  });
+
+  describe('Custom actions and navigation', () => {
+    test('custom action "View Novels" navigates with category query', async () => {
+      const LocationDisplay = () => {
+        const loc = useLocation();
+        return (
+          <div data-testid="location-display">
+            {loc.pathname}
+            {loc.search}
+          </div>
+        );
+      };
+
+      render(
+        <MemoryRouter initialEntries={['/admin/categories']}>
+          <Categories />
+          <LocationDisplay />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Fantasy')).toBeInTheDocument();
+      });
+
+      const viewNovelsBtn = screen.getByTestId('novels-1');
+      fireEvent.click(viewNovelsBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('location-display').textContent).toBe(
+          '/admin/novels?category=1&categoryName=Fantasy'
+        );
+      });
+    });
+
+    test('toggle status failure shows error message', async () => {
+      categoryService.toggleCategoryStatus.mockRejectedValueOnce(
+        new Error('toggle failed')
+      );
+
+      render(
+        <BrowserRouter>
+          <Categories />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('toggle-1')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('toggle-1'));
+
+      await waitFor(() => {
+        expect(require('antd').message.error).toHaveBeenCalledWith(
+          'Failed to toggle category status: toggle failed'
+        );
       });
     });
   });
