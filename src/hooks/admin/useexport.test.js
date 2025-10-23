@@ -13,9 +13,7 @@ describe('useExport Hook (end-to-end)', () => {
     // Mock URL object methods
     origCreateObjectURL = URL.createObjectURL;
     origRevokeObjectURL = URL.revokeObjectURL;
-    // @ts-ignore
     URL.createObjectURL = jest.fn(() => 'blob:mock-url');
-    // @ts-ignore
     URL.revokeObjectURL = jest.fn();
 
     // Mock document.createElement for <a>
