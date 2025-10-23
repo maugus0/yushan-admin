@@ -28,9 +28,6 @@ jest.mock('antd', () => {
 const mockOnSuccess = jest.fn();
 const mockOnCancel = jest.fn();
 
-// Increase timeout for async-heavy form flows
-jest.setTimeout(20000);
-
 describe('CategoryForm (enhanced)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -118,7 +115,7 @@ describe('CategoryForm (enhanced)', () => {
           }),
         { timeout: 10000 }
       );
-    });
+    }, 15000);
 
     test('shows error when create fails', async () => {
       const user = userEvent.setup();
@@ -151,7 +148,7 @@ describe('CategoryForm (enhanced)', () => {
         );
         expect(mockOnSuccess).not.toHaveBeenCalled();
       });
-    });
+    }, 10000);
 
     test('shows validation messages for empty and too short fields', async () => {
       const user = userEvent.setup();
@@ -194,7 +191,7 @@ describe('CategoryForm (enhanced)', () => {
           screen.getByText('Description must be at least 10 characters')
         ).toBeInTheDocument();
       });
-    });
+    }, 10000);
 
     test('cancel resets form and calls onCancel', async () => {
       const user = userEvent.setup();
@@ -212,7 +209,7 @@ describe('CategoryForm (enhanced)', () => {
       await user.click(screen.getByText('Cancel'));
 
       expect(mockOnCancel).toHaveBeenCalled();
-    });
+    }, 10000);
 
     test('submit button shows loading while pending', async () => {
       const user = userEvent.setup();
@@ -251,7 +248,7 @@ describe('CategoryForm (enhanced)', () => {
       await waitFor(() => {
         expect(mockOnSuccess).toHaveBeenCalled();
       });
-    });
+    }, 10000);
   });
 
   describe('Edit Mode', () => {
@@ -315,7 +312,7 @@ describe('CategoryForm (enhanced)', () => {
 
       expect(nameInput).toBeInTheDocument();
       expect(descInput).toBeInTheDocument();
-    });
+    }, 10000);
 
     test('error on load category shows error message and triggers onCancel', async () => {
       categoryService.getCategoryById.mockRejectedValue(
@@ -396,7 +393,7 @@ describe('CategoryForm (enhanced)', () => {
           name: 'New Name',
         });
       });
-    });
+    }, 15000);
 
     test('update failure shows error message', async () => {
       const user = userEvent.setup();
@@ -440,6 +437,6 @@ describe('CategoryForm (enhanced)', () => {
         );
         expect(mockOnSuccess).not.toHaveBeenCalled();
       });
-    });
+    }, 10000);
   });
 });
